@@ -7,25 +7,25 @@ descriptions from source files written in reStructuredText.
 Development and testing
 -----------------------
 
-This section how to install latest development version directly from source
-code.
+This section shows how to install latest development version directly from
+source code.
 
-First of all, clone git repository:
+First of all, clone git repository::
 
     git clone https://github.com/marbu/pylatest.git
     cd pylatest
 
-Create new virtualenv environment and activate it:
+Create new virtualenv environment and activate it::
 
     virtualenv .env
     source .env/bin/activate
 
-And finally, install pylatest:
+And finally, install pylatest::
 
     python setup.py install
 
 This way, you will have pylatest installed in local virtualenv without messing
-with global system or user environment:
+with global system or user environment::
 
     $ cd /tmp
     $ which python
