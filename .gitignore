@@ -1,5 +1,9 @@
 *.py[oc]
 .*.swp
 *~
+*.egg-info
+.env
+build
+dist
 tmp
 doc
