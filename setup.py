@@ -36,5 +36,7 @@ setup(
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         ],
-    packages=find_packages(exclude=['doc'])
+    packages=find_packages(exclude=['doc']),
+    install_requires=['docutils'],
+    scripts=['bin/pylahello.py']
     )

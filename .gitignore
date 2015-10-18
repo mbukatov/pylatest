@@ -6,4 +6,4 @@
 build
 dist
 tmp
-doc
+examples/*.html
