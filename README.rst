@@ -4,6 +4,9 @@ Pylatest
 Set of tools (docutils wrappers, custom rst directives) generating testcase
 descriptions from source files written in reStructuredText.
 
+This project is in early stage of development.
+There is not much to be seen so far ...
+
 Development and testing
 -----------------------
 
@@ -30,6 +33,8 @@ with global system or user environment::
     $ cd /tmp
     $ which python
     ~/tvorba/pylatest/.env/bin/python
+    $ which pylahello.py 
+    ~/tvorba/pylatest/.env/bin/pylahello.py
     $ python
     Python 2.7.10 (default, Sep 24 2015, 17:49:29) 
     [GCC 5.1.1 20150618 (Red Hat 5.1.1-4)] on linux2
