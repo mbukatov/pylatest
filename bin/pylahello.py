@@ -31,5 +31,15 @@ from pylatest.directives import Hello
 # see: http://docutils.sourceforge.net/docs/howto/rst-directives.html
 directives.register_directive("hello", Hello)
 
+# override default settings
 # see: http://docutils.sourceforge.net/docs/api/publisher.html
-publish_cmdline(writer_name='html')
+# see: http://docutils.sourceforge.net/docs/user/config.html
+overrides = {
+    # don't embed default stylesheed
+    'embed_stylesheet': False,
+    # don't use stylesheet at all
+    'stylesheet_path': None,
+    }
+
+# see: http://docutils.sourceforge.net/docs/api/cmdline-tool.html
+publish_cmdline(writer_name='html', settings_overrides=overrides)
