@@ -42,3 +42,34 @@ class Hello(rst.Directive):
         node = docutils.nodes.paragraph(text=content)
         node_list = [node]
         return node_list
+
+
+class SimpleAction(rst.Directive):
+    """
+    Simple action directive.
+    """
+
+    required_arguments = 1
+    optional_arguments = 0
+    final_argument_whitespace = False
+    has_content = True
+
+    def run(self):
+        self.assert_has_content()
+        # TODO: proper error handling
+        action_id = int(self.arguments[0])
+        # setup header node
+        head_text = "There is action #{0}.".format(action_id)
+        head_node = docutils.nodes.paragraph(text=head_text)
+        # setup list node
+        list_node = docutils.nodes.enumerated_list()
+        # add items with content into list node
+        for line in self.content:
+            # TODO: find a better node for text content
+            text_node = docutils.nodes.inline(text=line)
+            item_node = docutils.nodes.list_item()
+            item_node += text_node
+            list_node += item_node
+        # construct final result
+        node_list = [head_node, list_node]
+        return node_list

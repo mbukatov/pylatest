@@ -25,11 +25,13 @@ from docutils.parsers.rst import directives
 from docutils.core import publish_cmdline
 
 from pylatest.directives import Hello
+from pylatest.directives import SimpleAction
 
 
 # register custom pylatest rst directives
 # see: http://docutils.sourceforge.net/docs/howto/rst-directives.html
 directives.register_directive("hello", Hello)
+directives.register_directive("action", SimpleAction)
 
 # override default settings
 # see: http://docutils.sourceforge.net/docs/api/publisher.html
