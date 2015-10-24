@@ -1,0 +1,5 @@
+* pylatest todolist
+** TODO using it with spninx
+   [[http://stackoverflow.com/questions/12527783][custom-directives-in-sphinx]]
+** TODO custom client code
+   [[http://docutils.sourceforge.net/docs/api/publisher.html]]
