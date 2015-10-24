@@ -66,6 +66,7 @@ class SimpleAction(rst.Directive):
         # add items with content into list node
         for line in self.content:
             # TODO: find a better node for text content
+            # text_node = docutils.nodes.Text(line) ?
             text_node = docutils.nodes.inline(text=line)
             item_node = docutils.nodes.list_item()
             item_node += text_node
