@@ -23,8 +23,8 @@ ReStructuredText directives for test steps and actions.
 import sys
 import os.path
 
+from docutils import nodes
 from docutils.parsers import rst
-import docutils.nodes
 
 
 class Hello(rst.Directive):
@@ -39,7 +39,7 @@ class Hello(rst.Directive):
 
     def run(self):
         content = "Hello World {0}!".format(self.arguments[0])
-        node = docutils.nodes.paragraph(text=content)
+        node = nodes.paragraph(text=content)
         node_list = [node]
         return node_list
 
@@ -60,15 +60,15 @@ class SimpleAction(rst.Directive):
         action_id = int(self.arguments[0])
         # setup header node
         head_text = "There is action #{0}.".format(action_id)
-        head_node = docutils.nodes.paragraph(text=head_text)
+        head_node = nodes.paragraph(text=head_text)
         # setup list node
-        list_node = docutils.nodes.enumerated_list()
+        list_node = nodes.enumerated_list()
         # add items with content into list node
         for line in self.content:
             # TODO: find a better node for text content
-            # text_node = docutils.nodes.Text(line) ?
-            text_node = docutils.nodes.inline(text=line)
-            item_node = docutils.nodes.list_item()
+            # text_node = nodes.Text(line) ?
+            text_node = nodes.inline(text=line)
+            item_node = nodes.list_item()
             item_node += text_node
             list_node += item_node
         # construct final result
