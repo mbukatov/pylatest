@@ -39,18 +39,24 @@ class FooBarTransform(transforms.Transform):
     default_priority = 999
 
     def apply(self):
-        pending = self.startnode
-
-        # TODO: check: self.document.traverse()
-        # TODO: try to generate table
-
-        # create node struct to wrap data from pending node
-        # yeah, this way is kind of silly, but we need to start somewhere
+        pending_nodes = {}
+        # find all pending nodes of foobar directive
+        # TODO: validate id (eg. report error when conflicts are found)
+        for node in self.document.traverse(nodes.pending):
+            if 'foobar_id' in node.details:
+                pending_nodes[node.details['foobar_id']] = node
+        # TODO: generate table instead of list
+        # create node struct to wrap data from pending nodes
         list_node = nodes.enumerated_list()
-        item_node = nodes.list_item()
-        for node in pending.details['nodes']:
-            item_node += node
-        list_node += item_node
-
-        # replace pending element with new node
+        for foobar_id, pending_node in sorted(pending_nodes.iteritems()):
+            item_node = nodes.list_item()
+            for node in pending_node.details['nodes']:
+                item_node += node
+            list_node += item_node
+        # replace pending element with new node struct
+        # we assume that this is called on the first pending node only
         self.startnode.replace_self(list_node)
+        # remove all remaining foobar pending nodes from document tree
+        del pending_nodes[1]
+        for pending_node in pending_nodes.itervalues():
+            pending_node.parent.remove(pending_node)

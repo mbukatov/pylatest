@@ -19,11 +19,11 @@ Table Line Directive Test
 
 This is just another Hello World grade example.
 
-.. foobar::
+.. foobar:: 1
 
     This is *the very first* thing to do: run `uname -a` command.
 
-.. foobar::
+.. foobar:: 2
 
     And now this is 2nd. Try this::
 
@@ -32,6 +32,10 @@ This is just another Hello World grade example.
          M pylatest/directives.py
          M pylatest/transforms.py
 
-.. foobar::
+.. foobar:: 4
 
-    The end. Three lines are good enough.
+    The end (id determines placement in an output document).
+
+.. foobar:: 3
+
+    `Es ist möglich,` sagt *der Türhüter*, `jetzt aber nicht.`
