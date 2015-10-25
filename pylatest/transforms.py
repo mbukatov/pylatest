@@ -38,6 +38,35 @@ class FooBarTransform(transforms.Transform):
     # standard transformations will be executed before this one
     default_priority = 999
 
+    def build_table(self, row_nodes):
+        """
+        Creates new table node tree for FooBar data.
+        """
+        table = nodes.table()
+        tgroup = nodes.tgroup(cols=2)
+        table += tgroup
+        # TODO: headrows
+        # TODO: colspec
+        tbody = nodes.tbody()
+        tgroup += tbody
+        for row in row_nodes:
+            tbody += row
+        return table
+
+    def build_row(self, foobar_id, content_nodes):
+        """
+        Creates new table row node tree for FooBar data.
+        """
+        row_node = nodes.row()
+        num_node = nodes.entry()
+        num_node += nodes.paragraph(text=str(foobar_id))
+        row_node += num_node
+        entry_node = nodes.entry()
+        row_node += entry_node
+        for node in content_nodes:
+            entry_node += node
+        return row_node
+
     def apply(self):
         pending_nodes = {}
         # find all pending nodes of foobar directive
@@ -45,17 +74,15 @@ class FooBarTransform(transforms.Transform):
         for node in self.document.traverse(nodes.pending):
             if 'foobar_id' in node.details:
                 pending_nodes[node.details['foobar_id']] = node
-        # TODO: generate table instead of list
-        # create node struct to wrap data from pending nodes
-        list_node = nodes.enumerated_list()
+        # generate table node tree based on data from pending elements
+        row_nodes = []
         for foobar_id, pending_node in sorted(pending_nodes.iteritems()):
-            item_node = nodes.list_item()
-            for node in pending_node.details['nodes']:
-                item_node += node
-            list_node += item_node
+            row_node = self.build_row(foobar_id, pending_node.details['nodes'])
+            row_nodes += row_node
+        table_node = self.build_table(row_nodes)
         # replace pending element with new node struct
         # we assume that this is called on the first pending node only
-        self.startnode.replace_self(list_node)
+        self.startnode.replace_self(table_node)
         # remove all remaining foobar pending nodes from document tree
         del pending_nodes[1]
         for pending_node in pending_nodes.itervalues():
