@@ -89,15 +89,18 @@ class FooBar(rst.Directive):
     has_content = True
 
     def run(self):
+        # first of all, parse text. content of this directive
+        # into anonymous node element (can't be used directly in the tree)
+        node = nodes.Element()
+        self.state.nested_parse(self.content, self.content_offset, node)
         # create new pending node, which:
-        #  - Holds actual content of the directive
-        #  - References transform class which is concerned with this node.
-        #    later when whole document is parsed, transformer uses this
-        #    information to execute the transformation operation
+        #  - holds actual data (parsed content of the directive)
+        #  - references transform class which is concerned with this node.
+        # later when whole document is parsed, transformer uses this
+        # information to execute the transformation operation
         pending = nodes.pending(FooBarTransform)
         # add content into pending node
-        data_node = nodes.paragraph(text=" ".join(self.content))
-        pending.details['nodes'] = [data_node]
+        pending.details['nodes'] = node
         # register pending node
         # without this, transformer wouldn't know about this pending node
         self.state_machine.document.note_pending(pending)

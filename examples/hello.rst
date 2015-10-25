@@ -21,11 +21,16 @@ This is just another Hello World grade example.
 
 .. foobar::
 
-    This is the very first thing to do.
+    This is *the very first* thing to do: run `uname -a` command.
 
 .. foobar::
 
-    And now this is 2nd.
+    And now this is 2nd. Try this::
+
+        $ git st
+        ## master
+         M pylatest/directives.py
+         M pylatest/transforms.py
 
 .. foobar::
 

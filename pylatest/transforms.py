@@ -48,7 +48,8 @@ class FooBarTransform(transforms.Transform):
         # yeah, this way is kind of silly, but we need to start somewhere
         list_node = nodes.enumerated_list()
         item_node = nodes.list_item()
-        item_node += pending.details['nodes'][0]
+        for node in pending.details['nodes']:
+            item_node += node
         list_node += item_node
 
         # replace pending element with new node
