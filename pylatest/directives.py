@@ -26,6 +26,8 @@ import os.path
 from docutils import nodes
 from docutils.parsers import rst
 
+from pylatest.transforms import FooBarTransform
+
 
 class Hello(rst.Directive):
     """
@@ -74,3 +76,29 @@ class SimpleAction(rst.Directive):
         # construct final result
         node_list = [head_node, list_node]
         return node_list
+
+
+class FooBar(rst.Directive):
+    """
+    Create node structure using pending elements and rst transformations.
+    """
+
+    required_arguments = 0
+    optional_arguments = 0
+    final_argument_whitespace = False
+    has_content = True
+
+    def run(self):
+        # create new pending node, which:
+        #  - Holds actual content of the directive
+        #  - References transform class which is concerned with this node.
+        #    later when whole document is parsed, transformer uses this
+        #    information to execute the transformation operation
+        pending = nodes.pending(FooBarTransform)
+        # add content into pending node
+        data_node = nodes.paragraph(text=" ".join(self.content))
+        pending.details['nodes'] = [data_node]
+        # register pending node
+        # without this, transformer wouldn't know about this pending node
+        self.state_machine.document.note_pending(pending)
+        return [pending]
