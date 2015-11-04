@@ -46,7 +46,9 @@ class FooBarTransform(transforms.Transform):
         tgroup = nodes.tgroup(cols=2)
         table += tgroup
         # TODO: headrows
-        # TODO: colspec
+        for colwidth in [5, 95]:
+            colspec = nodes.colspec(colwidth=colwidth)
+            tgroup += colspec
         tbody = nodes.tbody()
         tgroup += tbody
         for row in row_nodes:
