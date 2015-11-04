@@ -78,7 +78,7 @@ class FooBarTransform(transforms.Transform):
         row_nodes = []
         for foobar_id, pending_node in sorted(pending_nodes.iteritems()):
             row_node = self.build_row(foobar_id, pending_node.details['nodes'])
-            row_nodes += row_node
+            row_nodes.append(row_node)
         table_node = self.build_table(row_nodes)
         # replace pending element with new node struct
         # we assume that this is called on the first pending node only
