@@ -4,4 +4,5 @@ cd ..
 python setup.py install
 cd -
 # python -m pdb ../bin/pylahello.py --traceback hello.rst
-pylahello.py --traceback hello.rst
+# pylahello.py --traceback hello.rst
+pylahello.py hello.rst | tee hello.html
