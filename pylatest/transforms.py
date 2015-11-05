@@ -22,8 +22,6 @@ See: http://docutils.sourceforge.net/docs/ref/transforms.html
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-import sys
-
 from docutils import nodes
 from docutils import transforms
 
