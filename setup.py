@@ -31,10 +31,9 @@ setup(
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
         'Development Status :: 3 - Alpha',
-        'Intended Audience :: Information Technology',
         'Topic :: Software Development :: Quality Assurance',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.4',
         ],
     packages=find_packages(exclude=['doc']),
     install_requires=['docutils'],

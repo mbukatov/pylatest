@@ -78,7 +78,7 @@ class FooBarTransform(transforms.Transform):
                 pending_nodes[node.details['foobar_id']] = node
         # generate table node tree based on data from pending elements
         row_nodes = []
-        for foobar_id, pending_node in sorted(pending_nodes.iteritems()):
+        for foobar_id, pending_node in sorted(pending_nodes.items()):
             row_node = self.build_row(foobar_id, pending_node.details['nodes'])
             row_nodes.append(row_node)
         table_node = self.build_table(row_nodes)
@@ -87,5 +87,5 @@ class FooBarTransform(transforms.Transform):
         self.startnode.replace_self(table_node)
         # remove all remaining foobar pending nodes from document tree
         del pending_nodes[1]
-        for pending_node in pending_nodes.itervalues():
+        for pending_node in pending_nodes.values():
             pending_node.parent.remove(pending_node)
