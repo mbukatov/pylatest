@@ -7,6 +7,22 @@ descriptions from source files written in reStructuredText.
 This project is in early stage of development.
 There is not much to be seen so far ...
 
+Sphinx
+------
+
+To use pylatest directives in sphinx project, you need to register them into
+docutils rst parser in a similar way as it's done in ``pylatest2html.py``
+command line client. Assuming you have pylatest installed properly (so that
+you can import pylatest module without any problems), add following lines
+into ``conf.py`` of your sphinx project::
+
+    from docutils.parsers.rst import directives
+    from pylatest.directives import PylatestDirective
+
+    # register custom pylatest rst directives
+    directives.register_directive("test_step", PylatestDirective)
+    directives.register_directive("test_result", PylatestDirective)
+
 Development and testing
 -----------------------
 
