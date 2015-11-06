@@ -5,8 +5,8 @@ if [[ ! -d ../.env/bin ]]; then
 fi
 source ../.env/bin/activate
 cd ..
-python3 setup.py install
+python setup.py install
 cd -
-# python3 -m pdb ../bin/pylatest2html.py --traceback test.rst
+# python -m pdb ../bin/pylatest2html.py --traceback test.rst
 # pylatest2html.py --traceback test.rst
 pylatest2html.py test.rst | tee test.html
