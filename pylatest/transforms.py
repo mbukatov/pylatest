@@ -26,64 +26,87 @@ from docutils import nodes
 from docutils import transforms
 
 
-class FooBarTransform(transforms.Transform):
+def build_table(row_nodes):
     """
-    Collects data from pending elements and generates new rst nodes
-    to replace them.
+    Creates new rst table node tree for test steps and actions.
+    """
+    table = nodes.table()
+    tgroup = nodes.tgroup(cols=3)
+    table += tgroup
+    # TODO: headrows
+    for colwidth in [2, 44, 44]:
+        colspec = nodes.colspec(colwidth=colwidth)
+        tgroup += colspec
+    tbody = nodes.tbody()
+    tgroup += tbody
+    for row in row_nodes:
+        tbody += row
+    return table
+
+def build_row(action_id, row_data):
+    """
+    Creates new rst table row node tree for testcase data.
+    """
+    row_node = nodes.row()
+    # create entry node for action id
+    num_node = nodes.entry()
+    num_node += nodes.paragraph(text=str(action_id))
+    row_node += num_node
+    # create entry nodes for data (test steps and results)
+    for content_nodes in row_data:
+        entry_node = nodes.entry()
+        row_node += entry_node
+        for node in content_nodes:
+            entry_node += node
+    return row_node
+
+
+class PylatestTableTransform(transforms.Transform):
+    """
+    Collects data from pending elements, removes them from document tree
+    and generates rst table (which contains all data from pending elements)
+    in the place of 1st pending element.
     """
 
     # use priority in "very late (non-standard)" range so that all
     # standard transformations will be executed before this one
     default_priority = 999
 
-    def build_table(self, row_nodes):
-        """
-        Creates new table node tree for FooBar data.
-        """
-        table = nodes.table()
-        tgroup = nodes.tgroup(cols=2)
-        table += tgroup
-        # TODO: headrows
-        for colwidth in [5, 95]:
-            colspec = nodes.colspec(colwidth=colwidth)
-            tgroup += colspec
-        tbody = nodes.tbody()
-        tgroup += tbody
-        for row in row_nodes:
-            tbody += row
-        return table
-
-    def build_row(self, foobar_id, content_nodes):
-        """
-        Creates new table row node tree for FooBar data.
-        """
-        row_node = nodes.row()
-        num_node = nodes.entry()
-        num_node += nodes.paragraph(text=str(foobar_id))
-        row_node += num_node
-        entry_node = nodes.entry()
-        row_node += entry_node
-        for node in content_nodes:
-            entry_node += node
-        return row_node
-
     def apply(self):
-        pending_nodes = {}
-        # find all pending nodes of foobar directive
+        # action is couple of test step and result with the same action id
+        # expected structure eg. for pending nodes of 1st step and result:
+        # actions_dict = {1: {'test_step': node_a, 'test_result': node_b}}
+        actions_dict = {}
+        # find all pending nodes of pylatest directive
         # TODO: validate id (eg. report error when conflicts are found)
         for node in self.document.traverse(nodes.pending):
-            if 'foobar_id' in node.details:
-                pending_nodes[node.details['foobar_id']] = node
+            if 'action_id' not in node.details:
+                continue
+            action_id = node.details['action_id']
+            action_name = node.details['action_name']
+            actions_dict.setdefault(action_id, {})[action_name] = node
         # generate table node tree based on data from pending elements
         row_nodes = []
-        for foobar_id, pending_node in sorted(pending_nodes.items()):
-            row_node = self.build_row(foobar_id, pending_node.details['nodes'])
+        for action_id, action_nodes in sorted(actions_dict.items()):
+            row_data = []
+            # for each action check if we have step and result pending node
+            # this defines order of collumns in resulting table
+            for col_name in ('test_step', 'test_result'):
+                if col_name in action_nodes:
+                    row_data.append(action_nodes[col_name].details['nodes'])
+                else:
+                    row_data.append(nodes.paragraph())
+            row_node = build_row(action_id, row_data)
             row_nodes.append(row_node)
-        table_node = self.build_table(row_nodes)
+        table_node = build_table(row_nodes)
         # replace pending element with new node struct
         # we assume that this is called on the first pending node only
+        # TODO: check the assumption
         self.startnode.replace_self(table_node)
-        # remove all remaining foobar pending nodes from document tree
-        del pending_nodes[1]
-        for pending_node in pending_nodes.values():
-            pending_node.parent.remove(pending_node)
+        # drop current pending element from actions_dict because this one
+        # has been already removed from document tree via replace_self()
+        del actions_dict[1]['test_step']
+        # remove all remaining pylatest pending nodes from document tree
+        for action_dict in actions_dict.values():
+            for pending_node in action_dict.values():
+                pending_node.parent.remove(pending_node)

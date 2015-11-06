@@ -2,7 +2,12 @@
 # -*- coding: utf8 -*-
 
 """
-Docutils client dev Hello World example.
+Pylatest client which generates html output.
+
+Using this custom docutils client is necessary because we need to register
+custom pylatest rst directives. Eg. if you use plain rst2html from docutils
+to process pylatest rst files, it would report warnings about unknown
+rst directives.
 """
 
 # Copyright (C) 2015 martin.bukatovic@gmail.com
@@ -24,16 +29,13 @@ Docutils client dev Hello World example.
 from docutils.parsers.rst import directives
 from docutils.core import publish_cmdline
 
-from pylatest.directives import Hello
-from pylatest.directives import SimpleAction
-from pylatest.directives import FooBar
+from pylatest.directives import PylatestDirective
 
 
 # register custom pylatest rst directives
 # see: http://docutils.sourceforge.net/docs/howto/rst-directives.html
-directives.register_directive("hello", Hello)
-directives.register_directive("action", SimpleAction)
-directives.register_directive("foobar", FooBar)
+directives.register_directive("test_step", PylatestDirective)
+directives.register_directive("test_result", PylatestDirective)
 
 # override default settings
 # see: http://docutils.sourceforge.net/docs/api/publisher.html

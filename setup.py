@@ -37,5 +37,5 @@ setup(
         ],
     packages=find_packages(exclude=['doc']),
     install_requires=['docutils'],
-    scripts=['bin/pylahello.py']
+    scripts=['bin/pylatest2html.py']
     )
