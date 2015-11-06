@@ -24,9 +24,9 @@ setup(
     version='0.1',
     description='Testcase description generation tools.',
     long_description=long_description,
-    url='http://github.com/marbu/pylatest/',
+    url='http://github.com/mbukatov/pylatest/',
     author='Martin Bukatovič',
-    author_email='martin.bukatovic@gmail.com',
+    author_email='mbukatov@redhat.com',
     license='GPLv3',
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
