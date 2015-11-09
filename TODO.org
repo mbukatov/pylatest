@@ -1,5 +1,6 @@
 * pylatest todolist
-** TODO using it with spninx
-   [[http://stackoverflow.com/questions/12527783][custom-directives-in-sphinx]]
 ** TODO custom client code
    [[http://docutils.sourceforge.net/docs/api/publisher.html]]
+** TODO custom role (eg. for bugzilla)
+   [[http://docutils.sourceforge.net/docs/howto/rst-roles.html]]
+** TODO generator of initial test template
