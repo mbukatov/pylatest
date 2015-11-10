@@ -7,6 +7,6 @@ source ../.env/bin/activate
 cd ..
 python setup.py install
 cd -
-# python -m pdb ../bin/pylatest2html.py --traceback test.rst
-# pylatest2html.py --traceback test.rst
-pylatest2html.py test.rst | tee test.html
+# python -m pdb ../bin/pylatest2html --traceback test.rst
+# pylatest2html --traceback test.rst
+pylatest2html test.rst | tee test.html
