@@ -1,9 +1,9 @@
 Hello World Test Case
 *********************
 
-.. csv-table::
-   :header: "Field", "Value"
-   :file: test.csv
+.. test_metadata:: author foobar@example.com
+.. test_metadata:: date 2015-11-06
+.. test_metadata:: comment This is here just to test metadata processing.
 
 Description
 ===========

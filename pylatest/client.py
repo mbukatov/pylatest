@@ -28,17 +28,22 @@ rst directives.
 from docutils.parsers.rst import directives
 from docutils.core import publish_cmdline
 
-from pylatest.directives import PylatestDirective
+from pylatest.directives import TestStepsDirective
+from pylatest.directives import TestMetadataDirective
 
 
 def register_directives():
     """
-    Register pylatest rst directives ``test_step`` and ``test_result``.
+    Register all pylatest rst directives:
+
+     * ``test_step`` and ``test_result``
+     * ``test_metadata``
 
     See: http://docutils.sourceforge.net/docs/howto/rst-directives.html
     """
-    directives.register_directive("test_step", PylatestDirective)
-    directives.register_directive("test_result", PylatestDirective)
+    directives.register_directive("test_metadata", TestMetadataDirective)
+    directives.register_directive("test_step", TestStepsDirective)
+    directives.register_directive("test_result", TestStepsDirective)
 
 def publish_cmdline_html():
     """

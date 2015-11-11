@@ -1,9 +1,7 @@
 TODO: name of the testcase
 **************************
 
-.. csv-table::
-   :header: "Field", "Value"
-   :file: ${tc_basename}.csv
+.. test_metadata:: author: ${tc_metadata_author}
 
 Description
 ===========

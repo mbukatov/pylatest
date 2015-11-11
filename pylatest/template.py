@@ -66,10 +66,9 @@ def generate_testcase(basename, author):
         "tc_metadata_author": author,
         "tc_basename": basename,
         }
-    for filetype in ('rst', 'csv'):
-        template = "template.{0}".format(filetype)
-        new_file = "{0}.{1}".format(basename, filetype)
-        create_file(template, new_file, variables)
+    template = "template.rst"
+    new_file = "{0}.rst".format(basename)
+    create_file(template, new_file, variables)
 
 def generate_default_author():
     """
