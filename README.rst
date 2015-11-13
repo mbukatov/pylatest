@@ -15,7 +15,7 @@ into ``conf.py`` of your sphinx project::
 
     import pylatest.client
 
-    pylatest.client.register_directives()
+    pylatest.client.register()
 
 Development and testing
 -----------------------

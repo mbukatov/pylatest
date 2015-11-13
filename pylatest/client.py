@@ -26,24 +26,33 @@ rst directives.
 
 
 from docutils.parsers.rst import directives
+from docutils.parsers.rst import roles
 from docutils.core import publish_cmdline
 
 from pylatest.directives import TestStepsDirective
 from pylatest.directives import TestMetadataDirective
+from pylatest.roles import redhat_bugzilla_role
 
 
-def register_directives():
+def register():
     """
     Register all pylatest rst directives:
 
      * ``test_step`` and ``test_result``
      * ``test_metadata``
 
-    See: http://docutils.sourceforge.net/docs/howto/rst-directives.html
+    and roles:
+
+     * ``BZ`` for referencing redhat bugzilla
+
+    See:
+     * http://docutils.sourceforge.net/docs/howto/rst-directives.html
+     * http://docutils.sourceforge.net/docs/howto/rst-roles.html
     """
     directives.register_directive("test_metadata", TestMetadataDirective)
     directives.register_directive("test_step", TestStepsDirective)
     directives.register_directive("test_result", TestStepsDirective)
+    roles.register_local_role("bz", redhat_bugzilla_role)
 
 def publish_cmdline_html():
     """

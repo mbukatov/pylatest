@@ -26,5 +26,5 @@ embedded css code.
 import pylatest.client
 
 
-pylatest.client.register_directives()
+pylatest.client.register()
 pylatest.client.publish_cmdline_html()
