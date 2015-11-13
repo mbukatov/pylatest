@@ -37,13 +37,6 @@ Setup
     # dnf install foobar
     # systemctl enable foobard
 
-Tear Down
-=========
-
-#. Lorem ipsum dolor sit amet: ``rm -rf /mnt/helloworld``.
-
-#. Umount and remove ``lv_helloword`` volume.
-
 Test Steps
 ==========
 
@@ -74,3 +67,10 @@ Test Steps
 .. test_result:: 4
 
     And this result has no test step.
+
+Teardown
+=========
+
+#. Lorem ipsum dolor sit amet: ``rm -rf /mnt/helloworld``.
+
+#. Umount and remove ``lv_helloword`` volume.
