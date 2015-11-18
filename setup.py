@@ -21,7 +21,7 @@ with codecs.open(os.path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 setup(
     name='pylatest',
-    version='0.0.2',
+    version='0.0.3',
     description='Testcase description generation tools.',
     long_description=long_description,
     url='http://github.com/mbukatov/pylatest/',
