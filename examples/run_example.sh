@@ -8,6 +8,10 @@ cd ..
 python setup.py install
 cd -
 
+# remove previous results
+rm foobar.*
+rm test.html
+
 # python -m pdb ../bin/pylatest2html --traceback test.rst
 # pylatest2html --traceback test.rst
 pylatest2html test.rst | tee test.html
