@@ -26,7 +26,7 @@ from docutils import nodes
 from docutils import transforms
 
 
-def build_table(row_nodes, colwidth_list):
+def build_table(row_nodes, colwidth_list, headrow_data=None):
     """
     Creates new rst table node tree.
 
@@ -42,10 +42,14 @@ def build_table(row_nodes, colwidth_list):
     table = nodes.table()
     tgroup = nodes.tgroup(cols=len(colwidth_list))
     table += tgroup
-    # TODO: headrows
     for colwidth in colwidth_list:
         colspec = nodes.colspec(colwidth=colwidth)
         tgroup += colspec
+    if headrow_data is not None:
+        thead = nodes.thead()
+        tgroup += thead
+        head_row_node = build_row(headrow_data)
+        thead += head_row_node
     tbody = nodes.tbody()
     tgroup += tbody
     for row in row_nodes:
@@ -112,7 +116,12 @@ class TestStepsTableTransform(transforms.Transform):
                     row_data.append(nodes.paragraph())
             row_node = build_row(row_data)
             row_nodes.append(row_node)
-        table_node = build_table(row_nodes, [2, 44, 44])
+        headrow_data = [
+            nodes.paragraph(),
+            [nodes.paragraph(text="Step")],
+            [nodes.paragraph(text="Expected Result")],
+            ]
+        table_node = build_table(row_nodes, [2, 44, 44], headrow_data)
         # replace pending element with new node struct
         # we assume that this is called on the first pending node only
         # TODO: check the assumption
