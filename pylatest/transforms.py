@@ -77,10 +77,13 @@ def build_row(row_data):
     return row_node
 
 
-class TestStepsTableTransform(transforms.Transform):
+# TODO: create single pylatest transformation base class
+
+
+class TestStepsTransform(transforms.Transform):
     """
     Collects data from pending elements, removes them from document tree
-    and generates rst table (which contains all data from pending elements)
+    and generates rst node tree (which contains all data from pending elements)
     in the place of 1st pending element.
     """
 
@@ -88,22 +91,66 @@ class TestStepsTableTransform(transforms.Transform):
     # standard transformations will be executed before this one
     default_priority = 999
 
-    def apply(self):
-        # action is couple of test step and result with the same action id
-        # expected structure eg. for pending nodes of 1st step and result:
-        # actions_dict = {1: {'test_step': node_a, 'test_result': node_b}}
-        actions_dict = {}
-        # find all pending nodes of pylatest directive
+    # Action is couple of test step and result with the same action id.
+    # Expected structure eg. for pending nodes of 1st step and result:
+    # ``actions_dict = {1: {'test_step': node_a, 'test_result': node_b}}``
+    _actions_dict = None
+
+    def _find_pending_nodes(self):
+        """
+        Find all pending nodes of pylatest directive and store them in
+        ``_actions_dict`` attribute.
+        """
+        self._actions_dict = {}
         # TODO: validate id (eg. report error when conflicts are found)
         for node in self.document.traverse(nodes.pending):
             if 'action_id' not in node.details:
                 continue
             action_id = node.details['action_id']
             action_name = node.details['action_name']
-            actions_dict.setdefault(action_id, {})[action_name] = node
-        # generate table node tree based on data from pending elements
+            self._actions_dict.setdefault(action_id, {})[action_name] = node
+
+    def _drop_pending_nodes(self):
+        """
+        Remove all pending nodes from rst document tree.
+        """
+        # drop current pending element from ``_actions_dict`` because this one
+        # has been already removed from document tree via replace_self()
+        del self._actions_dict[1]['test_step']
+        # remove all remaining pylatest pending nodes from document tree
+        for action_dict in self._actions_dict.values():
+            for pending_node in action_dict.values():
+                pending_node.parent.remove(pending_node)
+
+    def _create_content(self):
+        """
+        Generate new content which will be insterted into place where the
+        1st pending element was found.
+
+        This method should be implemented in each subclass.
+        """
+
+    def apply(self):
+        self._find_pending_nodes()
+        content_node = self._create_content()
+        # replace current pending node with new content
+        # we assume that this is called on the first pending node only
+        # TODO: check the assumption
+        self.startnode.replace_self(content_node)
+        self._drop_pending_nodes()
+
+
+class TestStepsTableTransform(TestStepsTransform):
+    """
+    Builds table from pending test step nodes.
+    """
+
+    def _create_content(self):
+        """
+        Generate table node tree based on data stored in pending elements.
+        """
         row_nodes = []
-        for action_id, action_nodes in sorted(actions_dict.items()):
+        for action_id, action_nodes in sorted(self._actions_dict.items()):
             row_data = []
             # add action_id into row_data as 1st entry
             row_data.append([nodes.paragraph(text=str(action_id))])
@@ -122,20 +169,20 @@ class TestStepsTableTransform(transforms.Transform):
             [nodes.paragraph(text="Expected Result")],
             ]
         table_node = build_table(row_nodes, [2, 44, 44], headrow_data)
-        # replace pending element with new node struct
-        # we assume that this is called on the first pending node only
-        # TODO: check the assumption
-        self.startnode.replace_self(table_node)
-        # drop current pending element from actions_dict because this one
-        # has been already removed from document tree via replace_self()
-        del actions_dict[1]['test_step']
-        # remove all remaining pylatest pending nodes from document tree
-        for action_dict in actions_dict.values():
-            for pending_node in action_dict.values():
-                pending_node.parent.remove(pending_node)
+        return table_node
 
 
-class TestMetadataTableTransform(transforms.Transform):
+class TestStepsPlainTransform(TestStepsTransform):
+    """
+    Builds TODO from pending test step nodes.
+    """
+
+    def _create_content(self):
+        # TODO: generate plain content wrapped in span/div elements
+        return nodes.paragraph(text="TODO")
+
+
+class TestMetadataTransform(transforms.Transform):
     """
     Collects data from metadata pending elements, removes them from document
     tree and generates rst table (which contains all metadata) in the place of
@@ -146,35 +193,69 @@ class TestMetadataTableTransform(transforms.Transform):
     # standard transformations will be executed before this one
     default_priority = 999
 
-    def apply(self):
-        # dictionary with metadata: meta_name -> meta_value
-        metadata_dict = {}
-        # list of pending nodes (so that they can be removed in the end)
-        pending_nodes = []
+    # dictionary with metadata: meta_name -> meta_value
+    _metadata_dict = None
+    # list of pending nodes (so that they can be removed in the end)
+    _pending_nodes = None
+
+    def _find_pending_nodes(self):
+        self._metadata_dict = {}
+        self._pending_nodes = []
         # find all metadata pending nodes
         for node in self.document.traverse(nodes.pending):
             if 'meta_name' not in node.details:
                 continue
             name = node.details['meta_name']
             value = node.details['meta_value']
-            metadata_dict[name] = value
-            pending_nodes.append(node)
-        # generate table node tree based on data from pending elements
+            self._metadata_dict[name] = value
+            self._pending_nodes.append(node)
+
+    def _drop_pending_nodes(self):
+        # drop current pending node from the list because it
+        # has been already removed from document tree via replace_self()
+        del self._pending_nodes[0]
+        # remove all remaining pylatest pending nodes from document tree
+        for pending_node in self._pending_nodes:
+            pending_node.parent.remove(pending_node)
+
+    def _create_content(self):
+        pass
+
+    def apply(self):
+        self._find_pending_nodes()
+        content_node = self._create_content()
+        # replace pending element with new node struct
+        # we assume that this is called on the first pending node only
+        # TODO: check the assumption
+        self.startnode.replace_self(content_node)
+        self._drop_pending_nodes()
+
+
+class TestMetadataTableTransform(TestMetadataTransform):
+    """
+    Builds table from pending test metadata nodes.
+    """
+
+    def _create_content(self):
+        """
+        Generate table node tree based on data from pending elements.
+        """
         row_nodes = []
-        for name, value in sorted(metadata_dict.items()):
+        for name, value in sorted(self._metadata_dict.items()):
             row_data = []
             row_data.append([nodes.paragraph(text=name)])
             row_data.append([nodes.paragraph(text=value)])
             row_node = build_row(row_data)
             row_nodes.append(row_node)
         table_node = build_table(row_nodes, [50, 50])
-        # replace pending element with new node struct
-        # we assume that this is called on the first pending node only
-        # TODO: check the assumption
-        self.startnode.replace_self(table_node)
-        # drop current pending node from the list because it
-        # has been already removed from document tree via replace_self()
-        del pending_nodes[0]
-        # remove all remaining pylatest pending nodes from document tree
-        for pending_node in pending_nodes:
-            pending_node.parent.remove(pending_node)
+        return table_node
+
+
+class TestMetadataPlainTransform(TestMetadataTransform):
+    """
+    Builds TODO from pending test metadata nodes.
+    """
+
+    def _create_content(self):
+        # TODO: generate plain content wrapped in span/div elements
+        return nodes.paragraph(text="TODO")

@@ -26,5 +26,5 @@ embedded css code.
 import pylatest.client
 
 
-pylatest.client.register_table()
+pylatest.client.register_plain()
 pylatest.client.publish_cmdline_html()

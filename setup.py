@@ -39,5 +39,8 @@ setup(
     packages=find_packages(exclude=['doc']),
     install_requires=['docutils'],
     package_data={'pylatest': ['templates/*']},
-    scripts=['bin/pylatest2html', 'bin/pylatest-template'],
+    scripts=[
+        'bin/pylatest2html',
+        'bin/pylatest2htmlplain',
+        'bin/pylatest-template'],
     )

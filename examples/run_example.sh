@@ -15,7 +15,9 @@ rm test.html
 # python -m pdb ../bin/pylatest2html --traceback test.rst
 # pylatest2html --traceback test.rst
 pylatest2html test.rst | tee test.html
+pylatest2htmlplain test.rst > test.plain.html
 
 # try to use default template
 pylatest-template --author john@example.com foobar
 pylatest2html foobar.rst | tee foobar.html
+pylatest2htmlplain foobar.rst > foobar.plain.html

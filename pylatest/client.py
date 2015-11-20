@@ -7,6 +7,11 @@ Using this custom docutils client is necessary because we need to register
 custom pylatest rst directives. Eg. if you use plain rst2html from docutils
 to process pylatest rst files, it would report warnings about unknown
 rst directives.
+
+See related docutils docs:
+
+ * http://docutils.sourceforge.net/docs/howto/rst-directives.html
+ * http://docutils.sourceforge.net/docs/howto/rst-roles.html
 """
 
 # Copyright (C) 2015 mbukatov@redhat.com
@@ -29,29 +34,31 @@ from docutils.parsers.rst import directives
 from docutils.parsers.rst import roles
 from docutils.core import publish_cmdline
 
-from pylatest.directives import TestStepsDirective
-from pylatest.directives import TestMetadataDirective
+from pylatest.directives import TestStepsTableDirective
+from pylatest.directives import TestStepsPlainDirective
+from pylatest.directives import TestMetadataTableDirective
+from pylatest.directives import TestMetadataPlainDirective
 from pylatest.roles import redhat_bugzilla_role
 
 
-def register():
+def register_table():
     """
-    Register all pylatest rst directives:
-
-     * ``test_step`` and ``test_result``
-     * ``test_metadata``
-
-    and roles:
-
-     * ``BZ`` for referencing redhat bugzilla
-
-    See:
-     * http://docutils.sourceforge.net/docs/howto/rst-directives.html
-     * http://docutils.sourceforge.net/docs/howto/rst-roles.html
+    Register table generating implementation of pylatest rst directives
+    and roles.
     """
-    directives.register_directive("test_metadata", TestMetadataDirective)
-    directives.register_directive("test_step", TestStepsDirective)
-    directives.register_directive("test_result", TestStepsDirective)
+    directives.register_directive("test_metadata", TestMetadataTableDirective)
+    directives.register_directive("test_step", TestStepsTableDirective)
+    directives.register_directive("test_result", TestStepsTableDirective)
+    roles.register_local_role("bz", redhat_bugzilla_role)
+
+def register_plain():
+    """
+    Register plain implementation of pylatest rst directives and roles.
+    This is intended for further processing.
+    """
+    directives.register_directive("test_metadata", TestMetadataPlainDirective)
+    directives.register_directive("test_step", TestStepsPlainDirective)
+    directives.register_directive("test_result", TestStepsPlainDirective)
     roles.register_local_role("bz", redhat_bugzilla_role)
 
 def publish_cmdline_html():

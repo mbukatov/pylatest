@@ -27,14 +27,17 @@ from docutils import nodes
 from docutils.parsers import rst
 
 from pylatest.transforms import TestStepsTableTransform
+from pylatest.transforms import TestStepsPlainTransform
 from pylatest.transforms import TestMetadataTableTransform
+from pylatest.transforms import TestMetadataPlainTransform
 
 
 class TestStepsDirective(rst.Directive):
     """
-    Implementation of ``test_step`` and ``test_result`` directives.
+    Base class with implementation of ``test_step`` and ``test_result`` rst
+    directives.
 
-    Create pending element (which contain parsed content of the directive)
+    Creates pending element (which contain parsed content of the directive)
     so that rst transformation is able to build final rst node tree structure
     later.
     """
@@ -43,6 +46,12 @@ class TestStepsDirective(rst.Directive):
     optional_arguments = 0
     final_argument_whitespace = False
     has_content = True
+
+    # Class of rst transformation for this directive, which creates final
+    # representation of all test steps directives in rst node tree.
+    # Since this is base class which is not direcly usable, transform class
+    # should be defined in each subclass.
+    transform_class = None
 
     def run(self):
         # each pylatest directive in the rst document has mandatory action id
@@ -58,7 +67,7 @@ class TestStepsDirective(rst.Directive):
         #  - holds actual data (parsed content of the directive)
         #  - references transform class which is concerned with this node.
         #  - name of the directive (test_step or test_result)
-        pending = nodes.pending(TestStepsTableTransform)
+        pending = nodes.pending(self.transform_class)
         # add content into pending node
         pending.details['nodes'] = node
         pending.details['action_id'] = action_id
@@ -74,9 +83,28 @@ class TestStepsDirective(rst.Directive):
         return [pending]
 
 
+class TestStepsTableDirective(TestStepsDirective):
+    """
+    Implementation of ``test_step`` and ``test_result`` directives for
+    direct consumption (transformation will generate proper table from
+    data stored in pending elements), eg. for html output.
+    """
+
+    transform_class = TestStepsTableTransform
+
+
+class TestStepsPlainDirective(TestStepsDirective):
+    """
+    Implementation of ``test_step`` and ``test_result`` directives for
+    further processing, eg. checking particular part of resulting document.
+    """
+
+    transform_class = TestStepsPlainTransform
+
+
 class TestMetadataDirective(rst.Directive):
     """
-    Implementation of ``test_metadata`` directive.
+    Base class with implementation of ``test_metadata`` directive.
 
     Create pending element (which contain content of the directive)
     so that rst transformation is able to build final rst node tree structure
@@ -88,13 +116,19 @@ class TestMetadataDirective(rst.Directive):
     final_argument_whitespace = True
     has_content = False
 
+    # Class of rst transformation for this directive, which creates final
+    # representation of all metadata directives in rst node tree.
+    # Since this is base class which is not direcly usable, transform class
+    # should be defined in each subclass.
+    transform_class = None
+
     def run(self):
         # TODO: error checking
         meta_name, meta_value = self.arguments
         # create new pending node, which will:
         #  - hold metadata
         #  - reference transform class which is concerned with this node
-        pending = nodes.pending(TestMetadataTableTransform)
+        pending = nodes.pending(self.transform_class)
         # add content into pending node
         pending.details['meta_name'] = meta_name
         pending.details['meta_value'] = meta_value
@@ -115,3 +149,21 @@ class TestMetadataDirective(rst.Directive):
             self.state_machine.document.note_pending(pending)
         # and finally return the pending node as the only result
         return [pending]
+
+
+class TestMetadataTableDirective(TestMetadataDirective):
+    """
+    Implementation of ``test_metadata`` directive for
+    direct consumption (transformation will generate proper table from
+    data stored in pending elements), eg. for html output.
+    """
+
+    transform_class = TestMetadataTableTransform
+
+class TestMetadataPlainDirective(TestMetadataDirective):
+    """
+    Implementation of ``test_metadata`` directive for
+    further processing, eg. checking particular part of resulting document.
+    """
+
+    transform_class = TestMetadataPlainTransform
