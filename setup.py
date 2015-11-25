@@ -42,5 +42,6 @@ setup(
     scripts=[
         'bin/pylatest2html',
         'bin/pylatest2htmlplain',
+        'bin/python2pylatest',
         'bin/pylatest-template'],
     )
