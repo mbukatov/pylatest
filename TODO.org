@@ -1,6 +1,0 @@
-* pylatest todolist
-** TODO custom client code
-   [[http://docutils.sourceforge.net/docs/api/publisher.html]]
-** TODO custom role (eg. for bugzilla)
-   [[http://docutils.sourceforge.net/docs/howto/rst-roles.html]]
-** TODO generator of initial test template
