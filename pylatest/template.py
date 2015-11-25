@@ -84,7 +84,7 @@ def main():
     """
     parser = argparse.ArgumentParser(
         description=(
-            'Generate rst and csv files for new testcase '
+            'Generate rst file for new testcase '
             'based on predefined template.'))
     parser.add_argument(
         '-a',
