@@ -17,6 +17,9 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
+import sys
+
 from pylatest.template import main
 
-main()
+
+sys.exit(main())
