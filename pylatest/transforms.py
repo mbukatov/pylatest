@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
 
 """
-ReStructuredText transformations for test steps and actions.
+ReStructuredText transformations for pylatest directives.
 
 See: http://docutils.sourceforge.net/docs/ref/transforms.html
 """
@@ -77,19 +77,53 @@ def build_row(row_data):
     return row_node
 
 
-# TODO: create single pylatest transformation base class
-
-
-class TestStepsTransform(transforms.Transform):
+class PylatestTransform(transforms.Transform):
     """
-    Collects data from pending elements, removes them from document tree
-    and generates rst node tree (which contains all data from pending elements)
-    in the place of 1st pending element.
+    Base class of all pylatest transformations.
+
+    Pylatest transformations (extending this base class) collect data from
+    pending elements, remove them from document tree and generate rst node tree
+    (which contains all data from pending elements) in the place of 1st pending
+    element.
     """
 
     # use priority in "very late (non-standard)" range so that all
     # standard transformations will be executed before this one
     default_priority = 999
+
+    def _find_pending_nodes(self):
+        """
+        Find all pending nodes (of given rst directive) in rst document tree.
+        """
+        raise NotImplementedError
+
+    def _drop_pending_nodes(self):
+        """
+        Drop all pending nodes (of given rst directive) from rst document tree.
+        """
+        raise NotImplementedError
+
+    def _create_content(self):
+        """
+        Generate new content which will be insterted into place where the
+        1st pending element was found.
+        """
+        raise NotImplementedError
+
+    def apply(self):
+        self._find_pending_nodes()
+        content_node = self._create_content()
+        # replace current pending node with new content
+        # we assume that this is called on the first pending node only
+        # TODO: check the assumption
+        self.startnode.replace_self(content_node)
+        self._drop_pending_nodes()
+
+
+class TestStepsTransform(PylatestTransform):
+    """
+    Base trasformation class for test steps directive.
+    """
 
     # Action is couple of test step and result with the same action id.
     # Expected structure eg. for pending nodes of 1st step and result:
@@ -121,23 +155,6 @@ class TestStepsTransform(transforms.Transform):
         for action_dict in self._actions_dict.values():
             for pending_node in action_dict.values():
                 pending_node.parent.remove(pending_node)
-
-    def _create_content(self):
-        """
-        Generate new content which will be insterted into place where the
-        1st pending element was found.
-
-        This method should be implemented in each subclass.
-        """
-
-    def apply(self):
-        self._find_pending_nodes()
-        content_node = self._create_content()
-        # replace current pending node with new content
-        # we assume that this is called on the first pending node only
-        # TODO: check the assumption
-        self.startnode.replace_self(content_node)
-        self._drop_pending_nodes()
 
 
 class TestStepsTableTransform(TestStepsTransform):
@@ -182,16 +199,10 @@ class TestStepsPlainTransform(TestStepsTransform):
         return nodes.paragraph(text="TODO")
 
 
-class TestMetadataTransform(transforms.Transform):
+class TestMetadataTransform(PylatestTransform):
     """
-    Collects data from metadata pending elements, removes them from document
-    tree and generates rst table (which contains all metadata) in the place of
-    1st metadata pending element.
+    Base trasformation class for test metadata directive.
     """
-
-    # use priority in "very late (non-standard)" range so that all
-    # standard transformations will be executed before this one
-    default_priority = 999
 
     # dictionary with metadata: meta_name -> meta_value
     _metadata_dict = None
@@ -217,18 +228,6 @@ class TestMetadataTransform(transforms.Transform):
         # remove all remaining pylatest pending nodes from document tree
         for pending_node in self._pending_nodes:
             pending_node.parent.remove(pending_node)
-
-    def _create_content(self):
-        pass
-
-    def apply(self):
-        self._find_pending_nodes()
-        content_node = self._create_content()
-        # replace pending element with new node struct
-        # we assume that this is called on the first pending node only
-        # TODO: check the assumption
-        self.startnode.replace_self(content_node)
-        self._drop_pending_nodes()
 
 
 class TestMetadataTableTransform(TestMetadataTransform):
