@@ -33,12 +33,16 @@ See related docutils docs:
 from docutils.parsers.rst import directives
 from docutils.parsers.rst import roles
 from docutils.core import publish_cmdline
+from docutils import nodes
+from docutils.writers.html4css1 import HTMLTranslator
 
 from pylatest.directives import TestStepsTableDirective
 from pylatest.directives import TestStepsPlainDirective
 from pylatest.directives import TestMetadataTableDirective
 from pylatest.directives import TestMetadataPlainDirective
 from pylatest.roles import redhat_bugzilla_role
+import pylatest.nodes
+import pylatest.htmltranslator
 
 
 def register_table():
@@ -54,12 +58,22 @@ def register_table():
 def register_plain():
     """
     Register plain implementation of pylatest rst directives and roles.
-    This is intended for further processing.
+    This is intended for further processing (HTML only).
     """
     directives.register_directive("test_metadata", TestMetadataPlainDirective)
     directives.register_directive("test_step", TestStepsPlainDirective)
     directives.register_directive("test_result", TestStepsPlainDirective)
     roles.register_local_role("bz", redhat_bugzilla_role)
+    # custom nodes are used to wrap content of pylatest directives into div
+    # or span elements
+    nodes._add_node_class_names(pylatest.nodes.node_class_names)
+    for node_name in pylatest.nodes.node_class_names:
+        visit_func_name = "visit_" + node_name
+        depart_func_name = "depart_" + node_name
+        setattr(HTMLTranslator, visit_func_name,
+            getattr(pylatest.htmltranslator, visit_func_name))
+        setattr(HTMLTranslator, depart_func_name,
+            getattr(pylatest.htmltranslator, depart_func_name))
 
 def publish_cmdline_html():
     """

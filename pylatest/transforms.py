@@ -25,6 +25,8 @@ See: http://docutils.sourceforge.net/docs/ref/transforms.html
 from docutils import nodes
 from docutils import transforms
 
+import pylatest.nodes
+
 
 def build_table(row_nodes, colwidth_list, headrow_data=None):
     """
@@ -191,12 +193,23 @@ class TestStepsTableTransform(TestStepsTransform):
 
 class TestStepsPlainTransform(TestStepsTransform):
     """
-    Builds TODO from pending test step nodes.
+    Wrapp content from pending test step nodes in div element so that test
+    steps are adressable via xpath (works with html output only).
     """
 
     def _create_content(self):
-        # TODO: generate plain content wrapped in span/div elements
-        return nodes.paragraph(text="TODO")
+        p_node = nodes.paragraph()
+        for action_id, action_nodes in sorted(self._actions_dict.items()):
+            for col_name in ('test_step', 'test_result'):
+                if col_name in action_nodes:
+                    node_name = "{0:s}_node".format(col_name)
+                    node = getattr(pylatest.nodes, node_name)()
+                    # add all content nodes into step or result node
+                    for c_node in action_nodes[col_name].details['nodes']:
+                        node += c_node
+                    node.attributes['action_id'] = action_id
+                    p_node += node
+        return p_node
 
 
 class TestMetadataTransform(PylatestTransform):
@@ -252,9 +265,15 @@ class TestMetadataTableTransform(TestMetadataTransform):
 
 class TestMetadataPlainTransform(TestMetadataTransform):
     """
-    Builds TODO from pending test metadata nodes.
+    Wrapp content (from metadata nodes) in span element so that metadata are
+    adressable via xpath.
     """
 
     def _create_content(self):
-        # TODO: generate plain content wrapped in span/div elements
-        return nodes.paragraph(text="TODO")
+        p_node = nodes.paragraph()
+        for name, value in sorted(self._metadata_dict.items()):
+            meta_node = pylatest.nodes.test_metadata_node()
+            p_node += meta_node
+            meta_node += nodes.paragraph(text=value)
+            meta_node.attributes['name'] = name
+        return p_node
