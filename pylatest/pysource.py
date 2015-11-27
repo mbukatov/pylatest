@@ -2,6 +2,8 @@
 
 """
 Python source reader module to extract pylatest data from docstrings.
+
+TODO: Unfortunatelly current initial implementation is a terryble hack.
 """
 
 # Copyright (C) 2015 mbukatov@redhat.com
@@ -56,8 +58,9 @@ def sections_condition(node):
     return isinstance(node, nodes.title) or isinstance(node, nodes.subtitle)
 
 # TODO: this doesn't work because node tree still contains pending elements
-# instead of test step nodes (wtf? metadata nodes are generated just fine)
-def teststeps_condition_doesntwork(node):
+# instead of test step nodes - with single exception: the very first test step
+# WTF? all metadata nodes are generated just fine ...
+def teststeps_condition_bypylatestnode(node):
     """
     Traverse condition for filtering nodes of test steps directives.
     """
@@ -101,6 +104,11 @@ def detect_pylatest_content(docstring):
     for node in nodetree.traverse(sections_condition):
         if node.astext() in pylatest_sections:
             result.append(node.astext())
+    # TODO: resolve this hack (this is needed to find just 1st test step!)
+    for node in nodetree.traverse(teststeps_condition_bypylatestnode):
+        result.append("Test Steps")
+        # single test step/result directive is enough
+        break
     # try to find any test steps directive
     for node in nodetree.traverse(teststeps_condition):
         result.append("Test Steps")
@@ -170,4 +178,5 @@ def main():
         if len(detected_sections) != 0:
             pylatest_content.append((detected_sections, docstring))
     rst_document = recreate_document(pylatest_content)
+    # TODO: here goes error handling
     print(rst_document)
