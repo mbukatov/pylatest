@@ -1,7 +1,7 @@
 Hello World Test Case
 *********************
 
-.. test_metadata:: author foobar@example.com
+.. test_metadata:: author foo@example.com
 .. test_metadata:: date 2015-11-06
 .. test_metadata:: comment This is here just to test metadata processing.
 
@@ -71,8 +71,10 @@ Test Steps
     And this result has no test step.
 
 Teardown
-=========
+========
 
 #. Lorem ipsum dolor sit amet: ``rm -rf /mnt/helloworld``.
 
 #. Umount and remove ``lv_helloword`` volume.
+
+#. The end.
