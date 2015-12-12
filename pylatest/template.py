@@ -8,9 +8,9 @@ Example of usage, following command::
 
     $ pylatest-template --author john@example.com foobarcase
     $ ls
-    foobarcase.rst foobarcase.csv
-    $ grep ^author foobarcase.csv
-    author, john@example.com
+    foobarcase.rst
+    $ grep '^.. test_metadata::' foobarcase.rst
+    .. test_metadata:: author john@example.com
 
 where ``pylatest-template`` is command line tool which uses ``main()``
 function from this module.
