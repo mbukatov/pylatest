@@ -20,6 +20,7 @@ Python source reader module to extract pylatest data from docstrings.
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
+from __future__ import print_function
 import argparse
 import ast
 import inspect
