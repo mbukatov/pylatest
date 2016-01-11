@@ -1,11 +1,22 @@
 #!/bin/bash
-if [[ ! -d ../.env/bin ]]; then
-  echo "create virtualenv first"
+
+# make sure we run this under virtualenv
+if [[ ${VIRTUAL_ENV} ]]; then
+  echo "looks like we are running in virtualenv: ${VIRTUAL_ENV}"
+elif [[ -d ../.env/bin ]]; then
+  source ../.env/bin/activate || exit 1
+else
+  echo "running outside of virtualenv, you need to create one"
   exit 1
 fi
-source ../.env/bin/activate
+
 cd ..
 python setup.py install
+# fail immediately when installation breaks
+if [[ $? -ne 0 ]]; then
+  echo "setup.py failed"
+  exit 2
+fi
 cd -
 
 # remove previous results
