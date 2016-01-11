@@ -244,7 +244,7 @@ class PylatestDocument(object):
 
 def main():
     """
-    Main function of python2pylatest cli tool.
+    Main function of py2pylatest cli tool.
     """
     parser = argparse.ArgumentParser(
         description='Generate rst testcase description from python source.')
