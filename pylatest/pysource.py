@@ -29,14 +29,9 @@ import sys
 from docutils.core import publish_doctree
 from docutils import nodes
 
+from pylatest.document import SECTIONS
 import pylatest.client
 import pylatest.nodes
-
-
-"""
-List of headers of mandatory sections in pylatest rst document (order matters).
-"""
-PYLATEST_SECTIONS = ("Description", "Setup", "Test Steps", "Teardown")
 
 
 def get_docstrings(ast_tree):
@@ -61,7 +56,8 @@ def get_docstrings(ast_tree):
 
 class PylatestDocument(object):
     """
-    Pylatest rst document (test case description).
+    Pylatest rst document (test case description) extracted from python
+    source code (implementing the test case).
     """
 
     def __init__(self):
@@ -147,7 +143,7 @@ class PylatestDocument(object):
         condition = lambda node: \
             isinstance(node, nodes.title) or isinstance(node, nodes.subtitle)
         for node in nodetree.traverse(condition):
-            if node.astext() in PYLATEST_SECTIONS:
+            if node.astext() in SECTIONS:
                 detected_sections.append(node.astext())
 
         # try to count all pylatest step/result directives
@@ -200,7 +196,7 @@ class PylatestDocument(object):
             return ""
 
         # report missing sections
-        for section in PYLATEST_SECTIONS:
+        for section in SECTIONS:
             if section not in self._section_dict:
                 if section == "Test Steps" and len(self._docstrings) > 1:
                     # test steps may be in standalone directives
@@ -216,7 +212,7 @@ class PylatestDocument(object):
         # document is splitted across multiple docstrings
         rst_list = []
         docstrings_used = set()
-        for section in PYLATEST_SECTIONS:
+        for section in SECTIONS:
             docstrings = self._section_dict.get(section)
             if docstrings is None and section == "Test Steps":
                 # put together test steps

@@ -33,6 +33,7 @@ See related docutils docs:
 from docutils.parsers.rst import directives
 from docutils.parsers.rst import roles
 from docutils.core import publish_cmdline
+from docutils.core import publish_parts
 from docutils import nodes
 from docutils.writers.html4css1 import HTMLTranslator
 
@@ -44,6 +45,16 @@ from pylatest.roles import redhat_bugzilla_role
 import pylatest.nodes
 import pylatest.htmltranslator
 
+
+# override default settings of html writer
+# see: http://docutils.sourceforge.net/docs/api/publisher.html
+# see: http://docutils.sourceforge.net/docs/user/config.html
+HTML_OVERRIDES = {
+    # don't embed default stylesheet
+    'embed_stylesheet': False,
+    # don't use stylesheet at all
+    'stylesheet_path': None,
+    }
 
 def register_table():
     """
@@ -81,15 +92,17 @@ def publish_cmdline_html():
 
     See: ``bin/pylatest2html`` script for usage.
     """
-    # override default settings
-    # see: http://docutils.sourceforge.net/docs/api/publisher.html
-    # see: http://docutils.sourceforge.net/docs/user/config.html
-    overrides = {
-        # don't embed default stylesheed
-        'embed_stylesheet': False,
-        # don't use stylesheet at all
-        'stylesheet_path': None,
-        }
-
     # see: http://docutils.sourceforge.net/docs/api/cmdline-tool.html
-    publish_cmdline(writer_name='html', settings_overrides=overrides)
+    publish_cmdline(writer_name='html', settings_overrides=HTML_OVERRIDES)
+
+def publish_parts_htmlbody(rst_document):
+    """
+    Publish method for pylatest.polarion module.
+
+    Returns:
+        string: html body of html rendering of given rst document
+    """
+    parts = publish_parts(
+        source=rst_document,
+        writer_name='html', settings_overrides=HTML_OVERRIDES)
+    return parts['html_body']

@@ -26,7 +26,8 @@ pylatest nodes (see pylatest.nodes module).
 
 def visit_test_step_node(self, node):
     attributes = {
-        'class': 'pylatest_step',
+        'class': 'pylatest_action',
+        'action_name': 'step',
         'action_id': node.attributes['action_id'],}
     self.body.append(self.starttag(node, 'div', **attributes))
 
@@ -35,7 +36,8 @@ def depart_test_step_node(self, node):
 
 def visit_test_result_node(self, node):
     attributes = {
-        'class': 'pylatest_result',
+        'class': 'pylatest_action',
+        'action_name': 'result',
         'action_id': node.attributes['action_id'],}
     self.body.append(self.starttag(node, 'div', **attributes))
 
