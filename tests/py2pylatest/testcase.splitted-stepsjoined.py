@@ -24,46 +24,6 @@ See :BZ:`439858` for more details.
 """
 
 """
-.. test_step:: 1
-
-    List files in the volume: ``ls -a /mnt/helloworld``
-"""
-
-"""
-.. test_result:: 1
-
-    There are no files, output should be empty.
-"""
-
-"""
-.. test_step:: 2
-
-    Donec et mollis dolor::
-
-        $ foo --extra sth
-        $ bar -vvv
-"""
-
-"""
-.. test_result:: 2
-
-    Maecenas congue ligula ac quam viverra nec
-    consectetur ante hendrerit.
-"""
-
-"""
-.. test_step:: 3
-
-    This one has no matching test result.
-"""
-
-"""
-.. test_result:: 4
-
-    And this result has no test step.
-"""
-
-"""
 Setup
 =====
 
@@ -87,6 +47,39 @@ Setup
 """
 
 """
+Test Steps
+==========
+
+.. test_step:: 1
+
+    List files in the volume: ``ls -a /mnt/helloworld``
+
+.. test_result:: 1
+
+    There are no files, output should be empty.
+
+.. test_step:: 2
+
+    Donec et mollis dolor::
+
+        $ foo --extra sth
+        $ bar -vvv
+
+.. test_result:: 2
+
+    Maecenas congue ligula ac quam viverra nec
+    consectetur ante hendrerit.
+
+.. test_step:: 3
+
+    This one has no matching test result.
+
+.. test_result:: 4
+
+    And this result has no test step.
+"""
+
+"""
 Teardown
 ========
 
@@ -96,6 +89,7 @@ Teardown
 
 #. The end.
 """
+
 
 import sys
 
