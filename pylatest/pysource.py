@@ -60,6 +60,7 @@ def is_pylatest_docstring(docstring):
     """
     return docstring.startswith("@pylatest")
 
+
 class PylatestDocument(object):
     """
     Pylatest rst document (test case description) extracted from python
