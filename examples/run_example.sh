@@ -35,7 +35,3 @@ pylatest2htmlplain hello.rst | tee hello.plain.html
 pylatest-template --author john@example.com foobar
 pylatest2html foobar.rst | tee foobar.html
 pylatest2htmlplain foobar.rst | tee foobar.plain.html
-
-# try to generate rst file from python code, it should match hello.rst
-py2pylatest hello.py > hello.generated.rst
-diff hello.rst hello.generated.rst
