@@ -34,25 +34,31 @@ import pylatest.client
 import pylatest.nodes
 
 
-def get_docstrings(ast_tree):
+def get_string_literals(content):
     """
-    Returns all docstrings (anonymous string literals) found in given python
-    ast node tree.
+    Returns all anonymous string literals found in given content of python
+    source file.
 
     Args:
-        ast_tree: python ast node tree
+        content(string): content of a python source file
 
     Returns:
         list of (``str``, ``int``) objects of all docstring expressions from
         the ast tree (string content and it's line number)
     """
     result = []
+    ast_tree = ast.parse(content)
     for node in ast.walk(ast_tree):
-        # docstring is a standalone string expression
         if isinstance(node, ast.Expr) and isinstance(node.value, ast.Str):
             result.append((inspect.cleandoc(node.value.s), node.lineno))
     return result
 
+def is_pylatest_docstring(docstring):
+    """
+    Check if given content (of an anonymous string literal)
+    is marked as a pylatest docstring.
+    """
+    return docstring.startswith("@pylatest")
 
 class PylatestDocument(object):
     """
@@ -122,6 +128,20 @@ class PylatestDocument(object):
         Return iterator for error found during last ``recreate()`` run.
         """
         return iter(self._run_errs)
+
+    def load_pysource(self, content):
+        """
+        Try to extract and load pylatest docstrings from given string
+        (content of a python source file).
+        """
+        strings = get_string_literals(content)
+        for docstring, lineno in strings:
+            # TODO: enable this check
+            # if not is_pylatest_docstring(docstring):
+            #     continue
+            status = self.add_docstring(docstring, lineno)
+            # TODO: do some debug output
+            # (status == True for valid pylatest data)
 
     def add_docstring(self, docstring, lineno):
         """
@@ -252,18 +272,12 @@ def main():
     # register pylatest rst extensions (parsing friendly plain implementation)
     pylatest.client.register_plain()
 
-    # get all python docstrings
-    docstrings = []
-    with open(args.filepath, 'r') as python_file:
-        tree = ast.parse(python_file.read())
-        docstrings = get_docstrings(tree)
-
-    # filter docstrings, I'm interested only if docstring contains
-    # part of pylatest testcase description
+    # create object to hold and process data from python source file
     doc = PylatestDocument()
-    for docstring, lineno in docstrings:
-        status = doc.add_docstring(docstring, lineno)
-        # TODO: do some debug output (status == True for valid pylatest data)
+
+    with open(args.filepath, 'r') as python_file:
+        source_content = python_file.read()
+        doc.load_pysource(source_content)
 
     # report all errors found so far
     for lineno, error in doc.errors():

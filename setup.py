@@ -44,5 +44,5 @@ setup(
         'bin/pylatest2htmlplain',
         'bin/py2pylatest',
         'bin/pylatest-template'],
-    test_suite = 'pylatest.tests',
+    test_suite = 'tests',
     )
