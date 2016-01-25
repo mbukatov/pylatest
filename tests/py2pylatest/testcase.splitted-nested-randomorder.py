@@ -6,7 +6,7 @@ import sys
 
 
 def foobar():
-    """
+    """@pylatest
     .. test_step:: 1
 
         List files in the volume: ``ls -a /mnt/helloworld``
@@ -15,7 +15,7 @@ def foobar():
     print("here will be some code")
     print("here will be some code")
 
-    """
+    """@pylatest
     .. test_result:: 1
 
         There are no files, output should be empty.
@@ -31,7 +31,7 @@ def teardown():
     print("here will be some code")
     print("here will be some code")
     print("here will be some code")
-    """
+    """@pylatest
     Teardown
     ========
 
@@ -44,7 +44,7 @@ def teardown():
     print("here will be some code")
 
 def setup():
-    """
+    """@pylatest
     Setup
     =====
 
@@ -76,7 +76,7 @@ def test():
     """
     foobar()
 
-    """
+    """@pylatest
     .. test_step:: 2
 
         Donec et mollis dolor::
@@ -88,7 +88,7 @@ def test():
     print("here will be some code")
     print("here will be some code")
 
-    """
+    """@pylatest
     .. test_result:: 2
 
         Maecenas congue ligula ac quam viverra nec
@@ -98,7 +98,7 @@ def test():
     print("here will be some code")
     print("here will be some code")
 
-    """
+    """@pylatest
     .. test_step:: 3
 
         This one has no matching test result.
@@ -112,7 +112,7 @@ def test():
     print("here will be some code")
 
 def main():
-    """
+    """@pylatest
     Hello World Test Case
     *********************
 

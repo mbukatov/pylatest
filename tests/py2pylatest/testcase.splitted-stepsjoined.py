@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf8 -*-
 
-"""
+"""@pylatest
 Hello World Test Case
 *********************
 
@@ -23,7 +23,7 @@ egestas mattis sit amet vitae augue.
 See :BZ:`439858` for more details.
 """
 
-"""
+"""@pylatest
 Setup
 =====
 
@@ -46,7 +46,7 @@ Setup
     # systemctl enable foobard
 """
 
-"""
+"""@pylatest
 Test Steps
 ==========
 
@@ -79,7 +79,7 @@ Test Steps
     And this result has no test step.
 """
 
-"""
+"""@pylatest
 Teardown
 ========
 

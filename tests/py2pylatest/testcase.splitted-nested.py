@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf8 -*-
 
-"""
+"""@pylatest
 Hello World Test Case
 *********************
 
@@ -34,7 +34,7 @@ def setup():
     print("here will be some code")
     print("here will be some code")
     print("here will be some code")
-    """
+    """@pylatest
     Setup
     =====
 
@@ -65,7 +65,7 @@ def teardown():
     print("here will be some code")
     print("here will be some code")
     print("here will be some code")
-    """
+    """@pylatest
     Teardown
     ========
 
@@ -86,7 +86,7 @@ def test():
     print("here will be some code")
     print("here will be some code")
 
-    """
+    """@pylatest
     .. test_step:: 1
 
         List files in the volume: ``ls -a /mnt/helloworld``
@@ -95,7 +95,7 @@ def test():
     print("here will be some code")
     print("here will be some code")
 
-    """
+    """@pylatest
     .. test_result:: 1
 
         There are no files, output should be empty.
@@ -104,7 +104,7 @@ def test():
     print("here will be some code")
     print("here will be some code")
 
-    """
+    """@pylatest
     .. test_step:: 2
 
         Donec et mollis dolor::
@@ -116,7 +116,7 @@ def test():
     print("here will be some code")
     print("here will be some code")
 
-    """
+    """@pylatest
     .. test_result:: 2
 
         Maecenas congue ligula ac quam viverra nec
@@ -126,7 +126,7 @@ def test():
     print("here will be some code")
     print("here will be some code")
 
-    """
+    """@pylatest
     .. test_step:: 3
 
         This one has no matching test result.

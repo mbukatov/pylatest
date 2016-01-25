@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf8 -*-
 
-"""
+"""@pylatest
 Hello World Test Case
 *********************
 
@@ -23,19 +23,19 @@ egestas mattis sit amet vitae augue.
 See :BZ:`439858` for more details.
 """
 
-"""
+"""@pylatest
 .. test_step:: 1
 
     List files in the volume: ``ls -a /mnt/helloworld``
 """
 
-"""
+"""@pylatest
 .. test_result:: 1
 
     There are no files, output should be empty.
 """
 
-"""
+"""@pylatest
 .. test_step:: 2
 
     Donec et mollis dolor::
@@ -44,26 +44,26 @@ See :BZ:`439858` for more details.
         $ bar -vvv
 """
 
-"""
+"""@pylatest
 .. test_result:: 2
 
     Maecenas congue ligula ac quam viverra nec
     consectetur ante hendrerit.
 """
 
-"""
+"""@pylatest
 .. test_step:: 3
 
     This one has no matching test result.
 """
 
-"""
+"""@pylatest
 .. test_result:: 4
 
     And this result has no test step.
 """
 
-"""
+"""@pylatest
 Setup
 =====
 
@@ -86,7 +86,7 @@ Setup
     # systemctl enable foobard
 """
 
-"""
+"""@pylatest
 Teardown
 ========
 

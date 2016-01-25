@@ -136,9 +136,6 @@ class PylatestDocument(object):
         """
         strings = get_string_literals(content)
         for docstring, lineno in strings:
-            # TODO: enable this check
-            # if not is_pylatest_docstring(docstring):
-            #     continue
             status = self.add_docstring(docstring, lineno)
             # TODO: do some debug output
             # (status == True for valid pylatest data)
@@ -155,6 +152,13 @@ class PylatestDocument(object):
             True if given docstring contains pylatest data and were added,
             Fase otherwise.
         """
+        # check if docstring is marked as pylatest content
+        if is_pylatest_docstring(docstring):
+            pylatest_header, _, docstring = docstring.partition('\n')
+            # TODO: process pylatest header
+        else:
+            return False
+
         # parse docstring to get rst node tree
         nodetree = publish_doctree(source=docstring)
 

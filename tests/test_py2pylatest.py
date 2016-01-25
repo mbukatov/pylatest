@@ -84,6 +84,25 @@ class TestStringExtraction(unittest.TestCase):
         docstring_item = ("Main function of py2pylatest cli tool.", 12)
         self.assertEqual(result, [docstring_item])
 
+    def test_is_pylatest_docstring_verysimple(self):
+        docstring = """@pylatest
+        And now something completelly different.
+        """
+        self.assertTrue(pysource.is_pylatest_docstring(docstring))
+
+    def test_is_pylatest_docstring_teardownsection(self):
+        docstring = """@pylatest
+        Teardown
+        ========
+
+        #. Lorem ipsum dolor sit amet: ``rm -rf /mnt/helloworld``.
+
+        #. Umount and remove ``lv_helloword`` volume.
+
+        #. The end.
+        """
+        self.assertTrue(pysource.is_pylatest_docstring(docstring))
+
     def test_is_pylatest_docstring_falsepositive(self):
         docstring1 = "This is just a string "
         docstring2 = """
@@ -107,7 +126,7 @@ class TestStringExtraction(unittest.TestCase):
         """
         examples = [docstring1, docstring2, docstring3]
         for docstring in examples:
-            self.assertEqual(pysource.is_pylatest_docstring(docstring), False)
+            self.assertFalse(pysource.is_pylatest_docstring(docstring))
 
 
 class TestPylatestDocumentExtraction(unittest.TestCase):
