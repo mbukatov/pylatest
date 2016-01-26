@@ -53,12 +53,50 @@ def get_string_literals(content):
             result.append((inspect.cleandoc(node.value.s), node.lineno))
     return result
 
-def is_pylatest_docstring(docstring):
+def classify_docstring(docstring):
     """
-    Check if given content (of an anonymous string literal)
-    is marked as a pylatest docstring.
+    Classify given docstring, if pylatest content is detected, extract
+    list of pylatest test case ids and docstring rst content.
+
+    Args:
+        content(string): content of an anonymous python string literal
+
+    Returns:
+        tuple: (is_pylatest_docstring(bool), doc_id_list(list), content(string))
     """
-    return docstring.startswith("@pylatest")
+    pylatest_mark = "@pylatest"
+    if docstring.startswith(pylatest_mark):
+        pylatest_header, _, docstring = docstring.partition('\n')
+        doc_id_list = []
+        id_str = pylatest_header[len(pylatest_mark):].lstrip()
+        if len(id_str) > 0:
+            doc_id_list = id_str.split(' ')
+        return (True, doc_id_list, docstring)
+    else:
+        return (False, [], docstring)
+
+def extract_documents(source):
+    """
+    Try to extract pylatest docstrings from given string (content of
+    a python source file) and generate PylatestDocument(s) from it.
+
+    Returns:
+        list of PylatestDocument items generated from given python source
+    """
+    # doc_id (aka testcase id) -> pylatest document object (aka test case doc)
+    doc_dict = {}
+    for docstring, lineno in get_string_literals(source):
+        is_pylatest_str, doc_id_list, content = classify_docstring(docstring)
+        if is_pylatest_str:
+            if len(doc_id_list) == 0:
+                # when no id is detected, create special document without id
+                doc_id_list = [None]
+            for doc_id in doc_id_list:
+                doc = doc_dict.setdefault(doc_id, PylatestDocument())
+                status = doc.add_docstring(content, lineno)
+                # TODO: do some debug output
+                # (status == True for valid pylatest data)
+    return doc_dict
 
 
 class PylatestDocument(object):
@@ -130,17 +168,6 @@ class PylatestDocument(object):
         """
         return iter(self._run_errs)
 
-    def load_pysource(self, content):
-        """
-        Try to extract and load pylatest docstrings from given string
-        (content of a python source file).
-        """
-        strings = get_string_literals(content)
-        for docstring, lineno in strings:
-            status = self.add_docstring(docstring, lineno)
-            # TODO: do some debug output
-            # (status == True for valid pylatest data)
-
     def add_docstring(self, docstring, lineno):
         """
         Look for some part of pylatest test description data in given string,
@@ -153,13 +180,6 @@ class PylatestDocument(object):
             True if given docstring contains pylatest data and were added,
             Fase otherwise.
         """
-        # check if docstring is marked as pylatest content
-        if is_pylatest_docstring(docstring):
-            pylatest_header, _, docstring = docstring.partition('\n')
-            # TODO: process pylatest header
-        else:
-            return False
-
         # parse docstring to get rst node tree
         nodetree = publish_doctree(source=docstring)
 
@@ -277,26 +297,26 @@ def main():
     # register pylatest rst extensions (parsing friendly plain implementation)
     pylatest.client.register_plain()
 
-    # create object to hold and process data from python source file
-    doc = PylatestDocument()
-
     with open(args.filepath, 'r') as python_file:
         source_content = python_file.read()
-        doc.load_pysource(source_content)
+        doc_dict = extract_documents(source_content)
 
-    # report all errors found so far
-    for lineno, error in doc.errors():
-        msg = "Error on line {0:d}: {1:s}"
-        print(msg.format(lineno, error), file=sys.stderr)
+    retcode = 0
 
-    # TODO: try except
-    rst_document = doc.recreate()
+    for doc_id, doc in doc_dict.items():
+        # report all errors found so far
+        for lineno, error in doc.errors():
+            msg = "Error on line {0:d}: {1:s}"
+            print(msg.format(lineno, error), file=sys.stderr)
+        # TODO: try except
+        rst_document = doc.recreate()
+        # report all runtime errors
+        for error in doc.errors_lastrecreate():
+            print("Error: {0:s}".format(error), file=sys.stderr)
+        print(rst_document, end='')
+        if len(doc_dict) > 1:
+            print()
+        if doc.has_errors():
+            retcode = 1
 
-    # report all runtime errors
-    for error in doc.errors_lastrecreate():
-        print("Error: {0:s}".format(error), file=sys.stderr)
-
-    print(rst_document, end='')
-
-    if doc.has_errors():
-        return 1
+    return retcode
