@@ -293,6 +293,12 @@ def main():
     parser = argparse.ArgumentParser(
         description='Generate rst testcase description from python source.')
     parser.add_argument(
+        "-c", "--create-files", action="store_true", default=False,
+        help="write pylatest rst documenent(s) into file(s) instead of stdout")
+    parser.add_argument(
+        "--default-filename", action="store",
+        help="default filename (use with --create-files)")
+    parser.add_argument(
         "filepath",
         help="path of python source code automating given testcase")
     args = parser.parse_args()
@@ -316,9 +322,24 @@ def main():
         # report all runtime errors
         for error in doc.errors_lastrecreate():
             print("Error: {0:s}".format(error), file=sys.stderr)
-        print(rst_document, end='')
-        if len(doc_dict) > 1:
-            print()
+        if args.create_files:
+            # try to use default filename when no testcase/doc id is used
+            if doc_id is None:
+                if args.default_filename is not None:
+                    doc_id = args.default_filename
+                else:
+                    msg = "default filename not specified, skipping 1 document"
+                    print("Error: " + msg, file=sys.stderr)
+                    retcode = 1
+                    continue
+            # TODO: change or allow to redefine naming scheme
+            filename = "{0}.rst".format(doc_id)
+            with open(filename, 'w') as rst_file:
+                rst_file.write(rst_document)
+        else:
+            print(rst_document, end='')
+            if len(doc_dict) > 1:
+                print()
         if doc.has_errors():
             retcode = 1
 
