@@ -80,6 +80,9 @@ def extract_documents(source):
     Try to extract pylatest docstrings from given string (content of
     a python source file) and generate PylatestDocument(s) from it.
 
+    Args:
+        source(string): content of a python source file
+
     Returns:
         list of PylatestDocument items generated from given python source
     """
