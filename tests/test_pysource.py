@@ -29,7 +29,7 @@ HERE = os.path.abspath(os.path.dirname(__file__))
 
 class TestStringExtraction(unittest.TestCase):
     """
-    Test an extraction of pylatest string literals from python source files.
+    Test an extraction of string literals from python source files.
     """
 
     def test_get_string_literals_emptysource(self):
@@ -129,7 +129,7 @@ class TestStringExtraction(unittest.TestCase):
             self.assertFalse(pysource.is_pylatest_docstring(docstring))
 
 
-class TestPylatestDocumentExtraction(unittest.TestCase):
+class TestPylatestDocumentExtractionOneCaseOneFile(unittest.TestCase):
     """
     Test extraction of entire pylatest document from single python source file.
 
@@ -146,7 +146,7 @@ class TestPylatestDocumentExtraction(unittest.TestCase):
 
     def _read_file(self, name):
         filename = os.path.join(
-            HERE, "py2pylatest", "testcase.{0}".format(name))
+            HERE, "pysource-onecaseperfile", "testcase.{0}".format(name))
         with open(filename, 'r') as python_file:
             content = python_file.read()
         return content
