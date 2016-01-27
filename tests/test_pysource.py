@@ -267,3 +267,10 @@ class TestPylatestDocumentsExtractionMultipleCasesPerFile(unittest.TestCase):
 
     def test_extract_documents_splitted_nested(self):
         self._test_extract_documents_noerrors(2, "splitted-nested.py")
+
+    def test_extract_documents_splitted_nested_withdefault(self):
+        self._test_extract_documents_noerrors(2, "splitted-nested-default.py")
+
+    def test_extract_documents_splitted_nested_withdefault_override(self):
+        pyfilename = "splitted-nested-default-override.py"
+        self._test_extract_documents_noerrors(3, pyfilename)

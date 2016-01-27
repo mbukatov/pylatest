@@ -88,17 +88,25 @@ def extract_documents(source):
     """
     # doc_id (aka testcase id) -> pylatest document object (aka test case doc)
     doc_dict = {}
+    default_doc = PylatestDocument()
     for docstring, lineno in get_string_literals(source):
         is_pylatest_str, doc_id_list, content = classify_docstring(docstring)
         if is_pylatest_str:
             if len(doc_id_list) == 0:
                 # when no id is detected, create special document without id
                 doc_id_list = [None]
+            elif "default" in doc_id_list:
+                status = default_doc.add_docstring(content, lineno)
+                continue
             for doc_id in doc_id_list:
                 doc = doc_dict.setdefault(doc_id, PylatestDocument())
                 status = doc.add_docstring(content, lineno)
                 # TODO: do some debug output
                 # (status == True for valid pylatest data)
+    # allow all document objects to find defaults if needed
+    if not default_doc.is_empty:
+        for doc in doc_dict.values():
+            doc.default_doc = default_doc
     return doc_dict
 
 
@@ -109,11 +117,16 @@ class PylatestDocument(object):
     """
 
     def __init__(self):
-        self._docstrings = [] # list of docstrings with at least one section
-        self._test_steps = [] # dosctrings with just test step directives
+        # content
+        self._docstrings = []   # list of docstrings with at least one section
         self._section_dict = {} # section name -> list of docstrings
+        self._test_actions = [] # dosctrings with test step/result directives only
+        self.default_doc = None # document object with default content
+        # errors
         self._err_dict = {} # lineno -> list of err msg
         self._run_errs = [] # runtile error list (after reading docstrings)
+        # state
+        self.is_empty = True
 
     # TODO: this doesn't work because node tree still contains pending elements
     # instead of test step nodes - with single exception: the very first test
@@ -171,6 +184,20 @@ class PylatestDocument(object):
         """
         return iter(self._run_errs)
 
+    def _add_section(self, docstring, lineno, sections):
+        """
+        Add docstring which contains given sections.
+        """
+        self._docstrings.append(docstring)
+        for section in sections:
+            self._section_dict.setdefault(section, []).append(docstring)
+
+    def _add_test_actions(self, docstring, lineno):
+        """
+        Add docstring which contains some test step or result directives.
+        """
+        self._test_actions.append(docstring)
+
     def add_docstring(self, docstring, lineno):
         """
         Look for some part of pylatest test description data in given string,
@@ -202,28 +229,28 @@ class PylatestDocument(object):
             test_directive_count += 1
 
         if len(detected_sections) == 0 and test_directive_count == 0:
-            return False
-        if len(detected_sections) == 0 and test_directive_count > 0:
-            self._test_steps.append(docstring)
-            return True
-        if len(detected_sections) > 0 and test_directive_count == 0:
+            status_success = False
+        elif len(detected_sections) == 0 and test_directive_count > 0:
+            self._add_test_actions(docstring, lineno)
+            status_success = True
+        elif len(detected_sections) > 0 and test_directive_count == 0:
             if "Test Steps" in detected_sections:
                 # we have Test Steps section without test step directives
                 msg = "found 'Test Steps' section without test step direcives"
                 self._add_error(msg, lineno)
-            self._docstrings.append(docstring)
-            for section in detected_sections:
-                self._section_dict.setdefault(section, []).append(docstring)
-            return True
-        if len(detected_sections) > 0 and test_directive_count > 0:
+            self._add_section(docstring, lineno, detected_sections)
+            status_success = True
+        elif len(detected_sections) > 0 and test_directive_count > 0:
             if "Test Steps" not in detected_sections:
                 msg = ("docstring with multiple sections contains test step"
                       " directives, but no 'Test Steps' section was found")
                 self._add_error(msg, lineno)
-            self._docstrings.append(docstring)
-            for section in detected_sections:
-                self._section_dict.setdefault(section, []).append(docstring)
-            return True
+            self._add_section(docstring, lineno, detected_sections)
+            status_success = True
+
+        if status_success:
+            self.is_empty = False
+        return status_success
 
     @property
     def sections(self):
@@ -242,6 +269,15 @@ class PylatestDocument(object):
         # nothing has been found
         if len(self._docstrings) == 0:
             return ""
+
+        # import default sections
+        if self.default_doc is not None:
+            for section in ("Setup", "Teardown"):
+                if section not in self.sections and section in self.default_doc.sections:
+                    # TODO: log this event (info or debug)
+                    # TODO: improve error checks (we assume few things here)
+                    def_section = self.default_doc._section_dict[section][0]
+                    self.add_docstring(def_section, 1)
 
         # report missing sections
         for section in SECTIONS:
@@ -264,9 +300,9 @@ class PylatestDocument(object):
             docstrings = self._section_dict.get(section)
             if docstrings is None and section == "Test Steps":
                 # put together test steps
-                if len(self._test_steps) > 0:
+                if len(self._test_actions) > 0:
                     rst_list.append("Test Steps\n==========")
-                    teststeps = "\n\n".join(self._test_steps)
+                    teststeps = "\n\n".join(self._test_actions)
                     rst_list.append(teststeps)
                 else:
                     msg = "test steps/actions directives are missing"
