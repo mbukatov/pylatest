@@ -65,7 +65,7 @@ def teardown():
     print("here will be some code")
     print("here will be some code")
     print("here will be some code")
-    """@pylatest test01 test02
+    """@pylatest default
     Teardown
     ========
 
