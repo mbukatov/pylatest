@@ -333,11 +333,21 @@ def main():
         help="write pylatest rst documenent(s) into file(s) instead of stdout")
     parser.add_argument(
         "--default-filename", action="store",
-        help="default filename (use with --create-files)")
+        help=(
+            "default filename for docstring without id "
+            "(use with --create-files)"))
+    parser.add_argument(
+        "--enforce-id", action="store_true", default=False,
+        help="fail outright when no docstring id is found")
     parser.add_argument(
         "filepath",
         help="path of python source code automating given testcase")
     args = parser.parse_args()
+
+    if args.default_filename and args.enforce_id:
+        msg = "using both --default-filename and --enforce-id doesn't make sense"
+        print("Error: " + msg, file=sys.stderr)
+        return 1
 
     # register pylatest rst extensions (parsing friendly plain implementation)
     pylatest.client.register_plain()
@@ -358,6 +368,12 @@ def main():
         # report all runtime errors
         for error in doc.errors_lastrecreate():
             print("Error: {0:s}".format(error), file=sys.stderr)
+        if args.enforce_id and doc_id is None:
+            msg = "docstring without id found while id enforcing enabled"
+            # TODO: report line numbers of such docstrings
+            print("Error: " + msg, file=sys.stderr)
+            retcode = 1
+            break
         if args.create_files:
             # try to use default filename when no testcase/doc id is used
             if doc_id is None:
