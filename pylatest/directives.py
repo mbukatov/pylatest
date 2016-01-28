@@ -46,6 +46,9 @@ class TestStepsDirective(rst.Directive):
     optional_arguments = 0
     final_argument_whitespace = False
     has_content = True
+    option_spec = {
+        'include': str,
+        }
 
     # Class of rst transformation for this directive, which creates final
     # representation of all test steps directives in rst node tree.
