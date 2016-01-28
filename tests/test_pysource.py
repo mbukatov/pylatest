@@ -258,6 +258,8 @@ class TestPylatestDocumentsExtractionMultipleCasesPerFile(unittest.TestCase):
         doc_dict = pysource.extract_documents(source)
         self.assertEqual(len(doc_dict), doc_num)
         for doc_id, doc in doc_dict.items():
+            if doc_id is None:
+                doc_id = "none"
             filename = "{}.rst".format(doc_id)
             expected_result = read_file("multiplecasesperfile", filename)
             self.assertEqual(len(list(doc.errors())), 0)
@@ -273,4 +275,8 @@ class TestPylatestDocumentsExtractionMultipleCasesPerFile(unittest.TestCase):
 
     def test_extract_documents_splitted_nested_withdefault_override(self):
         pyfilename = "splitted-nested-default-override.py"
+        self._test_extract_documents_noerrors(3, pyfilename)
+
+    def test_extract_documents_splitted_nested_withdefault_override_null(self):
+        pyfilename = "splitted-nested-default-override-null.py"
         self._test_extract_documents_noerrors(3, pyfilename)
