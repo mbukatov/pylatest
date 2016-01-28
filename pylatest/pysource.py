@@ -213,6 +213,12 @@ class PylatestDocument(object):
         # parse docstring to get rst node tree
         nodetree = publish_doctree(source=docstring)
 
+        # TODO: search for this kind of elements in the tree:
+        # <system_message level="3" line="4" source="<string>" type="ERROR">
+        # and report rst parsing errors in a useful way immediately
+        # Also note that publish_doctree() reports the errors to stderr, which
+        # is not that great here - TODO: reconfigure (logging involved?)
+
         # try to find any pylatest section
         detected_sections = []
         condition = lambda node: \
