@@ -1,5 +1,18 @@
 This section shows how to install latest development version directly from
-source code.
+the source code.
+
+Unit tests
+==========
+
+Unit tests (located in ``tests/`` directory) are written using plain
+``unittest`` module from python standard library.
+
+To execute all unit tests, just run::
+
+    python setup.py test
+
+Installation into virtualenv
+============================
 
 Create new virtualenv environment in root directory of pylatest project (use
 path you cloned pylatest git repository into)::
