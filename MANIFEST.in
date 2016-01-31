@@ -1,1 +1,2 @@
-include README.rst
+graft pylatest
+global-exclude *.py[cod] __pycache__ .gitignore *.html

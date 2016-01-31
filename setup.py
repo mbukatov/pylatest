@@ -21,6 +21,8 @@ with codecs.open(os.path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 setup(
     name='pylatest',
+    # See https://packaging.python.org/en/latest/distributing/#choosing-a-versioning-scheme
+    # TODO: connect with git tags?
     version='0.0.4',
     description='Testcase description generation tools.',
     long_description=long_description,
@@ -36,9 +38,13 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.4',
         ],
-    packages=find_packages(exclude=['doc']),
+    packages=find_packages(exclude=['doc', 'tests']),
     install_requires=['docutils'],
-    package_data={'pylatest': ['templates/*']},
+    # TODO: make this work with git (and remove MANIFEST.in?)
+    # setup_requires=['setuptools_scm'],
+    # use_scm_version=True,
+    include_package_data=True,
+    # TODO: use entry_points instead
     scripts=[
         'bin/pylatest2html',
         'bin/pylatest2htmlplain',
