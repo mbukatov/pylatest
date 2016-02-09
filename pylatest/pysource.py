@@ -382,6 +382,9 @@ def main():
         "--enforce-id", action="store_true", default=False,
         help="fail outright when no docstring id is found")
     parser.add_argument(
+        "-l", "--list", action="store_true", default=False,
+        help="just list testcases in given python file without exporting")
+    parser.add_argument(
         "filepath",
         help="path of python source code automating given testcase")
     args = parser.parse_args()
@@ -401,6 +404,12 @@ def main():
     retcode = 0
 
     for doc_id, doc in doc_dict.items():
+        if args.list:
+            # try to use default filename when no testcase/doc id is used
+            if doc_id is None and args.default_filename is not None:
+                doc_id = args.default_filename
+            print("{0}".format(doc_id))
+            continue
         # report all errors found so far
         for lineno, error in doc.errors():
             msg = "Error on line {0:d}: {1:s}"
