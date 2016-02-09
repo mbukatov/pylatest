@@ -11,21 +11,6 @@ Hello World Test Case
 """
 
 """@pylatest
-Description
-===========
-
-This is just demonstration of usage of pylatest rst directives and expected
-structure of rst document.
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus.
-Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec
-consectetur ante hendrerit. Donec et mollis dolor. Praesent et diam eget libero
-egestas mattis sit amet vitae augue.
-
-See :BZ:`439858` for more details.
-"""
-
-"""@pylatest
 .. test_step:: 1
 
     List files in the volume: ``ls -a /mnt/helloworld``

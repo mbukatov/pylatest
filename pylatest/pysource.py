@@ -29,7 +29,7 @@ import sys
 from docutils.core import publish_doctree
 from docutils import nodes
 
-from pylatest.document import SECTIONS
+from pylatest.document import SECTIONS, HEADER, SECTIONS_ALL
 import pylatest.client
 import pylatest.nodes
 
@@ -234,6 +234,23 @@ class PylatestDocument(object):
         for node in nodetree.traverse(self._teststeps_condition_hack):
             test_directive_count += 1
 
+        # try to detect header pseudo section (contains name and metadata)
+        meta_directive_count = 0
+        nodes_title_count = 0
+        for node in nodetree.traverse(pylatest.nodes.test_metadata_node):
+            meta_directive_count += 1
+        for node in nodetree.traverse(nodes.title):
+            nodes_title_count += 1
+        if meta_directive_count > 0 and nodes_title_count > 0:
+            # here we expect that:
+            # 1) header pseudosection starts with the title,
+            #    which would make it the very first element in the nodetree
+            # 2) this title contains name of the test case,
+            #    so that title text doesn't match predefined set of sections
+            title_index = nodetree.first_child_matching_class(nodes.title)
+            if title_index == 0 and nodetree[title_index].astext() not in SECTIONS:
+                detected_sections.insert(1, HEADER)
+
         if len(detected_sections) == 0 and test_directive_count == 0:
             status_success = False
         elif len(detected_sections) == 0 and test_directive_count > 0:
@@ -278,7 +295,7 @@ class PylatestDocument(object):
 
         # import default sections
         if self.default_doc is not None:
-            for section in ("Setup", "Teardown"):
+            for section in ("Description", "Setup", "Teardown"):
                 if section not in self.sections and section in self.default_doc.sections:
                     # TODO: log this event (info or debug)
                     # TODO: improve error checks (we assume few things here)
@@ -286,7 +303,7 @@ class PylatestDocument(object):
                     self.add_docstring(def_section, 1)
 
         # report missing sections
-        for section in SECTIONS:
+        for section in SECTIONS_ALL:
             if section not in self._section_dict:
                 if section == "Test Steps" and len(self._docstrings) > 1:
                     # test steps may be in standalone directives
@@ -302,7 +319,7 @@ class PylatestDocument(object):
         # document is splitted across multiple docstrings
         rst_list = []
         docstrings_used = set()
-        for section in SECTIONS:
+        for section in SECTIONS_ALL:
             docstrings = self._section_dict.get(section)
             if docstrings is None and section == "Test Steps":
                 # put together test steps

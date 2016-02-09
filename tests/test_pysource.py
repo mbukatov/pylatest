@@ -191,9 +191,9 @@ class TestPylatestDocumentExtractionOneCaseOneFile(unittest.TestCase):
         doc_dict = pysource.extract_documents(source)
         self.assertEqual(len(doc_dict), 1)
         doc = doc_dict[None]
-        self.assertEqual(len(list(doc.errors())), 0)
+        self.assertEqual(list(doc.errors()), [])
         self.assertEqual(doc.recreate(), expected_result)
-        self.assertEqual(len(list(doc.errors_lastrecreate())), 0)
+        self.assertEqual(list(doc.errors_lastrecreate()), [])
         self.assertFalse(doc.has_errors())
 
     def _test_extract_document_mangled(self, testname, resultname):
@@ -233,10 +233,27 @@ class TestPylatestDocumentExtractionOneCaseOneFile(unittest.TestCase):
         self._test_extract_document_mangled(
             "single-stepsmissing.py", "stepsmissing.rst")
 
+    def test_extract_document_single_descriptionmissing(self):
+        self._test_extract_document_mangled(
+            "single-descriptionmissing.py", "descriptionmissing.rst")
+
+    def test_extract_document_single_descriptionmissing_setupmissing(self):
+        self._test_extract_document_mangled(
+            "single-descriptionmissing-setupmissing.py",
+            "descriptionmissing-setupmissing.rst")
+
     def test_extract_document_single_stepsmissing_teardownmissing(self):
         self._test_extract_document_mangled(
             "single-stepsmissing-teardownmissing.py",
             "stepsmissing-teardownmissing.rst")
+
+    def test_extract_document_splitted_descriptionmissing(self):
+        self._test_extract_document_mangled(
+            "splitted-descriptionmissing.py", "descriptionmissing.rst")
+
+    def test_extract_document_splitted_setupmissing(self):
+        self._test_extract_document_mangled(
+            "splitted-setupmissing.py", "setupmissing.rst")
 
 
 class TestPylatestDocumentsExtractionMultipleCasesPerFile(unittest.TestCase):
@@ -262,9 +279,9 @@ class TestPylatestDocumentsExtractionMultipleCasesPerFile(unittest.TestCase):
                 doc_id = "none"
             filename = "{}.rst".format(doc_id)
             expected_result = read_file("multiplecasesperfile", filename)
-            self.assertEqual(len(list(doc.errors())), 0)
+            self.assertEqual(list(doc.errors()), [])
             self.assertEqual(doc.recreate(), expected_result)
-            self.assertEqual(len(list(doc.errors_lastrecreate())), 0)
+            self.assertEqual(list(doc.errors_lastrecreate()), [])
             self.assertFalse(doc.has_errors())
 
     def test_extract_documents_splitted_nested(self):

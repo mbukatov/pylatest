@@ -8,24 +8,7 @@ Hello World Test Case
 .. test_metadata:: author foo@example.com
 .. test_metadata:: date 2015-11-06
 .. test_metadata:: comment This is here just to test metadata processing.
-"""
 
-"""@pylatest
-Description
-===========
-
-This is just demonstration of usage of pylatest rst directives and expected
-structure of rst document.
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus.
-Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec
-consectetur ante hendrerit. Donec et mollis dolor. Praesent et diam eget libero
-egestas mattis sit amet vitae augue.
-
-See :BZ:`439858` for more details.
-"""
-
-"""@pylatest
 Setup
 =====
 
@@ -46,9 +29,7 @@ Setup
 
     # dnf install foobar
     # systemctl enable foobard
-"""
 
-"""@pylatest
 Test Steps
 ==========
 
@@ -79,9 +60,7 @@ Test Steps
 .. test_result:: 4
 
     And this result has no test step.
-"""
 
-"""@pylatest
 Teardown
 ========
 
