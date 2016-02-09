@@ -412,17 +412,17 @@ def main():
             continue
         # report all errors found so far
         for lineno, error in doc.errors():
-            msg = "Error on line {0:d}: {1:s}"
-            print(msg.format(lineno, error), file=sys.stderr)
+            msg = "Error on line {0:d}: {1:s} (doc_id: {2:s})"
+            print(msg.format(lineno, error, doc_id), file=sys.stderr)
         # TODO: try except
         rst_document = doc.recreate()
         # report all runtime errors
         for error in doc.errors_lastrecreate():
-            print("Error: {0:s}".format(error), file=sys.stderr)
+            print("Error: {0:s} (doc_id: {1:s})".format(error, doc_id), file=sys.stderr)
         if args.enforce_id and doc_id is None:
             msg = "docstring without id found while id enforcing enabled"
             # TODO: report line numbers of such docstrings
-            print("Error: " + msg, file=sys.stderr)
+            print("Error: {0:s}".format(msg), file=sys.stderr)
             retcode = 1
             break
         if args.create_files:
