@@ -12,6 +12,7 @@ This file is written in rst file format, if you are not familiar with it,
 check:
 
  * https://en.wikipedia.org/wiki/ReStructuredText
+ * http://docutils.sourceforge.net/docs/user/rst/quickref.html
  * http://sphinx-doc.org/rest.html
 
 In addition to that, you can use the following syntax to reference redhat
