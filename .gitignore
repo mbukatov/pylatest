@@ -2,6 +2,7 @@
 .*.swp
 *~
 *.egg-info
+.eggs
 .env
 build
 dist
