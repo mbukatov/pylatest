@@ -52,3 +52,21 @@ def redhat_bugzilla_role(role, rawtext, text, lineno, inliner,
     node = nodes.reference(
         rawtext, 'BZ ' + utils.unescape(text), refuri=ref, **options)
     return [node], []
+
+def pylaref_html_role(role, rawtext, text, lineno, inliner,
+                         options={}, content=[]):
+    """
+    Implementation of pylatest reference role for html output.
+
+    Usage::
+
+        See :pylaref:`foobar` for more information.
+
+    Where ``foobar`` is a pylatest document id.
+    """
+    doc_id = text
+    ref = "{0:s}.html".format(doc_id)
+    roles.set_classes(options)
+    node = nodes.reference(
+        rawtext, utils.unescape(text), refuri=ref, **options)
+    return [node], []

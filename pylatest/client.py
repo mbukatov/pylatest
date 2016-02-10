@@ -42,6 +42,7 @@ from pylatest.directives import TestStepsPlainDirective
 from pylatest.directives import TestMetadataTableDirective
 from pylatest.directives import TestMetadataPlainDirective
 from pylatest.roles import redhat_bugzilla_role
+from pylatest.roles import pylaref_html_role
 import pylatest.nodes
 import pylatest.htmltranslator
 
@@ -65,6 +66,8 @@ def register_table():
     directives.register_directive("test_step", TestStepsTableDirective)
     directives.register_directive("test_result", TestStepsTableDirective)
     roles.register_local_role("bz", redhat_bugzilla_role)
+    roles.register_local_role("pylaref", pylaref_html_role)
+
 
 def register_plain():
     """
@@ -75,6 +78,7 @@ def register_plain():
     directives.register_directive("test_step", TestStepsPlainDirective)
     directives.register_directive("test_result", TestStepsPlainDirective)
     roles.register_local_role("bz", redhat_bugzilla_role)
+    roles.register_local_role("pylaref", pylaref_html_role)
     # custom nodes are used to wrap content of pylatest directives into div
     # or span elements
     nodes._add_node_class_names(pylatest.nodes.node_class_names)
