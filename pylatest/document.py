@@ -2,10 +2,32 @@
 
 """
 Pylatest test case document module.
+
+**Pylatest document** means a description of a single test case written in rst
+markup format.
+
+This module contains information about expected structure (eg. list of section
+titles) and TODO: other general functions.
 """
 
+# Copyright (C) 2016 mbukatov@redhat.com
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+
 """
-List of headers of expected sections in pylatest document (order matters).
+List of titles of expected sections in pylatest document (order matters).
 """
 SECTIONS = (
     "Description",
@@ -14,7 +36,7 @@ SECTIONS = (
     "Teardown")
 
 """
-Header section is not a real section, but a placeholder for data
+Header pseudo section. It's not a real section, but a placeholder for data
 which includes:
 
  * main headline with a name of the test case
@@ -27,8 +49,8 @@ placeholder is not direcly included in ``SECTIONS`` tuple.
 HEADER = "__header__"
 
 """
-List of headers of all sections in pylatest document (order matters),
-including ``__header__`` data.
+List of titles of all sections in pylatest document (order matters),
+including HEADER pseudo section.
 """
 __tmp = [HEADER]
 __tmp.extend(SECTIONS)
