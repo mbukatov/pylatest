@@ -20,9 +20,7 @@ fi
 cd -
 
 # remove previous results
-rm foobar.*
-rm hello.html
-rm hello.generated.rst
+rm -f hello.*html
 
 # python -m pdb ../bin/pylatest2html --traceback hello.rst
 # pylatest2html --traceback hello.rst
@@ -32,6 +30,6 @@ pylatest2html hello.rst | tee hello.html
 pylatest2htmlplain hello.rst | tee hello.plain.html
 
 # try to use default template
-pylatest-template --author john@example.com foobar
-pylatest2html foobar.rst | tee foobar.html
-pylatest2htmlplain foobar.rst | tee foobar.plain.html
+# pylatest-template --author john@example.com foobar
+# pylatest2html foobar.rst | tee foobar.html
+# pylatest2htmlplain foobar.rst | tee foobar.plain.html
