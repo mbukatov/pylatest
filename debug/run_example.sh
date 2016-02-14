@@ -20,12 +20,10 @@ fi
 cd -
 
 # remove previous results
-rm -f hello.*html
+rm -f *html
 
 # python -m pdb ../bin/pylatest2html --traceback hello.rst
 # pylatest2html --traceback hello.rst
-
-# use hello.rst file
 pylatest2html hello.rst | tee hello.html
 pylatest2htmlplain hello.rst | tee hello.plain.html
 
