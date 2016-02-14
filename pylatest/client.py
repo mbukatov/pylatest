@@ -57,6 +57,21 @@ HTML_OVERRIDES = {
     'stylesheet_path': None,
     }
 
+def register_pylatest_nodes():
+    """
+    Register custom pylatest nodes for test step and resutl sections.
+    These custom nodes are used to wrap content of pylatest directives into div
+    or span elements.
+    """
+    nodes._add_node_class_names(pylatest.nodes.node_class_names)
+    for node_name in pylatest.nodes.node_class_names:
+        visit_func_name = "visit_" + node_name
+        depart_func_name = "depart_" + node_name
+        setattr(HTMLTranslator, visit_func_name,
+            getattr(pylatest.htmltranslator, visit_func_name))
+        setattr(HTMLTranslator, depart_func_name,
+            getattr(pylatest.htmltranslator, depart_func_name))
+
 def register_table():
     """
     Register table generating implementation of pylatest rst directives
@@ -68,7 +83,6 @@ def register_table():
     roles.register_local_role("bz", redhat_bugzilla_role)
     roles.register_local_role("pylaref", pylaref_html_role)
 
-
 def register_plain():
     """
     Register plain implementation of pylatest rst directives and roles.
@@ -79,16 +93,7 @@ def register_plain():
     directives.register_directive("test_result", TestStepsPlainDirective)
     roles.register_local_role("bz", redhat_bugzilla_role)
     roles.register_local_role("pylaref", pylaref_html_role)
-    # custom nodes are used to wrap content of pylatest directives into div
-    # or span elements
-    nodes._add_node_class_names(pylatest.nodes.node_class_names)
-    for node_name in pylatest.nodes.node_class_names:
-        visit_func_name = "visit_" + node_name
-        depart_func_name = "depart_" + node_name
-        setattr(HTMLTranslator, visit_func_name,
-            getattr(pylatest.htmltranslator, visit_func_name))
-        setattr(HTMLTranslator, depart_func_name,
-            getattr(pylatest.htmltranslator, depart_func_name))
+    register_pylatest_nodes()
 
 def publish_cmdline_html():
     """
