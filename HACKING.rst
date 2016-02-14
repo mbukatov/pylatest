@@ -4,12 +4,21 @@ the source code.
 Unit tests
 ==========
 
-Unit tests (located in ``tests/`` directory) are written using plain
-``unittest`` module from python standard library.
+Unit tests are located in ``tests/`` directory and are written using plain
+``unittest`` module from python standard library. There are no custom test
+runners or test suites.
 
-To execute all unit tests, just run::
+To execute all unit tests, run::
 
     python setup.py test
+
+To run particular suite, eg. for ``tests/test_document.py``, use::
+
+    python setup.py test -s tests.test_document
+
+Note that's possible to go one step further and specify a class name::
+
+    python setup.py test -s tests.test_document.TestSectionTuples
 
 Installation into virtualenv
 ============================
