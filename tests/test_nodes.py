@@ -42,12 +42,18 @@ class TestCustomNodes(unittest.TestCase):
             parser_name='restructuredtext',)
 
     def _publish_pseudoxml(self):
+        """
+        Returns string with pseudo xml rendering of ``self.doctree``.
+        """
         output = publish_from_doctree(
             self.doctree,
             settings_overrides={'output_encoding': 'unicode'},)
         return output
 
     def _publish_html(self):
+        """
+        Returns string with html rendering of ``self.doctree``.
+        """
         output = publish_from_doctree(
             self.doctree,
             writer_name='html',
@@ -62,8 +68,13 @@ class TestCustomNodes(unittest.TestCase):
         self.assertEqual(output.strip(), '<document source="<string>">')
 
     def test_test_step_node(self):
-        self.doctree += pylatest.nodes.test_step_node()
+        # create test step without any content
+        node = pylatest.nodes.test_step_node()
+        # add this node into doctree
+        self.doctree += node
+        # generate html into string
         output = self._publish_pseudoxml()
+        # check the result
         exp_result = textwrap.dedent('''\
         <document source="<string>">
             <test_step_node>
@@ -75,23 +86,22 @@ class TestCustomNodes(unittest.TestCase):
     def test_test_step_node_with_content_html(self):
         # create test step node with some content
         node = pylatest.nodes.test_step_node()
-        node.attributes["action_id"] = 1
-        node += nodes.paragraph(text="Just do something.")
+        node.attributes["action_id"] = 7
+        node += nodes.paragraph(text="Just do it!")
         # add this node into doctree
         self.doctree += node
         # generate html into string
         output = self._publish_html()
-        # search for pylatest action div element for this test_step_node
+        # this test step node should be rendered as a div element
+        # so search for pylatest action div elements in the output string
         output_tree = ET.fromstring(output)
         xml_ns = 'http://www.w3.org/1999/xhtml'
-        node_xpath = ".//{{{0}}}body/{{{0}}}div[@class='pylatest_action']/"
-        node_list = output_tree.findall(node_xpath.format(xml_ns))
-
-        # TODO: fix this (the element is there, but it's not in the list)
-        # self.assertEqual(len(node_list), 1)
-
+        node_xpath = ".//{%s}div[@class='pylatest_action']" % xml_ns
+        node_list = output_tree.findall(node_xpath)
+        # check that there is only one such node
+        self.assertEqual(len(node_list), 1)
         # examine the div element
-        # node_el = node_list[0]
-        # exp_result = textwrap.dedent('''\
-        # ''')
-        # self.assertEqual(output, exp_result)
+        node_el = node_list[0]
+        self.assertEqual(node_el.text.strip(), "Just do it!")
+        self.assertEqual(node_el.get("action_id"), "7")
+        self.assertEqual(node_el.get("action_name"), "step")
