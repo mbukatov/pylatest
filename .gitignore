@@ -8,3 +8,4 @@ build
 dist
 tmp
 examples/*.html
+.tox
