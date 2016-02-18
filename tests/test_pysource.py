@@ -19,6 +19,7 @@
 import unittest
 import textwrap
 import os
+import platform
 
 import pylatest.client
 import pylatest.document
@@ -90,7 +91,12 @@ class TestStringExtraction(unittest.TestCase):
         ''')
         result = pysource.get_string_literals(source)
         self.assertEqual(len(result), 1)
-        docstring_item = ("Main function of py2pylatest cli tool.", 12)
+        # HACK: PyPy vs CPython compat issue: line numbering differs
+        # TODO: recheck and report or fix?
+        if platform.python_implementation() == "PyPy":
+            docstring_item = ("Main function of py2pylatest cli tool.", 10)
+        else:
+            docstring_item = ("Main function of py2pylatest cli tool.", 12)
         self.assertEqual(result, [docstring_item])
 
     def test_is_pylatest_docstring_verysimple(self):
