@@ -1,7 +1,7 @@
 Pylatest
 ========
 
-Pylatest project provides a set of tool which allows you to:
+Pylatest project provides a set of tools which allows you to:
 
 * Write a description of a test case using reStructuredText syntax.
 * Include this description into a python source code directly, split into
