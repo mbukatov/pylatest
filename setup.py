@@ -23,7 +23,7 @@ setup(
     name='pylatest',
     # See https://packaging.python.org/en/latest/distributing/#choosing-a-versioning-scheme
     # TODO: connect with git tags?
-    version='0.0.4',
+    version='0.0.5.dev1',
     description='Testcase description generation tools.',
     long_description=long_description,
     url='http://github.com/mbukatov/pylatest/',
