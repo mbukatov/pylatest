@@ -20,6 +20,7 @@ import unittest
 import textwrap
 import os
 import platform
+import codecs
 
 import pylatest.client
 import pylatest.document
@@ -32,7 +33,7 @@ HERE = os.path.abspath(os.path.dirname(__file__))
 def read_file(dirname, name):
     filename = os.path.join(
         HERE, "pysource-{0}".format(dirname), "testcase.{0}".format(name))
-    with open(filename, 'r') as python_file:
+    with codecs.open(filename, 'r', encoding='utf8') as python_file:
         content = python_file.read()
     return content
 
