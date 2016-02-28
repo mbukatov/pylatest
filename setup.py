@@ -44,12 +44,14 @@ setup(
     # setup_requires=['setuptools_scm'],
     # use_scm_version=True,
     include_package_data=True,
-    # TODO: use entry_points instead
-    scripts=[
-        'bin/pylatest2html',
-        'bin/pylatest2htmlplain',
-        'bin/pylatest2man',
-        'bin/py2pylatest',
-        'bin/pylatest-template'],
+    entry_points={
+        'console_scripts': [
+            'pylatest-template=pylatest.template:main',
+            'py2pylatest=pylatest.pysource:main',
+            'pylatest2html=pylatest.main:pylatest2html',
+            'pylatest2htmlplain=pylatest.main:pylatest2htmlplain',
+            'pylatest2man=pylatest.main:pylatest2man',
+        ],
+    },
     test_suite = 'tests',
     )

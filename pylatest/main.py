@@ -1,7 +1,10 @@
-#!/usr/bin/env python
 # -*- coding: utf8 -*-
 
-# Copyright (C) 2015 mbukatov@redhat.com
+"""
+Commandline script module for pylatest docutils clients.
+"""
+
+# Copyright (C) 2016 mbukatov@redhat.com
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,9 +20,23 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-import sys
-
-from pylatest.template import main
+from pylatest.xdocutils import client
 
 
-sys.exit(main())
+def pylatest2html():
+    """
+    Pylatest client which generates html output. It is similar to ``rst2html``,
+    but it knows how to handle pylatest rst directives and doesn't produce
+    embedded css code.
+    """
+    client.register_table()
+    client.publish_cmdline_html()
+
+def pylatest2htmlplain():
+    client.register_plain()
+    client.publish_cmdline_html()
+
+def pylatest2man():
+    # TODO: run manpage viewer immediately
+    client.register_table()
+    client.publish_cmdline_man()
