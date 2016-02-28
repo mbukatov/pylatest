@@ -66,7 +66,7 @@ def generate_testcase(basename, author):
         "tc_metadata_author": author,
         "tc_basename": basename,
         }
-    template = "template.rst"
+    template = "test_case.rst"
     new_file = "{0}.rst".format(basename)
     create_file(template, new_file, variables)
 
