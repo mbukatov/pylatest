@@ -25,7 +25,7 @@ See: http://docutils.sourceforge.net/docs/ref/transforms.html
 from docutils import nodes
 from docutils import transforms
 
-import pylatest.nodes
+import pylatest.xdocutils.nodes
 
 
 def build_table(row_nodes, colwidth_list, headrow_data=None):
@@ -203,7 +203,7 @@ class TestStepsPlainTransform(TestStepsTransform):
             for col_name in ('test_step', 'test_result'):
                 if col_name in action_nodes:
                     node_name = "{0:s}_node".format(col_name)
-                    node = getattr(pylatest.nodes, node_name)()
+                    node = getattr(pylatest.xdocutils.nodes, node_name)()
                     # add all content nodes into step or result node
                     for c_node in action_nodes[col_name].details['nodes']:
                         node += c_node
@@ -272,7 +272,7 @@ class TestMetadataPlainTransform(TestMetadataTransform):
     def _create_content(self):
         p_node = nodes.paragraph()
         for name, value in sorted(self._metadata_dict.items()):
-            meta_node = pylatest.nodes.test_metadata_node()
+            meta_node = pylatest.xdocutils.nodes.test_metadata_node()
             p_node += meta_node
             meta_node += nodes.paragraph(text=value)
             meta_node.attributes['name'] = name

@@ -31,8 +31,8 @@ from docutils.core import publish_doctree
 from docutils import nodes
 
 from pylatest.document import SECTIONS, HEADER, SECTIONS_ALL
-import pylatest.client
-import pylatest.nodes
+import pylatest.xdocutils.client
+import pylatest.xdocutils.nodes
 
 
 def get_string_literals(content):
@@ -119,7 +119,7 @@ def _teststeps_condition(node):
     """
     test_steps_directives = ("test_step_node", "test_result_node")
     for pylatest_node in test_steps_directives:
-        node_class = getattr(pylatest.nodes, pylatest_node)
+        node_class = getattr(pylatest.xdocutils.nodes, pylatest_node)
         if isinstance(node, node_class):
             return True
     return False
@@ -173,7 +173,7 @@ def detect_docstring_sections(docstring):
     # try to detect header pseudo section (contains name and metadata)
     meta_directive_count = 0
     nodes_title_count = 0
-    for node in nodetree.traverse(pylatest.nodes.test_metadata_node):
+    for node in nodetree.traverse(pylatest.xdocutils.nodes.test_metadata_node):
         meta_directive_count += 1
     for node in nodetree.traverse(nodes.title):
         nodes_title_count += 1
@@ -395,7 +395,7 @@ def main():
         return 1
 
     # register pylatest rst extensions (parsing friendly plain implementation)
-    pylatest.client.register_plain()
+    pylatest.xdocutils.client.register_plain()
 
     with open(args.filepath, 'r') as python_file:
         source_content = python_file.read()

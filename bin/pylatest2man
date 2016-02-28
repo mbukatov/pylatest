@@ -23,8 +23,8 @@ embedded css code.
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-import pylatest.client
+from pylatest.xdocutils import client
 
 
-pylatest.client.register_table()
-pylatest.client.publish_cmdline_man()
+client.register_table()
+client.publish_cmdline_man()

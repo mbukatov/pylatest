@@ -5,7 +5,7 @@ Pylatest extension of HTMLTranslator
 
 This module contains functions which extends
 docutils.writers.html4css1.HTMLTranslator class with implementation of custom
-pylatest nodes (see pylatest.nodes module).
+pylatest nodes (see pylatest.xdocutils.nodes module).
 """
 
 # Copyright (C) 2015 martin.bukatovic@gmail.com

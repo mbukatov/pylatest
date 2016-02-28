@@ -37,14 +37,14 @@ from docutils.core import publish_parts
 from docutils import nodes
 from docutils.writers.html4css1 import HTMLTranslator
 
-from pylatest.directives import TestStepsTableDirective
-from pylatest.directives import TestStepsPlainDirective
-from pylatest.directives import TestMetadataTableDirective
-from pylatest.directives import TestMetadataPlainDirective
-from pylatest.roles import redhat_bugzilla_role
-from pylatest.roles import pylaref_html_role
-import pylatest.nodes
-import pylatest.htmltranslator
+from pylatest.xdocutils.directives import TestStepsTableDirective
+from pylatest.xdocutils.directives import TestStepsPlainDirective
+from pylatest.xdocutils.directives import TestMetadataTableDirective
+from pylatest.xdocutils.directives import TestMetadataPlainDirective
+from pylatest.xdocutils.roles import redhat_bugzilla_role
+from pylatest.xdocutils.roles import pylaref_html_role
+import pylatest.xdocutils.nodes
+import pylatest.xdocutils.htmltranslator
 
 
 # override default settings of html writer
@@ -63,14 +63,14 @@ def register_pylatest_nodes():
     These custom nodes are used to wrap content of pylatest directives into div
     or span elements.
     """
-    nodes._add_node_class_names(pylatest.nodes.node_class_names)
-    for node_name in pylatest.nodes.node_class_names:
+    nodes._add_node_class_names(pylatest.xdocutils.nodes.node_class_names)
+    for node_name in pylatest.xdocutils.nodes.node_class_names:
         visit_func_name = "visit_" + node_name
         depart_func_name = "depart_" + node_name
         setattr(HTMLTranslator, visit_func_name,
-            getattr(pylatest.htmltranslator, visit_func_name))
+            getattr(pylatest.xdocutils.htmltranslator, visit_func_name))
         setattr(HTMLTranslator, depart_func_name,
-            getattr(pylatest.htmltranslator, depart_func_name))
+            getattr(pylatest.xdocutils.htmltranslator, depart_func_name))
 
 def register_table():
     """

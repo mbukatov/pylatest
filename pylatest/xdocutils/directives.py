@@ -4,7 +4,7 @@
 ReStructuredText directives for test steps, actions and metadata.
 
 Note that binding between name of directive (as used in rst file) and rst
-directive class which implements it is defined in pylatest.client module.
+directive class which implements it is defined in pylatest.xdocutils.client module.
 """
 
 # Copyright (C) 2015 martin.bukatovic@gmail.com
@@ -26,10 +26,10 @@ directive class which implements it is defined in pylatest.client module.
 from docutils import nodes
 from docutils.parsers import rst
 
-from pylatest.transforms import TestStepsTableTransform
-from pylatest.transforms import TestStepsPlainTransform
-from pylatest.transforms import TestMetadataTableTransform
-from pylatest.transforms import TestMetadataPlainTransform
+from pylatest.xdocutils.transforms import TestStepsTableTransform
+from pylatest.xdocutils.transforms import TestStepsPlainTransform
+from pylatest.xdocutils.transforms import TestMetadataTableTransform
+from pylatest.xdocutils.transforms import TestMetadataPlainTransform
 
 
 class TestStepsDirective(rst.Directive):

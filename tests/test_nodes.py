@@ -23,8 +23,8 @@ import xml.etree.ElementTree as ET
 from docutils import nodes
 from docutils.core import publish_from_doctree, publish_doctree
 
-import pylatest.client
-import pylatest.nodes
+import pylatest.xdocutils.client
+import pylatest.xdocutils.nodes
 
 
 class TestCustomNodes(unittest.TestCase):
@@ -34,7 +34,7 @@ class TestCustomNodes(unittest.TestCase):
 
     def setUp(self):
         # register custom pylatest nodes with html translator
-        pylatest.client.register_pylatest_nodes()
+        pylatest.xdocutils.client.register_pylatest_nodes()
         # produce empty document tree
         self.doctree = publish_doctree(
             source="",
@@ -69,7 +69,7 @@ class TestCustomNodes(unittest.TestCase):
 
     def test_test_step_node(self):
         # create test step without any content
-        node = pylatest.nodes.test_step_node()
+        node = pylatest.xdocutils.nodes.test_step_node()
         # add this node into doctree
         self.doctree += node
         # generate html into string
@@ -85,7 +85,7 @@ class TestCustomNodes(unittest.TestCase):
 
     def test_test_step_node_with_content_html(self):
         # create test step node with some content
-        node = pylatest.nodes.test_step_node()
+        node = pylatest.xdocutils.nodes.test_step_node()
         node.attributes["action_id"] = 7
         node += nodes.paragraph(text="Just do it!")
         # add this node into doctree

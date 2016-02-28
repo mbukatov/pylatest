@@ -20,7 +20,7 @@ import unittest
 import textwrap
 import os
 
-import pylatest.client
+import pylatest.xdocutils.client
 import pylatest.document
 import pylatest.pysource as pysource
 
@@ -179,7 +179,7 @@ class TestPylatestDocstringProcessing(unittest.TestCase):
 
     def setUp(self):
         # commons steps required for all test cases
-        pylatest.client.register_plain()
+        pylatest.xdocutils.client.register_plain()
 
     def test_detect_docstring_sections_empty(self):
         self.assertEqual(pysource.detect_docstring_sections(""), ([], 0))
@@ -404,7 +404,7 @@ class TestPylatestDocumentExtractionOneCaseOneFile(unittest.TestCase):
         # show full diff (note: python3 unittest diff is much better)
         self.maxDiff = None
         # commons steps required for all test cases
-        pylatest.client.register_plain()
+        pylatest.xdocutils.client.register_plain()
 
     def _test_extract_document_noerrors(self, testname):
         source = read_file("onecaseperfile", testname)
@@ -489,7 +489,7 @@ class TestPylatestDocumentsExtractionMultipleCasesPerFile(unittest.TestCase):
         # show full diff (note: python3 unittest diff is much better)
         self.maxDiff = None
         # common steps required for all test cases
-        pylatest.client.register_plain()
+        pylatest.xdocutils.client.register_plain()
 
     def _test_extract_documents_noerrors(self, doc_num, testname):
         source = read_file("multiplecasesperfile", testname)
