@@ -104,6 +104,14 @@ def publish_cmdline_html():
     # see: http://docutils.sourceforge.net/docs/api/cmdline-tool.html
     publish_cmdline(writer_name='html', settings_overrides=HTML_OVERRIDES)
 
+def publish_cmdline_man():
+    """
+    Main function for pylatest ``rst2html`` like command line client.
+
+    See: ``bin/pylatest2man`` script for usage.
+    """
+    publish_cmdline(writer_name='manpage')
+
 def publish_parts_htmlbody(rst_document):
     """
     Publish method for pylatest.polarion module.

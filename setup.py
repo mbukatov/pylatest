@@ -48,6 +48,7 @@ setup(
     scripts=[
         'bin/pylatest2html',
         'bin/pylatest2htmlplain',
+        'bin/pylatest2man',
         'bin/py2pylatest',
         'bin/pylatest-template'],
     test_suite = 'tests',
