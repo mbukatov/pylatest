@@ -13,11 +13,18 @@ import codecs
 import os
 
 
-here = os.path.abspath(os.path.dirname(__file__))
+long_description="""\
+Pylatest project provides a set of tools which allows you to:
 
-# Get the long description from the README file
-with codecs.open(os.path.join(here, 'README.rst'), encoding='utf-8') as f:
-    long_description = f.read()
+* Write a description of a test case using reStructuredText syntax.
+* Include this description into a python source code directly, where it can
+  be split into individual sections or actions to be performed, so that the
+  description and test automation code are stored next to each other.
+
+The reason behind this is to make synchronization between automatic test cases
+and test case description documents simple while keeping the maintenance cost
+low in the long term.
+"""
 
 setup(
     name='pylatest',
