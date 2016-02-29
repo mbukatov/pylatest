@@ -11,9 +11,9 @@ TODO: write description of this test case
 This file is written in rst file format, if you are not familiar with it,
 check:
 
- * https://en.wikipedia.org/wiki/ReStructuredText
- * http://docutils.sourceforge.net/docs/user/rst/quickref.html
- * http://sphinx-doc.org/rest.html
+* https://en.wikipedia.org/wiki/ReStructuredText
+* http://docutils.sourceforge.net/docs/user/rst/quickref.html
+* http://sphinx-doc.org/rest.html
 
 In addition to that, you can use the following syntax to reference redhat
 bugzilla: see :BZ:`439858` (it will create proper link).
@@ -43,6 +43,14 @@ Test Steps
 
     TODO: write expected result of 1st test step, make sure you maintain 4
     space indentation in the whole text section which describes this result.
+
+.. test_step:: 2
+
+    TODO
+
+.. test_result:: 2
+
+    TODO
 
 Teardown
 ========
