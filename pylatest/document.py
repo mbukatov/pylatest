@@ -36,6 +36,23 @@ SECTIONS = (
     "Teardown")
 
 """
+List of ids of expected sections in plainhtml export of pylatest document.
+"""
+SECTIONS_PLAINHTML = (
+    "description",
+    "setup",
+    "teardown")
+
+"""
+List of action_name items of all pylatest actions.
+
+*Pylatest action* is couple of test step and result with the same *action id*.
+
+note: htmlplain div element uses just 'step' and 'result' - TODO: refactor?
+"""
+ACTION_NAMES = ("test_step", "test_result")
+
+"""
 Header pseudo section. It's not a real section, but a placeholder for data
 which includes:
 

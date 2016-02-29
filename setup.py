@@ -46,7 +46,7 @@ setup(
         'Programming Language :: Python :: 3.4',
         ],
     packages=find_packages(exclude=['doc', 'tests']),
-    install_requires=['docutils'],
+    install_requires=['docutils', 'lxml'],
     # TODO: make this work with git (and remove MANIFEST.in?)
     # setup_requires=['setuptools_scm'],
     # use_scm_version=True,
@@ -54,6 +54,7 @@ setup(
     entry_points={
         'console_scripts': [
             'pylatest-template=pylatest.template:main',
+            'pylatest-export=pylatest.export:main',
             'py2pylatest=pylatest.pysource:main',
             'pylatest2html=pylatest.main:pylatest2html',
             'pylatest2htmlplain=pylatest.main:pylatest2htmlplain',
