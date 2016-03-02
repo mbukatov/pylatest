@@ -27,6 +27,17 @@ import pylatest.xdocutils.client
 import pylatest.xdocutils.nodes
 
 
+def get_empty_doctree():
+    """
+    Produce empty rst document tree.
+    """
+    doctree = publish_doctree(
+        source="",
+        reader_name='standalone',
+        parser_name='restructuredtext',)
+    return doctree
+
+
 class TestCustomNodes(unittest.TestCase):
     """
     Test custom pylatest nodes.
@@ -36,10 +47,7 @@ class TestCustomNodes(unittest.TestCase):
         # register custom pylatest nodes with html translator
         pylatest.xdocutils.client.register_pylatest_nodes()
         # produce empty document tree
-        self.doctree = publish_doctree(
-            source="",
-            reader_name='standalone',
-            parser_name='restructuredtext',)
+        self.doctree = get_empty_doctree()
 
     def _publish_pseudoxml(self):
         """
@@ -66,6 +74,24 @@ class TestCustomNodes(unittest.TestCase):
     def test_pylatest_doesnt_break_docutils(self):
         output = self._publish_pseudoxml()
         self.assertEqual(output.strip(), '<document source="<string>">')
+
+    def test_all_custom_nodes(self):
+        for node_name in pylatest.xdocutils.nodes.node_class_names:
+            # produce empty document tree
+            self.doctree = get_empty_doctree()
+            # create test step without any content
+            node_class = getattr(pylatest.xdocutils.nodes, node_name)
+            node = node_class()
+            # add this node into doctree
+            self.doctree += node
+            # generate html into string
+            output = self._publish_pseudoxml()
+            # check the result
+            exp_result = textwrap.dedent('''\
+            <document source="<string>">
+                <{0:s}>
+            '''.format(node_name))
+            self.assertEqual(output, exp_result)
 
     def test_test_step_node(self):
         # create test step without any content
