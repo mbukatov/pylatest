@@ -32,11 +32,13 @@ from docutils import nodes
 class test_step_node(nodes.Element): pass
 class test_result_node(nodes.Element): pass
 class test_metadata_node(nodes.Element): pass
+class requirement_node(nodes.Element): pass
 
 
 node_class_names = [
     "test_step_node",
     "test_result_node",
     "test_metadata_node",
+    "requirement_node",
     ]
 """A list of names of all pylatest Node subclasses."""
