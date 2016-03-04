@@ -37,6 +37,28 @@ def get_empty_doctree():
         parser_name='restructuredtext',)
     return doctree
 
+def publish_pseudoxml(doctree):
+    """
+    Returns string with pseudo xml rendering of ``doctree``.
+    """
+    output = publish_from_doctree(
+        doctree,
+        settings_overrides={'output_encoding': 'unicode'},)
+    return output
+
+def publish_html(doctree):
+    """
+    Returns string with html rendering of ``doctree``.
+    """
+    output = publish_from_doctree(
+        doctree,
+        writer_name='html',
+        settings_overrides={
+            # 'output_encoding': 'unicode',
+            'stylesheet_path': None,
+            })
+    return output
+
 
 class TestCustomNodes(unittest.TestCase):
     """
@@ -49,30 +71,8 @@ class TestCustomNodes(unittest.TestCase):
         # produce empty document tree
         self.doctree = get_empty_doctree()
 
-    def _publish_pseudoxml(self):
-        """
-        Returns string with pseudo xml rendering of ``self.doctree``.
-        """
-        output = publish_from_doctree(
-            self.doctree,
-            settings_overrides={'output_encoding': 'unicode'},)
-        return output
-
-    def _publish_html(self):
-        """
-        Returns string with html rendering of ``self.doctree``.
-        """
-        output = publish_from_doctree(
-            self.doctree,
-            writer_name='html',
-            settings_overrides={
-                # 'output_encoding': 'unicode',
-                'stylesheet_path': None,
-                })
-        return output
-
     def test_pylatest_doesnt_break_docutils(self):
-        output = self._publish_pseudoxml()
+        output = publish_pseudoxml(self.doctree)
         self.assertEqual(output.strip(), '<document source="<string>">')
 
     def test_all_custom_nodes(self):
@@ -85,7 +85,7 @@ class TestCustomNodes(unittest.TestCase):
             # add this node into doctree
             self.doctree += node
             # generate html into string
-            output = self._publish_pseudoxml()
+            output = publish_pseudoxml(self.doctree)
             # check the result
             exp_result = textwrap.dedent('''\
             <document source="<string>">
@@ -101,7 +101,7 @@ class TestCustomNodes(unittest.TestCase):
         # add this node into doctree
         self.doctree += node
         # generate html into string
-        output = self._publish_html()
+        output = publish_html(self.doctree)
         # this test step node should be rendered as a div element
         # so search for pylatest action div elements in the output string
         output_tree = ET.fromstring(output)
