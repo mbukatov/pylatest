@@ -93,36 +93,6 @@ class TestCustomNodes(unittest.TestCase):
             '''.format(node_name))
             self.assertEqual(output, exp_result)
 
-    def test_test_step_node(self):
-        # create test step without any content
-        node = pylatest.xdocutils.nodes.test_step_node()
-        # add this node into doctree
-        self.doctree += node
-        # generate html into string
-        output = self._publish_pseudoxml()
-        # check the result
-        exp_result = textwrap.dedent('''\
-        <document source="<string>">
-            <test_step_node>
-        ''')
-        self.assertEqual(output, exp_result)
-
-    def test_requirement_node(self):
-        # create requirement without any content
-        node = pylatest.xdocutils.nodes.requirement_node()
-        # add this node into doctree
-        self.doctree += node
-        # generate html into string
-        output = self._publish_pseudoxml()
-        # check the result
-        exp_result = textwrap.dedent('''\
-        <document source="<string>">
-            <requirement_node>
-        ''')
-        self.assertEqual(output, exp_result)
-
-    # TODO: add test cases for test_result_node and test_metadata_node
-
     def test_test_step_node_with_content_html(self):
         # create test step node with some content
         node = pylatest.xdocutils.nodes.test_step_node()
