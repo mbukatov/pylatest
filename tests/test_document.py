@@ -24,9 +24,6 @@ import pylatest.document
 from pylatest.document import SECTIONS, HEADER, SECTIONS_ALL
 
 
-HERE = os.path.abspath(os.path.dirname(__file__))
-
-
 class TestSectionTuples(unittest.TestCase):
     """
     Test properties of SECTION and SECTION_ALL tuples.
