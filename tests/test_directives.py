@@ -178,11 +178,15 @@ class TestRequirementPlainDirective(TestDirectivesBase):
             :priority: high
 
             Natus illum repudiandae consequatur.
+
+            Expedita saepe architecto numquam accusamus.
         ''')
         exp_result = textwrap.dedent('''\
         <document source="testparse() method">
             <requirement_node priority="high" req_id="FOO123">
                 <paragraph>
                     Natus illum repudiandae consequatur.
+                <paragraph>
+                    Expedita saepe architecto numquam accusamus.
         ''')
         self.check_directive(rst_input, exp_result)
