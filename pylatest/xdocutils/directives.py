@@ -192,5 +192,6 @@ class RequirementPlainDirective(rst.Directive):
         self.assert_has_content()
         req_id = self.arguments[0]
         node = pylatest.xdocutils.nodes.requirement_node()
+        node.attributes['req_id'] = req_id
         self.state.nested_parse(self.content, self.content_offset, node)
         return [node]

@@ -56,7 +56,7 @@ def depart_test_metadata_node(self, node):
 def visit_requirement_node(self, node):
     attributes = {
         'class': 'pylatest_requirement',
-        'id': node.attributes['id'],}
+        'req_id': node.attributes['req_id'],}
     self.body.append(self.starttag(node, 'div', **attributes))
 
 def depart_requirement_node(self, node):

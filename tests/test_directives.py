@@ -166,7 +166,7 @@ class TestRequirementPlainDirective(TestDirectivesBase):
         ''')
         exp_result = textwrap.dedent('''\
         <document source="testparse() method">
-            <requirement_node>
+            <requirement_node req_id="SOME_ID">
                 <paragraph>
                     Some content.
         ''')
