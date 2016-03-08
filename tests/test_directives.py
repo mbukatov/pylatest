@@ -158,7 +158,7 @@ class TestTestMetadataDirective(TestDirectivesBase):
 
 class TestRequirementPlainDirective(TestDirectivesBase):
 
-    def test_testmetadata_empty(self):
+    def test_testmetadata_full_nooptions(self):
         rst_input = textwrap.dedent('''\
         .. requirement:: SOME_ID
 
@@ -169,5 +169,20 @@ class TestRequirementPlainDirective(TestDirectivesBase):
             <requirement_node req_id="SOME_ID">
                 <paragraph>
                     Some content.
+        ''')
+        self.check_directive(rst_input, exp_result)
+
+    def test_testmetadata_full_alloptions(self):
+        rst_input = textwrap.dedent('''\
+        .. requirement:: FOO123
+            :priority: high
+
+            Natus illum repudiandae consequatur.
+        ''')
+        exp_result = textwrap.dedent('''\
+        <document source="testparse() method">
+            <requirement_node priority="high" req_id="FOO123">
+                <paragraph>
+                    Natus illum repudiandae consequatur.
         ''')
         self.check_directive(rst_input, exp_result)

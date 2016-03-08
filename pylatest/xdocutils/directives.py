@@ -185,7 +185,6 @@ class RequirementPlainDirective(rst.Directive):
     has_content = True
     option_spec = {
         'priority': str,
-        'qe_owner': str,
         }
 
     def run(self):
@@ -193,5 +192,7 @@ class RequirementPlainDirective(rst.Directive):
         req_id = self.arguments[0]
         node = pylatest.xdocutils.nodes.requirement_node()
         node.attributes['req_id'] = req_id
+        if 'priority' in self.options:
+            node.attributes['priority'] = self.options['priority']
         self.state.nested_parse(self.content, self.content_offset, node)
         return [node]
