@@ -73,6 +73,13 @@ def register_pylatest_nodes():
         setattr(HTMLTranslator, depart_func_name,
             getattr(pylatest.xdocutils.htmltranslator, depart_func_name))
 
+def register_pylatest_roles():
+    """
+    Register custom pylatest roles.
+    """
+    roles.register_local_role("bz", redhat_bugzilla_role)
+    roles.register_local_role("pylaref", pylaref_html_role)
+
 def register_table():
     """
     Register table generating implementation of pylatest rst directives
@@ -82,8 +89,7 @@ def register_table():
     directives.register_directive("test_step", TestStepsTableDirective)
     directives.register_directive("test_result", TestStepsTableDirective)
     directives.register_directive("requirement", RequirementPlainDirective)
-    roles.register_local_role("bz", redhat_bugzilla_role)
-    roles.register_local_role("pylaref", pylaref_html_role)
+    register_pylatest_roles()
 
 def register_plain():
     """
@@ -94,8 +100,7 @@ def register_plain():
     directives.register_directive("test_step", TestStepsPlainDirective)
     directives.register_directive("test_result", TestStepsPlainDirective)
     directives.register_directive("requirement", RequirementPlainDirective)
-    roles.register_local_role("bz", redhat_bugzilla_role)
-    roles.register_local_role("pylaref", pylaref_html_role)
+    register_pylatest_roles()
     register_pylatest_nodes()
 
 def publish_cmdline_html():
