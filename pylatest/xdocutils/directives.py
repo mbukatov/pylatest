@@ -30,6 +30,7 @@ from pylatest.xdocutils.transforms import TestStepsTableTransform
 from pylatest.xdocutils.transforms import TestStepsPlainTransform
 from pylatest.xdocutils.transforms import TestMetadataTableTransform
 from pylatest.xdocutils.transforms import TestMetadataPlainTransform
+import pylatest.xdocutils.nodes
 
 
 class TestStepsDirective(rst.Directive):
@@ -163,6 +164,7 @@ class TestMetadataTableDirective(TestMetadataDirective):
 
     transform_class = TestMetadataTableTransform
 
+
 class TestMetadataPlainDirective(TestMetadataDirective):
     """
     Implementation of ``test_metadata`` directive for
@@ -170,3 +172,25 @@ class TestMetadataPlainDirective(TestMetadataDirective):
     """
 
     transform_class = TestMetadataPlainTransform
+
+
+class RequirementPlainDirective(rst.Directive):
+    """
+    Implementation of ``requirement`` rst directive.
+    """
+
+    required_arguments = 1
+    optional_arguments = 0
+    final_argument_whitespace = True
+    has_content = True
+    option_spec = {
+        'priority': str,
+        'qe_owner': str,
+        }
+
+    def run(self):
+        self.assert_has_content()
+        req_id = self.arguments[0]
+        node = pylatest.xdocutils.nodes.requirement_node()
+        self.state.nested_parse(self.content, self.content_offset, node)
+        return [node]

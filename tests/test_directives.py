@@ -84,6 +84,7 @@ class TestDirectives(TestDirectivesBase):
         ''')
         self.check_directive(rst_input, exp_result)
 
+
 class TestTestMetadataDirective(TestDirectivesBase):
 
     def test_testmetadata_empty(self):
@@ -151,5 +152,22 @@ class TestTestMetadataDirective(TestDirectivesBase):
                      .details:
                        meta_name: 'comment'
                        meta_value: 'This is here just to test arg processing.'
+        ''')
+        self.check_directive(rst_input, exp_result)
+
+
+class TestRequirementPlainDirective(TestDirectivesBase):
+
+    def test_testmetadata_empty(self):
+        rst_input = textwrap.dedent('''\
+        .. requirement:: SOME_ID
+
+            Some content.
+        ''')
+        exp_result = textwrap.dedent('''\
+        <document source="testparse() method">
+            <requirement_node>
+                <paragraph>
+                    Some content.
         ''')
         self.check_directive(rst_input, exp_result)
