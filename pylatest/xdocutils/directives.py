@@ -196,3 +196,36 @@ class RequirementPlainDirective(rst.Directive):
             node.attributes['priority'] = self.options['priority']
         self.state.nested_parse(self.content, self.content_offset, node)
         return [node]
+
+
+class RequirementSectionDirective(RequirementPlainDirective):
+    """
+    Implementation of ``requirement`` rst directive for human friendly HTML,
+    all content is placed into a section with req_id in it's header.
+    """
+
+    def run(self):
+        self.assert_has_content()
+        section_node = nodes.section()
+        # header of the section
+        req_id = self.arguments[0]
+        title = "Requirement {0}".format(req_id)
+        section_node += nodes.title(text=title)
+        # TODO: find out more about 'ids' and 'names' attributes
+        # (this is necessary for table of contents to work)
+        req_id_docutils = req_id.lower()
+        # ids - list of unique keys
+        section_node.attributes['ids'] = req_id_docutils
+        # names - list of element names, generated from title or content
+        section_node.attributes['names'] = req_id_docutils
+        # priority paragraph (if priority is specified)
+        if 'priority' in self.options:
+            text = "Priority: {0}".format(self.options['priority'])
+            prio_node = nodes.paragraph(text=text)
+            section_node += prio_node
+        # and a paragraph with all content of the directive
+        tmp_node = nodes.Element()
+        self.state.nested_parse(self.content, self.content_offset, tmp_node)
+        for content_node in tmp_node:
+            section_node += content_node
+        return [section_node]

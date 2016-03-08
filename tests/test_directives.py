@@ -190,3 +190,51 @@ class TestRequirementPlainDirective(TestDirectivesBase):
                     Expedita saepe architecto numquam accusamus.
         ''')
         self.check_directive(rst_input, exp_result)
+
+
+class TestRequirementSectionDirective(TestDirectivesBase):
+
+    def setUp(self):
+        # register custom pylatest nodes with html translator
+        pylatest.xdocutils.client.register_table()
+        # show full diff (note: python3 unittest diff is much better)
+        self.maxDiff = None
+
+    def test_testmetadata_full_nooptions(self):
+        rst_input = textwrap.dedent('''\
+        .. requirement:: SOME_ID
+
+            Some content.
+        ''')
+        exp_result = textwrap.dedent('''\
+        <document source="testparse() method">
+            <section ids="some_id" names="some_id">
+                <title>
+                    Requirement SOME_ID
+                <paragraph>
+                    Some content.
+        ''')
+        self.check_directive(rst_input, exp_result)
+
+    def test_testmetadata_full_alloptions(self):
+        rst_input = textwrap.dedent('''\
+        .. requirement:: FOO123
+            :priority: high
+
+            Natus illum repudiandae consequatur.
+
+            Expedita saepe architecto numquam accusamus.
+        ''')
+        exp_result = textwrap.dedent('''\
+        <document source="testparse() method">
+            <section ids="foo123" names="foo123">
+                <title>
+                    Requirement FOO123
+                <paragraph>
+                    Priority: high
+                <paragraph>
+                    Natus illum repudiandae consequatur.
+                <paragraph>
+                    Expedita saepe architecto numquam accusamus.
+        ''')
+        self.check_directive(rst_input, exp_result)

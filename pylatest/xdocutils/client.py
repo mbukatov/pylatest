@@ -42,6 +42,7 @@ from pylatest.xdocutils.directives import TestStepsPlainDirective
 from pylatest.xdocutils.directives import TestMetadataTableDirective
 from pylatest.xdocutils.directives import TestMetadataPlainDirective
 from pylatest.xdocutils.directives import RequirementPlainDirective
+from pylatest.xdocutils.directives import RequirementSectionDirective
 from pylatest.xdocutils.roles import redhat_bugzilla_role
 from pylatest.xdocutils.roles import pylaref_html_role
 import pylatest.xdocutils.nodes
@@ -88,7 +89,7 @@ def register_table():
     directives.register_directive("test_metadata", TestMetadataTableDirective)
     directives.register_directive("test_step", TestStepsTableDirective)
     directives.register_directive("test_result", TestStepsTableDirective)
-    directives.register_directive("requirement", RequirementPlainDirective)
+    directives.register_directive("requirement", RequirementSectionDirective)
     register_pylatest_roles()
 
 def register_plain():
