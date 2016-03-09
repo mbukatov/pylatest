@@ -121,14 +121,11 @@ def publish_cmdline_man():
     """
     publish_cmdline(writer_name='manpage')
 
-def publish_parts_htmlbody(rst_document):
+def publish_parts_wrapper(rst_document):
     """
-    Publish method for pylatest.polarion module.
-
-    Returns:
-        string: html body of html rendering of given rst document
+    Publish method for pylatest.export module.
     """
     parts = publish_parts(
         source=rst_document,
         writer_name='html', settings_overrides=HTML_OVERRIDES)
-    return parts['html_body']
+    return parts
