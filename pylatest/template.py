@@ -50,25 +50,12 @@ def create_file(template_name, new_name, variables):
         new_name (str): basename of new file (eg. ``foobar.rst``)
         variables: dict with template variables to expand
     """
-    src_path = os.path.join(pylatest.__path__[0], "templates", template_name)
-    new_path = os.path.join(os.getcwd(), new_name)
-
+    src_path = os.path.join(
+        pylatest.__path__[0], "templates", template_name + '.rst')
+    new_path = os.path.join(os.getcwd(), new_name + '.rst')
     with open(src_path, 'r') as src_file, open(new_path, 'w') as new_file:
         content = string.Template(src_file.read())
         new_file.write(content.substitute(**variables))
-
-def generate_testcase(basename, author):
-    """
-    Creates testcase files based on default templates.
-    """
-    # TODO: make possible to pass more metadata than just author
-    variables = {
-        "tc_metadata_author": author,
-        "tc_basename": basename,
-        }
-    template = "test_case.rst"
-    new_file = "{0}.rst".format(basename)
-    create_file(template, new_file, variables)
 
 def generate_default_author():
     """
@@ -92,6 +79,11 @@ def main():
         default=generate_default_author(),
         help="author of the testcase (eg. foo@example.com)")
     parser.add_argument(
+        '-t',
+        '--type',
+        default="testcase",
+        help="type of pylatest template (eg. testcase)")
+    parser.add_argument(
         "basename",
         help="basename for new testcase without suffix")
     args = parser.parse_args()
@@ -104,4 +96,9 @@ def main():
     # TODO: do not overwrite files if already exists by default, add force flag
 
     # TODO proper error checking
-    generate_testcase(args.basename, args.author)
+
+    # TODO: make possible to pass more metadata than just author
+    variables = {
+        "tc_metadata_author": args.author,
+        }
+    create_file(args.type, args.basename, variables)

@@ -3,8 +3,6 @@ TODO Requirements
 
 This is a *Requirements Document* of TODO.
 
-.. contents::
-
 This file is written in rst file format, if you are not familiar with it,
 check:
 
