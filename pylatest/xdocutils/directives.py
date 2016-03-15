@@ -66,7 +66,15 @@ class TestStepsDirective(rst.Directive):
         # first of all, parse text content of this directive
         # into anonymous node element (can't be used directly in the tree)
         node = nodes.Element()
-        self.state.nested_parse(self.content, self.content_offset, node)
+        # include HACK: link to the referred test case
+        # TODO: use a proper referece (nested parse?)
+        # TODO: the final solutions is a working include though
+        if 'include' in self.options:
+            ref_tc, ref_action = str(self.options['include']).split(":", 2)
+            text_content = "See {0}, action {1}".format(ref_tc, ref_action)
+            node += nodes.paragraph(text=text_content)
+        else:
+            self.state.nested_parse(self.content, self.content_offset, node)
         # create new pending node, which:
         #  - holds actual data (parsed content of the directive)
         #  - references transform class which is concerned with this node.
