@@ -40,3 +40,10 @@ def pylatest2man():
     # TODO: run manpage viewer immediately
     client.register_table()
     client.publish_cmdline_man()
+
+def pylatest2pseudoxml():
+    """
+    This client is useful for debugging purposes only.
+    """
+    client.register_table()
+    client.publish_cmdline_pseudoxml()

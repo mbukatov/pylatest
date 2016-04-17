@@ -113,6 +113,14 @@ def publish_cmdline_html():
     # see: http://docutils.sourceforge.net/docs/api/cmdline-tool.html
     publish_cmdline(writer_name='html', settings_overrides=HTML_OVERRIDES)
 
+def publish_cmdline_pseudoxml():
+    """
+    Main function for pylatest ``rst2pseudoxml`` like command line client.
+
+    See: ``bin/pylatest2pseudoxml`` script for usage.
+    """
+    publish_cmdline(writer_name='pseudoxml')
+
 def publish_cmdline_man():
     """
     Main function for pylatest ``rst2html`` like command line client.

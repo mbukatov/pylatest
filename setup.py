@@ -59,6 +59,7 @@ setup(
             'pylatest2html=pylatest.main:pylatest2html',
             'pylatest2htmlplain=pylatest.main:pylatest2htmlplain',
             'pylatest2man=pylatest.main:pylatest2man',
+            'pylatest2pseudoxml=pylatest.main:pylatest2pseudoxml',
         ],
     },
     test_suite = 'tests',
