@@ -219,13 +219,12 @@ class RequirementSectionDirective(RequirementPlainDirective):
         req_id = self.arguments[0]
         title = "Requirement {0}".format(req_id)
         section_node += nodes.title(text=title)
-        # TODO: find out more about 'ids' and 'names' attributes
-        # (this is necessary for table of contents to work)
-        req_id_docutils = req_id.lower()
-        # ids - list of unique keys
-        section_node.attributes['ids'] = req_id_docutils
-        # names - list of element names, generated from title or content
-        section_node.attributes['names'] = req_id_docutils
+        # see docutils.nodes.Element docstring for description of both
+        # 'ids' and 'names' attributes (necessary for table of contents)
+        # attr ids - list of unique keys
+        section_node.attributes['ids'] = [nodes.make_id(title)]
+        # attr names - list of element names, generated from title or content
+        section_node.attributes['names'] = [nodes.fully_normalize_name(title)]
         # priority paragraph (if priority is specified)
         if 'priority' in self.options:
             text = "Priority: {0}".format(self.options['priority'])

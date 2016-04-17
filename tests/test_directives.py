@@ -208,7 +208,7 @@ class TestRequirementSectionDirective(TestDirectivesBase):
         ''')
         exp_result = textwrap.dedent('''\
         <document source="testparse() method">
-            <section ids="some_id" names="some_id">
+            <section ids="requirement-some-id" names="requirement\ some_id">
                 <title>
                     Requirement SOME_ID
                 <paragraph>
@@ -227,7 +227,7 @@ class TestRequirementSectionDirective(TestDirectivesBase):
         ''')
         exp_result = textwrap.dedent('''\
         <document source="testparse() method">
-            <section ids="foo123" names="foo123">
+            <section ids="requirement-foo123" names="requirement\ foo123">
                 <title>
                     Requirement FOO123
                 <paragraph>
