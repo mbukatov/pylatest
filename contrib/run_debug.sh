@@ -25,5 +25,5 @@ rm -f *html
 # to add break point somewhere:
 # import pdb; pdb.set_trace()
 
-# pylatest2html --traceback hello.rst
-python -m pdb $(which pylatest2html) --traceback hello.rst
+# pylatest2html --traceback testcase.example.rst
+python -m pdb $(which pylatest2html) --traceback testcase.example.rst
