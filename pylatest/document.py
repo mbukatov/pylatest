@@ -3,9 +3,6 @@
 """
 Pylatest test case document module.
 
-**Pylatest document** means a description of a single test case written in rst
-markup format.
-
 This module contains information about expected structure (eg. list of section
 titles) and TODO: other general functions.
 """
@@ -26,51 +23,66 @@ titles) and TODO: other general functions.
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-"""
-List of titles of expected sections in pylatest document (order matters).
-"""
-SECTIONS = (
-    "Description",
-    "Setup",
-    "Test Steps",
-    "Teardown")
+class Section(object):
+    """
+    A section in reStructuredText document.
+    """
 
-"""
-List of ids of expected sections in plainhtml export of pylatest document.
-"""
-SECTIONS_PLAINHTML = (
-    "description",
-    "setup",
-    "teardown")
+    def __init__(self, title, html_id=None):
+        self.title = title
+        # TODO: generate id from the title
+        self.html_id = html_id
 
-"""
-List of action_name items of all pylatest actions.
 
-*Pylatest action* is couple of test step and result with the same *action id*.
+class TestActions(object):
+    """
+    List of action_name items of all pylatest actions.
 
-note: htmlplain div element uses just 'step' and 'result' - TODO: refactor?
-"""
-ACTION_NAMES = ("test_step", "test_result")
+    *Pylatest action* is couple of test step and result with the same *action id*.
 
-"""
-Header pseudo section. It's not a real section, but a placeholder for data
-which includes:
+    note: htmlplain div element uses just 'step' and 'result' - TODO: refactor?
+    """
+    ACTION_NAMES = ("test_step", "test_result")
 
- * main headline with a name of the test case
- * pylatest metadata directives
 
-Since this data can't be placed into a dedicated section (for obvious reasons:
-it's a main headline and immediate content with metadata), this header
-placeholder is not direcly included in ``SECTIONS`` tuple.
-"""
-HEADER = "__header__"
+class TestCaseDocument(object):
+    """
+    Pylatest test case document.
+    """
 
-"""
-List of titles of all sections in pylatest document (order matters),
-including HEADER pseudo section.
-"""
-__tmp = [HEADER]
-__tmp.extend(SECTIONS)
-SECTIONS_ALL = tuple(__tmp)
+    DESCR = Section("Description", "description")
+    SETUP = Section("Setup", "setup")
+    STEPS = Section("Test Steps")
+    TEARD = Section("Teardown", "teardown")
 
-# TODO: refactoring move actions processing here
+    """
+    Header pseudo section. It's not a real section, but a placeholder for data
+    which includes:
+
+     * main headline with a name of the test case
+     * pylatest metadata directives
+
+    Since this data can't be placed into a dedicated section (for obvious reasons:
+    it's a main headline and immediate content with metadata), this header
+    placeholder is not direcly included in ``SECTIONS`` tuple.
+    """
+    HEADER = Section("__header__")
+
+    """
+    List of sections expected in pylatest document (order matters).
+    """
+    sections = [DESCR, SETUP, STEPS, TEARD]
+
+    """
+    List of titles of all sections in pylatest document (order matters),
+    including HEADER pseudo section.
+    """
+    sections_all = [HEADER] + SECTIONS
+
+
+class RequirementItem(object):
+    pass
+
+
+class TestPlanDocument(object):
+    pass
