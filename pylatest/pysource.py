@@ -106,7 +106,8 @@ def extract_documents(source):
                 doc = doc_dict.setdefault(doc_id, PylatestDocument())
                 status = doc.add_docstring(content, lineno)
                 # TODO: do some debug output
-                # (status == True for valid pylatest data)
+                # (status is True for a valid pylatest data)
+                assert status is True
     # allow all document objects to find defaults if needed
     if not default_doc.is_empty:
         for doc in doc_dict.values():
