@@ -63,7 +63,10 @@ def classify_docstring(docstring):
         content(string): content of an anonymous python string literal
 
     Returns:
-        tuple: (is_pylatest_docstring(bool), doc_id_list(list), content(string))
+        a tuple with:
+            is_pylatest_docstring(bool)
+            doc_id_list(list)
+            content(string)
     """
     pylatest_mark = "@pylatest"
     if docstring.startswith(pylatest_mark):
@@ -198,13 +201,31 @@ class PylatestDocument(object):
 
     def __init__(self):
         # content
-        self._docstrings = []   # list of docstrings with at least one section
-        self._section_dict = {} # section name -> list of docstrings
-        self._test_actions = [] # dosctrings with test step/result directives only
-        self.default_doc = None # document object with default content
+        self._docstrings = []
+        """
+        list of docstrings with at least one section
+        """
+        self._section_dict = {}
+        """
+        section name -> list of docstrings
+        """
+        self._test_actions = []
+        """
+        dosctrings with test step/result directives only
+        """
+        self.default_doc = None
+        """
+        document object with default content
+        """
         # errors
-        self._err_dict = {} # lineno -> list of err msg
-        self._run_errs = [] # runtile error list (after reading docstrings)
+        self._err_dict = {}
+        """
+        lineno -> list of err msg
+        """
+        self._run_errs = []
+        """
+        runtile error list (after reading docstrings)
+        """
         # state
         self.is_empty = True
 
@@ -310,7 +331,8 @@ class PylatestDocument(object):
         # import default sections
         if self.default_doc is not None:
             for section in ("Description", "Setup", "Teardown"):
-                if section not in self.sections and section in self.default_doc.sections:
+                if section not in self.sections \
+                    and section in self.default_doc.sections:
                     # TODO: log this event (info or debug)
                     # TODO: improve error checks (we assume few things here)
                     def_section = self.default_doc._section_dict[section][0]
@@ -390,8 +412,10 @@ def main():
     args = parser.parse_args()
 
     if args.default_filename and args.enforce_id:
-        msg = "using both --default-filename and --enforce-id doesn't make sense"
-        print("Error: " + msg, file=sys.stderr)
+        msg = (
+            "Error: using both --default-filename "
+            "and --enforce-id doesn't make sense")
+        print(msg, file=sys.stderr)
         return 1
 
     # register pylatest rst extensions (parsing friendly plain implementation)
@@ -418,7 +442,8 @@ def main():
         rst_document = doc.recreate()
         # report all runtime errors
         for error in doc.errors_lastrecreate():
-            print("Error: {0:s} (doc_id: {1:s})".format(error, doc_id), file=sys.stderr)
+            msg = "Error: {0:s} (doc_id: {1:s})"
+            print(msg.format(error, doc_id), file=sys.stderr)
         if args.enforce_id and doc_id is None:
             msg = "docstring without id found while id enforcing enabled"
             # TODO: report line numbers of such docstrings

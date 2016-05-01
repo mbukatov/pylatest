@@ -56,7 +56,7 @@ def redhat_bugzilla_role(role, rawtext, text, lineno, inliner,
     return [node], []
 
 def pylaref_html_role(role, rawtext, text, lineno, inliner,
-                         options={}, content=[]):
+                      options={}, content=[]):
     """
     Implementation of pylatest reference role for html output.
 
@@ -69,7 +69,7 @@ def pylaref_html_role(role, rawtext, text, lineno, inliner,
     doc_id = text
     # make the target path relative
     comp_num = len(doc_id.split("/"))
-    relpath_list = ['..' for _ in range(comp_num-1)]
+    relpath_list = ['..' for _ in range(comp_num - 1)]
     relpath_list.append(doc_id)
     relative_path = "{0:s}.html".format(os.path.join(*relpath_list))
     # create result

@@ -28,7 +28,8 @@ def visit_test_step_node(self, node):
     attributes = {
         'class': 'pylatest_action',
         'action_name': 'step',
-        'action_id': node.attributes['action_id'],}
+        'action_id': node.attributes['action_id'],
+        }
     self.body.append(self.starttag(node, 'div', **attributes))
 
 def depart_test_step_node(self, node):
@@ -38,7 +39,8 @@ def visit_test_result_node(self, node):
     attributes = {
         'class': 'pylatest_action',
         'action_name': 'result',
-        'action_id': node.attributes['action_id'],}
+        'action_id': node.attributes['action_id'],
+        }
     self.body.append(self.starttag(node, 'div', **attributes))
 
 def depart_test_result_node(self, node):
@@ -47,7 +49,8 @@ def depart_test_result_node(self, node):
 def visit_test_metadata_node(self, node):
     attributes = {
         'class': 'pylatest_metadata',
-        'name': node.attributes['name'],}
+        'name': node.attributes['name'],
+        }
     self.body.append(self.starttag(node, 'span', **attributes))
 
 def depart_test_metadata_node(self, node):
@@ -56,7 +59,8 @@ def depart_test_metadata_node(self, node):
 def visit_requirement_node(self, node):
     attributes = {
         'class': 'pylatest_requirement',
-        'req_id': node.attributes['req_id'],}
+        'req_id': node.attributes['req_id'],
+        }
     # optional attributes
     if 'priority' in node.attributes:
         attributes['priority'] = node.attributes['priority']

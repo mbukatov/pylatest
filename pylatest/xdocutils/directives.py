@@ -4,7 +4,8 @@
 ReStructuredText directives for test steps, actions and metadata.
 
 Note that binding between name of directive (as used in rst file) and rst
-directive class which implements it is defined in pylatest.xdocutils.client module.
+directive class which implements it is defined in pylatest.xdocutils.client
+module.
 """
 
 # Copyright (C) 2015 martin.bukatovic@gmail.com
@@ -61,7 +62,8 @@ class TestStepsDirective(rst.Directive):
         # each pylatest directive in the rst document has mandatory action id
         # (starts from 1), so there is either just one or no pylatest directive
         # with action_id == 1
-        # note: action is couple of test step and result with the same action_id
+        # note:
+        # action is couple of test step and result with the same action_id
         action_id = int(self.arguments[0])
         # first of all, parse text content of this directive
         # into anonymous node element (can't be used directly in the tree)
