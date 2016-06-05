@@ -148,11 +148,12 @@ class TestStepsTransform(PylatestTransform):
         """
         Remove all pending nodes from rst document tree.
         """
-        # drop current pending element from ``_actions`` because this one
+        pending_node_iter = self._actions.iter_content()
+        # skip current pending element because this one
         # has been already removed from document tree via replace_self()
-        del self._actions._actions_dict[1]['test_step']
+        next(pending_node_iter)
         # remove all remaining pylatest pending nodes from document tree
-        for pending_node in self._actions.iter_content():
+        for pending_node in pending_node_iter:
             pending_node.parent.remove(pending_node)
 
 
