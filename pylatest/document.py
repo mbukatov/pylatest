@@ -71,16 +71,24 @@ class TestActions(object):
         return len(self._actions_dict)
 
     def __iter__(self):
+        """
+        Iterate over actions, yielding: *action id* and content of test step
+        and test result (None is used if step or result is not specified).
+        """
         for action_id, action_dict in sorted(self._actions_dict.items()):
-            yield action_id, action_dict
+            step = action_dict.get('test_step')
+            result = action_dict.get('test_result')
+            yield action_id, step, result
 
     def iter_content(self):
         """
         Iterate over all content.
         """
         for _, action_dict in sorted(self._actions_dict.items()):
-            # TODO: fix issue with random order of content here
-            for content in action_dict.values():
+            for name in ('test_step', 'test_result'):
+                content = action_dict.get(name)
+                if content is None:
+                    continue
                 yield content
 
     def add(self, action_id, action_name, content):

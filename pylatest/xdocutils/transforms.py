@@ -166,15 +166,15 @@ class TestStepsTableTransform(TestStepsTransform):
         Generate table node tree based on data stored in pending elements.
         """
         row_nodes = []
-        for action_id, action_nodes in self._actions:
+        for action_id, step_nodes, result_nodes in self._actions:
             row_data = []
             # add action_id into row_data as 1st entry
             row_data.append([nodes.paragraph(text=str(action_id))])
             # for each action check if we have step and result pending node
             # this defines order of collumns in resulting table
-            for col_name in ('test_step', 'test_result'):
-                if col_name in action_nodes:
-                    row_data.append(action_nodes[col_name].details['nodes'])
+            for action_nodes in (step_nodes, result_nodes):
+                if action_nodes is not None:
+                    row_data.append(action_nodes.details['nodes'])
                 else:
                     row_data.append(nodes.paragraph())
             row_node = build_row(row_data)
@@ -194,18 +194,25 @@ class TestStepsPlainTransform(TestStepsTransform):
     steps are adressable via xpath (works with html output only).
     """
 
+    _node_names = ('test_step_node', 'test_result_node')
+    """
+    Class names of rst tree nodes (for html plain output) of both *test
+    step* and *test result* of a test action.
+    """
+
     def _create_content(self):
         p_node = nodes.paragraph()
-        for action_id, action_nodes in self._actions:
-            for col_name in ('test_step', 'test_result'):
-                if col_name in action_nodes:
-                    node_name = "{0:s}_node".format(col_name)
-                    node = getattr(pylatest.xdocutils.nodes, node_name)()
-                    # add all content nodes into step or result node
-                    for c_node in action_nodes[col_name].details['nodes']:
-                        node += c_node
-                    node.attributes['action_id'] = action_id
-                    p_node += node
+        for action_id, step_nodes, result_nodes in self._actions:
+            for action_nodes, node_name in \
+                    zip((step_nodes, result_nodes), self._node_names):
+                if action_nodes is None:
+                    continue
+                node = getattr(pylatest.xdocutils.nodes, node_name)()
+                # add all content nodes into step or result node
+                for c_node in action_nodes.details['nodes']:
+                    node += c_node
+                node.attributes['action_id'] = action_id
+                p_node += node
         return p_node
 
 
