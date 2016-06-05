@@ -142,7 +142,7 @@ class TestStepsTransform(PylatestTransform):
                 continue
             action_id = node.details['action_id']
             action_name = node.details['action_name']
-            self._actions.add(action_id, action_name, node)
+            self._actions.add(action_name, node, action_id)
 
     def _drop_pending_nodes(self):
         """

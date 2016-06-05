@@ -40,9 +40,9 @@ class TestTestActions(unittest.TestCase):
         self.assertEqual(list(self.actions.iter_content()), [])
 
     def test_actions_add_onefull(self):
-        self.actions.add(1, "test_step", "1.step")
+        self.actions.add("test_step", "1.step", 1)
         self.assertEqual(len(self.actions), 1)
-        self.actions.add(1, "test_result", "1.result")
+        self.actions.add("test_result", "1.result", 1)
         self.assertEqual(len(self.actions), 1)
         self.assertEqual(
             list(self.actions.iter_content()), ["1.step", "1.result"])
@@ -51,7 +51,7 @@ class TestTestActions(unittest.TestCase):
             [(1, '1.step', '1.result')])
 
     def test_actions_add_onestep(self):
-        self.actions.add(1, "test_step", "1.step")
+        self.actions.add("test_step", "1.step", 1)
         self.assertEqual(len(self.actions), 1)
         self.assertEqual(
             list(self.actions.iter_content()), ["1.step"])
@@ -60,10 +60,10 @@ class TestTestActions(unittest.TestCase):
             [(1, '1.step', None)])
 
     def test_actions_iter_twofull(self):
-        self.actions.add(1, "test_step", "1.step")
-        self.actions.add(1, "test_result", "1.result")
-        self.actions.add(2, "test_step", "2.step")
-        self.actions.add(2, "test_result", "2.result")
+        self.actions.add("test_step", "1.step", 1)
+        self.actions.add("test_result", "1.result", 1)
+        self.actions.add("test_step", "2.step", 2)
+        self.actions.add("test_result", "2.result", 2)
         self.assertEqual(
             list(self.actions),
             [(1, '1.step', '1.result'), (2, '2.step', '2.result')])

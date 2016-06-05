@@ -91,7 +91,7 @@ class TestActions(object):
                     continue
                 yield content
 
-    def add(self, action_id, action_name, content):
+    def add(self, action_name, content, action_id=None):
         self._actions_dict.setdefault(action_id, {})[action_name] = content
 
     # TODO: change the interface a bit
