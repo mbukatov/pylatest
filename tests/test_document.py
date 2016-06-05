@@ -59,6 +59,27 @@ class TestTestActions(unittest.TestCase):
             list(self.actions),
             [(1, '1.step', None)])
 
+    def test_actions_add_oneresult(self):
+        self.actions.add("test_result", "1.result", 1)
+        self.assertEqual(len(self.actions), 1)
+        self.assertEqual(
+            list(self.actions.iter_content()), ["1.result"])
+        self.assertEqual(
+            list(self.actions),
+            [(1, None, '1.result')])
+
+    def test_actions_add_clash(self):
+        self.actions.add("test_step", "1.step-1", 1)
+        self.actions.add("test_result", "1.result", 1)
+        self.assertEqual(len(self.actions), 1)
+        self.actions.add("test_step", "1.step-2", 1)
+        self.assertEqual(len(self.actions), 1)
+        self.assertEqual(
+            list(self.actions.iter_content()), ["1.step-2", "1.result"])
+        self.assertEqual(
+            list(self.actions),
+            [(1, '1.step-2', '1.result')])
+
     def test_actions_iter_twofull(self):
         self.actions.add("test_step", "1.step", 1)
         self.actions.add("test_result", "1.result", 1)
