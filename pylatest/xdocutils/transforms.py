@@ -25,6 +25,7 @@ See: http://docutils.sourceforge.net/docs/ref/transforms.html
 from docutils import nodes
 from docutils import transforms
 
+import pylatest.document
 import pylatest.xdocutils.nodes
 
 
@@ -127,36 +128,32 @@ class TestStepsTransform(PylatestTransform):
     Base trasformation class for test steps directive.
     """
 
-    # Action is couple of test step and result with the same action id.
-    # Expected structure eg. for pending nodes of 1st step and result:
-    # ``actions_dict = {1: {'test_step': node_a, 'test_result': node_b}}``
-    _actions_dict = None
+    _actions = None
 
     def _find_pending_nodes(self):
         """
         Find all pending nodes of pylatest directive and store them in
-        ``_actions_dict`` attribute.
+        ``_actions`` attribute.
         """
-        self._actions_dict = {}
+        self._actions = pylatest.document.TestActions()
         # TODO: validate id (eg. report error when conflicts are found)
         for node in self.document.traverse(nodes.pending):
             if 'action_id' not in node.details:
                 continue
             action_id = node.details['action_id']
             action_name = node.details['action_name']
-            self._actions_dict.setdefault(action_id, {})[action_name] = node
+            self._actions.add(action_id, action_name, node)
 
     def _drop_pending_nodes(self):
         """
         Remove all pending nodes from rst document tree.
         """
-        # drop current pending element from ``_actions_dict`` because this one
+        # drop current pending element from ``_actions`` because this one
         # has been already removed from document tree via replace_self()
-        del self._actions_dict[1]['test_step']
+        del self._actions._actions_dict[1]['test_step']
         # remove all remaining pylatest pending nodes from document tree
-        for action_dict in self._actions_dict.values():
-            for pending_node in action_dict.values():
-                pending_node.parent.remove(pending_node)
+        for pending_node in self._actions.iter_content():
+            pending_node.parent.remove(pending_node)
 
 
 class TestStepsTableTransform(TestStepsTransform):
@@ -169,7 +166,7 @@ class TestStepsTableTransform(TestStepsTransform):
         Generate table node tree based on data stored in pending elements.
         """
         row_nodes = []
-        for action_id, action_nodes in sorted(self._actions_dict.items()):
+        for action_id, action_nodes in self._actions:
             row_data = []
             # add action_id into row_data as 1st entry
             row_data.append([nodes.paragraph(text=str(action_id))])
@@ -199,7 +196,7 @@ class TestStepsPlainTransform(TestStepsTransform):
 
     def _create_content(self):
         p_node = nodes.paragraph()
-        for action_id, action_nodes in sorted(self._actions_dict.items()):
+        for action_id, action_nodes in self._actions:
             for col_name in ('test_step', 'test_result'):
                 if col_name in action_nodes:
                     node_name = "{0:s}_node".format(col_name)

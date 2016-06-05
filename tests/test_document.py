@@ -24,6 +24,33 @@ import pylatest.document
 from pylatest.document import SECTIONS, HEADER, SECTIONS_ALL
 
 
+class TestTestActions(unittest.TestCase):
+    """
+    Tests of pylatest.document.TestActions class.
+    """
+
+    def setUp(self):
+        self.actions = pylatest.document.TestActions()
+
+    def test_actions_null(self):
+        self.assertEqual(len(self.actions), 0)
+
+    def test_actions_iter_null(self):
+        self.assertEqual(list(self.actions), [])
+        self.assertEqual(list(self.actions.iter_content()), [])
+
+    def test_actions_add_onefull(self):
+        self.actions.add(1, "test_step", "1.step")
+        self.assertEqual(len(self.actions), 1)
+        self.actions.add(1, "test_result", "1.result")
+        self.assertEqual(len(self.actions), 1)
+        self.assertEqual(
+            list(self.actions.iter_content()), ["1.step", "1.result"])
+        self.assertEqual(
+            list(self.actions),
+            [(1, {'test_result': '1.result', 'test_step': '1.step'})])
+
+
 class TestSectionTuples(unittest.TestCase):
     """
     Test properties of SECTION and SECTION_ALL tuples.

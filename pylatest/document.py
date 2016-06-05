@@ -26,6 +26,75 @@ titles) and TODO: other general functions.
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
+class PylatestDocumentError(Exception):
+    pass
+
+
+class PylatestActionsError(PylatestDocumentError):
+    pass
+
+
+class TestActions(object):
+    """
+    List of test actions, content of *Test Steps* section of a test case
+    document.
+
+    Action is couple of a test step and result with the same *action id*.
+
+    Example
+    -------
+
+    Here is the rst source text of some *test action* with *action id* 42::
+
+        .. test_step:: 42
+
+            some step here
+
+        .. test_result:: 42
+
+            some result here
+
+    And the expected structure of actions dict::
+
+        actions_dict = {42: {'test_step': node_a, 'test_result': node_b}}
+
+    where node_a and node_b are pending nodes of the step and resul directives.
+    """
+
+    # TODO: consider changing inner representation (replace action_dict with
+    # something else).
+
+    def __init__(self):
+        self._actions_dict = {}
+
+    def __len__(self):
+        return len(self._actions_dict)
+
+    def __iter__(self):
+        for action_id, action_dict in sorted(self._actions_dict.items()):
+            yield action_id, action_dict
+
+    def iter_content(self):
+        """
+        Iterate over all content.
+        """
+        for _, action_dict in sorted(self._actions_dict.items()):
+            # TODO: fix issue with random order of content here
+            for content in action_dict.values():
+                yield content
+
+    def add(self, action_id, action_name, content):
+        self._actions_dict.setdefault(action_id, {})[action_name] = content
+
+    # TODO: change the interface a bit
+
+    def add_step(self, content, action_id=None):
+        pass
+
+    def add_result(self, content, action_id=None):
+        pass
+
+
 """
 List of titles of expected sections in pylatest document (order matters).
 """
@@ -72,5 +141,3 @@ including HEADER pseudo section.
 __tmp = [HEADER]
 __tmp.extend(SECTIONS)
 SECTIONS_ALL = tuple(__tmp)
-
-# TODO: refactoring move actions processing here
