@@ -61,6 +61,13 @@ class TestActions(object):
     where node_a and node_b are pending nodes of the step and resul directives.
     """
 
+    ACTION_NAMES = ('test_step', 'test_result')
+    """
+    List of valid names of all pylatest actions.
+
+    note: htmlplain div element uses just 'step' and 'result' - TODO: refactor?
+    """
+
     # TODO: consider changing inner representation (replace action_dict with
     # something else).
 
@@ -85,7 +92,7 @@ class TestActions(object):
         Iterate over all content.
         """
         for _, action_dict in sorted(self._actions_dict.items()):
-            for name in ('test_step', 'test_result'):
+            for name in self.ACTION_NAMES:
                 content = action_dict.get(name)
                 if content is None:
                     continue
@@ -119,15 +126,6 @@ SECTIONS_PLAINHTML = (
     "description",
     "setup",
     "teardown")
-
-"""
-List of action_name items of all pylatest actions.
-
-*Pylatest action* is couple of test step and result with the same *action id*.
-
-note: htmlplain div element uses just 'step' and 'result' - TODO: refactor?
-"""
-ACTION_NAMES = ("test_step", "test_result")
 
 """
 Header pseudo section. It's not a real section, but a placeholder for data

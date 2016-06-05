@@ -21,7 +21,8 @@ import unittest
 
 from lxml import etree
 
-from pylatest.document import SECTIONS_PLAINHTML, ACTION_NAMES
+from pylatest.document import SECTIONS_PLAINHTML
+from pylatest.document import TestActions
 from pylatest.xdocutils.client import register_plain
 import pylatest.export as export
 
