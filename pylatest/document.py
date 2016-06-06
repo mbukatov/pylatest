@@ -71,8 +71,9 @@ class TestActions(object):
     # TODO: consider changing inner representation (replace action_dict with
     # something else).
 
-    def __init__(self):
+    def __init__(self, enforce_id=False):
         self._actions_dict = {}
+        self._enforce_id = enforce_id
 
     def __len__(self):
         return len(self._actions_dict)
@@ -102,6 +103,12 @@ class TestActions(object):
         if action_name not in self.ACTION_NAMES:
             msg = "invalid action_name: {0}".format(action_name)
             raise PylatestActionsError(msg)
+        if self._enforce_id:
+            action_dict = self._actions_dict.get(action_id)
+            if action_dict is not None \
+                    and action_dict.get(action_name) is not None:
+                msg = "id error: such action has been already added"
+                raise PylatestActionsError(msg)
         self._actions_dict.setdefault(action_id, {})[action_name] = content
 
     # TODO: change the interface a bit
