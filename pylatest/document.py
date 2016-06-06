@@ -111,13 +111,11 @@ class TestActions(object):
                 raise PylatestActionsError(msg)
         self._actions_dict.setdefault(action_id, {})[action_name] = content
 
-    # TODO: change the interface a bit
-
     def add_step(self, content, action_id=None):
-        pass
+        self.add("test_step", content, action_id)
 
     def add_result(self, content, action_id=None):
-        pass
+        self.add("test_result", content, action_id)
 
 
 """
