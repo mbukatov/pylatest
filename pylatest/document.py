@@ -99,6 +99,9 @@ class TestActions(object):
                 yield content
 
     def add(self, action_name, content, action_id=None):
+        if action_name not in self.ACTION_NAMES:
+            msg = "invalid action_name: {0}".format(action_name)
+            raise PylatestActionsError(msg)
         self._actions_dict.setdefault(action_id, {})[action_name] = content
 
     # TODO: change the interface a bit

@@ -50,6 +50,11 @@ class TestTestActions(unittest.TestCase):
             list(self.actions),
             [(1, '1.step', '1.result')])
 
+    def test_actions_add_error(self):
+        with self.assertRaises(pylatest.document.PylatestActionsError):
+            self.actions.add("test_foobar", "1.foobar", 1)
+        self.assertEqual(len(self.actions), 0)
+
     def test_actions_add_onestep(self):
         self.actions.add("test_step", "1.step", 1)
         self.assertEqual(len(self.actions), 1)
