@@ -126,6 +126,28 @@ class TestTestActions(unittest.TestCase):
             list(self.actions),
             [(1, '1.step', '1.result'), (2, '2.step', '2.result')])
 
+    def test_actions_add_auto_id(self):
+        self.actions.add_step("1.step")
+        self.assertEqual(list(self.actions), [(1, '1.step', None)])
+        self.actions.add_step("2.step")
+        self.assertEqual(
+            list(self.actions),
+            [(1, '1.step', None), (2, '2.step', None)])
+        self.actions.add_result("2.result")
+        self.assertEqual(
+            list(self.actions),
+            [(1, '1.step', None), (2, '2.step', '2.result')])
+        self.actions.add_result("3.result")
+        self.assertEqual(list(self.actions), [
+            (1, '1.step', None),
+            (2, '2.step', '2.result'),
+            (3, None, '3.result'), ])
+        self.actions.add_step("3.step")
+        self.assertEqual(list(self.actions), [
+            (1, '1.step', None),
+            (2, '2.step', '2.result'),
+            (3, '3.step', '3.result'), ])
+
 
 class TestSectionTuples(unittest.TestCase):
     """

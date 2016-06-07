@@ -99,10 +99,21 @@ class TestActions(object):
                     continue
                 yield content
 
+    def _get_id(self, action_name):
+        if len(self._actions_dict) == 0:
+            return 1
+        last_id = max(self._actions_dict.keys())
+        if self._actions_dict[last_id].get(action_name) is None:
+            return last_id
+        else:
+            return last_id + 1
+
     def add(self, action_name, content, action_id=None):
         if action_name not in self.ACTION_NAMES:
             msg = "invalid action_name: {0}".format(action_name)
             raise PylatestActionsError(msg)
+        if action_id is None:
+            action_id = self._get_id(action_name)
         if self._enforce_id:
             action_dict = self._actions_dict.get(action_id)
             if action_dict is not None \
