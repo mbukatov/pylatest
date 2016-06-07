@@ -78,6 +78,9 @@ class TestActions(object):
     def __len__(self):
         return len(self._actions_dict)
 
+    def __eq__(self, other):
+        return self._actions_dict == other._actions_dict
+
     def __iter__(self):
         """
         Iterate over actions, yielding: *action id* and content of test step
