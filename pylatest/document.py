@@ -88,16 +88,24 @@ class TestActions(object):
             result = action_dict.get('test_result')
             yield action_id, step, result
 
-    def iter_content(self):
+    def iter_action(self):
         """
-        Iterate over all content.
+        Iterate over all actions, but yield each test step or result as
+        a single item in a tuple: action_id, action_name, content.
         """
-        for _, action_dict in sorted(self._actions_dict.items()):
+        for action_id, action_dict in sorted(self._actions_dict.items()):
             for name in self.ACTION_NAMES:
                 content = action_dict.get(name)
                 if content is None:
                     continue
-                yield content
+                yield action_id, name, content
+
+    def iter_content(self):
+        """
+        Iterate over all content.
+        """
+        for _, _, content in self.iter_action():
+            yield content
 
     def _get_id(self, action_name):
         if len(self._actions_dict) == 0:
