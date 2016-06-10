@@ -85,6 +85,94 @@ class TestDirectives(TestDirectivesBase):
         self.check_directive(rst_input, exp_result)
 
 
+class TestTestActionsPlainDirective(TestDirectivesBase):
+
+    def test_teststep_empty(self):
+        rst_input = '.. test_step:: 1'
+        exp_result = textwrap.dedent('''\
+        <document source="testparse() method">
+            <pending>
+                .. internal attributes:
+                     .transform: pylatest.xdocutils.transforms.TestStepsPlainTransform
+                     .details:
+                       action_id: 1
+                       action_name: 'test_step'
+                       nodes:
+                         <Element>
+        ''')
+        self.check_directive(rst_input, exp_result)
+
+    def test_teststep_empty_noid(self):
+        rst_input = '.. test_step::'
+        exp_result = textwrap.dedent('''\
+        <document source="testparse() method">
+            <system_message level="3" line="1" source="testparse() method" type="ERROR">
+                <paragraph>
+                    Error in "test_step" directive:
+                    1 argument(s) required, 0 supplied.
+                <literal_block xml:space="preserve">
+                    .. test_step::
+        ''')
+        self.check_directive(rst_input, exp_result)
+
+    def test_testresult_empty(self):
+        rst_input = '.. test_result:: 1'
+        exp_result = textwrap.dedent('''\
+        <document source="testparse() method">
+            <pending>
+                .. internal attributes:
+                     .transform: pylatest.xdocutils.transforms.TestStepsPlainTransform
+                     .details:
+                       action_id: 1
+                       action_name: 'test_result'
+                       nodes:
+                         <Element>
+        ''')
+        self.check_directive(rst_input, exp_result)
+
+    def test_teststep_simple(self):
+        rst_input = textwrap.dedent('''\
+        .. test_step:: 7
+
+            Some content.
+        ''')
+        exp_result = textwrap.dedent('''\
+        <document source="testparse() method">
+            <pending>
+                .. internal attributes:
+                     .transform: pylatest.xdocutils.transforms.TestStepsPlainTransform
+                     .details:
+                       action_id: 7
+                       action_name: 'test_step'
+                       nodes:
+                         <Element>
+                             <paragraph>
+                                 Some content.
+        ''')
+        self.check_directive(rst_input, exp_result)
+
+    def test_testresult_simple(self):
+        rst_input = textwrap.dedent('''\
+        .. test_result:: 7
+
+            Some content.
+        ''')
+        exp_result = textwrap.dedent('''\
+        <document source="testparse() method">
+            <pending>
+                .. internal attributes:
+                     .transform: pylatest.xdocutils.transforms.TestStepsPlainTransform
+                     .details:
+                       action_id: 7
+                       action_name: 'test_result'
+                       nodes:
+                         <Element>
+                             <paragraph>
+                                 Some content.
+        ''')
+        self.check_directive(rst_input, exp_result)
+
+
 class TestTestMetadataDirective(TestDirectivesBase):
 
     def test_testmetadata_empty(self):
