@@ -34,7 +34,7 @@ from pylatest.xdocutils.transforms import TestMetadataPlainTransform
 import pylatest.xdocutils.nodes
 
 
-class TestStepsDirective(rst.Directive):
+class TestActionDirective(rst.Directive):
     """
     Base class with implementation of ``test_step`` and ``test_result`` rst
     directives.
@@ -97,7 +97,7 @@ class TestStepsDirective(rst.Directive):
         return [pending]
 
 
-class TestStepsTableDirective(TestStepsDirective):
+class TestActionTableDirective(TestActionDirective):
     """
     Implementation of ``test_step`` and ``test_result`` directives for
     direct consumption (transformation will generate proper table from
@@ -107,7 +107,7 @@ class TestStepsTableDirective(TestStepsDirective):
     transform_class = TestStepsTableTransform
 
 
-class TestStepsPlainDirective(TestStepsDirective):
+class TestActionPlainDirective(TestActionDirective):
     """
     Implementation of ``test_step`` and ``test_result`` directives for
     further processing, eg. checking particular part of resulting document.

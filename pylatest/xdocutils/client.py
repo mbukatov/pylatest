@@ -37,8 +37,8 @@ from docutils.core import publish_parts
 from docutils import nodes
 from docutils.writers.html4css1 import HTMLTranslator
 
-from pylatest.xdocutils.directives import TestStepsTableDirective
-from pylatest.xdocutils.directives import TestStepsPlainDirective
+from pylatest.xdocutils.directives import TestActionTableDirective
+from pylatest.xdocutils.directives import TestActionPlainDirective
 from pylatest.xdocutils.directives import TestMetadataTableDirective
 from pylatest.xdocutils.directives import TestMetadataPlainDirective
 from pylatest.xdocutils.directives import RequirementPlainDirective
@@ -87,8 +87,8 @@ def register_table():
     and roles.
     """
     directives.register_directive("test_metadata", TestMetadataTableDirective)
-    directives.register_directive("test_step", TestStepsTableDirective)
-    directives.register_directive("test_result", TestStepsTableDirective)
+    directives.register_directive("test_step", TestActionTableDirective)
+    directives.register_directive("test_result", TestActionTableDirective)
     directives.register_directive("requirement", RequirementSectionDirective)
     register_pylatest_roles()
 
@@ -98,8 +98,8 @@ def register_plain():
     This is intended for further processing (HTML only).
     """
     directives.register_directive("test_metadata", TestMetadataPlainDirective)
-    directives.register_directive("test_step", TestStepsPlainDirective)
-    directives.register_directive("test_result", TestStepsPlainDirective)
+    directives.register_directive("test_step", TestActionPlainDirective)
+    directives.register_directive("test_result", TestActionPlainDirective)
     directives.register_directive("requirement", RequirementPlainDirective)
     register_pylatest_roles()
     register_pylatest_nodes()
