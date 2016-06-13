@@ -1,0 +1,187 @@
+# -*- coding: utf8 -*-
+
+"""
+Tests of pylatest docutils extensions: pylatest.xdocutils module as a whole.
+
+This means that tests in this module uses user level docutils API to build
+rst source into html build and then checks the result.
+"""
+
+# Copyright (C) 2016 martin.bukatovic@gmail.com
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+
+import textwrap
+import unittest
+
+import pylatest.xdocutils.client as xclient
+
+
+class TestDocutilsPlain(unittest.TestCase):
+    """
+    Tests to to make sure that docutils module isn't broken (via pylatest
+    extensions) and still works fine.
+    """
+
+    def setUp(self):
+        # register custom pylatest nodes with html translator
+        xclient.register_plain()
+        # show full diff (note: python3 unittest diff is much better)
+        self.maxDiff = None
+
+    def check_html_body(self, rst_input, exp_result):
+        htmlbody_str = xclient.publish_parts_wrapper(rst_input)['html_body']
+        self.assertEqual(htmlbody_str, exp_result)
+
+    def test_doc_empty(self):
+        rst_input = ""
+        exp_result = textwrap.dedent('''\
+        <div class="document">
+        </div>
+        ''')
+        self.check_html_body(rst_input, exp_result)
+
+    def test_doc_simple(self):
+        rst_input = "Ceterum censeo Carthaginem esse delendam"
+        exp_result = textwrap.dedent('''\
+        <div class="document">
+        <p>Ceterum censeo Carthaginem esse delendam</p>
+        </div>
+        ''')
+        self.check_html_body(rst_input, exp_result)
+
+    def test_doc_simple(self):
+        rst_input = textwrap.dedent('''\
+        .. container::
+
+            Ceterum censeo Carthaginem esse delendam.
+        ''')
+        exp_result = textwrap.dedent('''\
+        <div class="document">
+        <div class="container">
+        Ceterum censeo Carthaginem esse delendam.</div>
+        </div>
+        ''')
+        self.check_html_body(rst_input, exp_result)
+
+
+class TestDocutilsTable(TestDocutilsPlain):
+    """
+    The same basic tests, but with pylatest table transformations.
+    """
+
+    def setUp(self):
+        # register custom pylatest nodes with html translator
+        xclient.register_table()
+        # show full diff (note: python3 unittest diff is much better)
+        self.maxDiff = None
+
+
+class TestTestActionsPlain(TestDocutilsPlain):
+    """
+    Test of test action directives and transformations.
+    """
+
+    def test_teststep_empty(self):
+        rst_input = '.. test_step:: 1'
+        exp_result = textwrap.dedent('''\
+        <div class="document">
+        <p><div action_id="1" action_name="step" class="pylatest_action">
+
+        </div>
+        </p>
+        </div>
+        ''')
+        self.check_html_body(rst_input, exp_result)
+
+    def test_teststep_simple(self):
+        rst_input = textwrap.dedent('''\
+        .. test_step:: 1
+
+            Ceterum censeo Carthaginem esse delendam.
+        ''')
+        exp_result = textwrap.dedent('''\
+        <div class="document">
+        <p><div action_id="1" action_name="step" class="pylatest_action">
+        Ceterum censeo Carthaginem esse delendam.
+        </div>
+        </p>
+        </div>
+        ''')
+        self.check_html_body(rst_input, exp_result)
+
+
+class TestTestActionsTable(TestDocutilsTable):
+    """
+    Test of test action directives and transformations.
+    """
+
+    def test_teststep_empty(self):
+        rst_input = '.. test_step:: 1'
+        exp_result = textwrap.dedent('''\
+        <div class="document">
+        <table border="1" class="docutils">
+        <colgroup>
+        <col width="2%" />
+        <col width="49%" />
+        <col width="49%" />
+        </colgroup>
+        <thead valign="bottom">
+        <tr><th class="head">&nbsp;</th>
+        <th class="head">Step</th>
+        <th class="head">Expected Result</th>
+        </tr>
+        </thead>
+        <tbody valign="top">
+        <tr><td>1</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        </tr>
+        </tbody>
+        </table>
+        </div>
+        ''')
+        self.check_html_body(rst_input, exp_result)
+
+    def test_teststep_simple(self):
+        rst_input = textwrap.dedent('''\
+        .. test_step:: 1
+
+            Ceterum censeo Carthaginem esse delendam.
+        ''')
+        exp_result = textwrap.dedent('''\
+        <div class="document">
+        <table border="1" class="docutils">
+        <colgroup>
+        <col width="2%" />
+        <col width="49%" />
+        <col width="49%" />
+        </colgroup>
+        <thead valign="bottom">
+        <tr><th class="head">&nbsp;</th>
+        <th class="head">Step</th>
+        <th class="head">Expected Result</th>
+        </tr>
+        </thead>
+        <tbody valign="top">
+        <tr><td>1</td>
+        <td>Ceterum censeo Carthaginem esse delendam.</td>
+        <td>&nbsp;</td>
+        </tr>
+        </tbody>
+        </table>
+        </div>
+        ''')
+        self.check_html_body(rst_input, exp_result)
