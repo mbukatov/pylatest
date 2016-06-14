@@ -62,7 +62,7 @@ class TestDocutilsPlain(unittest.TestCase):
         ''')
         self.check_html_body(rst_input, exp_result)
 
-    def test_doc_simple(self):
+    def test_doc_somedirective(self):
         rst_input = textwrap.dedent('''\
         .. container::
 
