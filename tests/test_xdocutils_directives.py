@@ -47,7 +47,7 @@ def testparse(rst_str):
     return document.pformat()
 
 
-class TestDirectivesBase(unittest.TestCase):
+class TestBasePlain(unittest.TestCase):
 
     def setUp(self):
         # register custom pylatest nodes with html translator
@@ -60,7 +60,7 @@ class TestDirectivesBase(unittest.TestCase):
         self.assertEqual(result, exp_result)
 
 
-class TestDirectives(TestDirectivesBase):
+class TestDocutilsPlain(TestBasePlain):
     """
     Make sure that docutils isn't broken.
     """
@@ -85,7 +85,7 @@ class TestDirectives(TestDirectivesBase):
         self.check_directive(rst_input, exp_result)
 
 
-class TestTestActionsPlainDirective(TestDirectivesBase):
+class TestTestActionsDirectivePlain(TestBasePlain):
 
     def test_teststep_empty(self):
         rst_input = '.. test_step:: 1'
@@ -173,7 +173,7 @@ class TestTestActionsPlainDirective(TestDirectivesBase):
         self.check_directive(rst_input, exp_result)
 
 
-class TestTestMetadataDirective(TestDirectivesBase):
+class TestTestMetadataDirectivePlain(TestBasePlain):
 
     def test_testmetadata_empty(self):
         rst_input = '.. test_metadata:: author'
@@ -244,7 +244,7 @@ class TestTestMetadataDirective(TestDirectivesBase):
         self.check_directive(rst_input, exp_result)
 
 
-class TestRequirementPlainDirective(TestDirectivesBase):
+class TestRequirementDirectivePlain(TestBasePlain):
 
     def test_testmetadata_full_nooptions(self):
         rst_input = textwrap.dedent('''\
@@ -280,7 +280,7 @@ class TestRequirementPlainDirective(TestDirectivesBase):
         self.check_directive(rst_input, exp_result)
 
 
-class TestRequirementSectionDirective(TestDirectivesBase):
+class TestRequirementDirectiveTable(TestBasePlain):
 
     def setUp(self):
         # register custom pylatest nodes with html translator
