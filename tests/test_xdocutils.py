@@ -29,7 +29,7 @@ import unittest
 import pylatest.xdocutils.client as xclient
 
 
-class TestDocutilsPlain(unittest.TestCase):
+class TestBasePlain(unittest.TestCase):
     """
     Tests to to make sure that docutils module isn't broken (via pylatest
     extensions) and still works fine.
@@ -44,6 +44,13 @@ class TestDocutilsPlain(unittest.TestCase):
     def check_html_body(self, rst_input, exp_result):
         htmlbody_str = xclient.publish_parts_wrapper(rst_input)['html_body']
         self.assertEqual(htmlbody_str, exp_result)
+
+
+class TestDocutilsPlain(TestBasePlain):
+    """
+    Tests to to make sure that docutils module isn't broken (via pylatest
+    extensions) and still works fine.
+    """
 
     def test_doc_empty(self):
         rst_input = ""
@@ -89,7 +96,7 @@ class TestDocutilsTable(TestDocutilsPlain):
         self.maxDiff = None
 
 
-class TestTestActionsPlain(TestDocutilsPlain):
+class TestTestActionsPlain(TestBasePlain):
     """
     Test of test action directives and transformations.
     """
@@ -123,10 +130,16 @@ class TestTestActionsPlain(TestDocutilsPlain):
         self.check_html_body(rst_input, exp_result)
 
 
-class TestTestActionsTable(TestDocutilsTable):
+class TestTestActionsTable(TestBasePlain):
     """
     Test of test action directives and transformations.
     """
+
+    def setUp(self):
+        # register custom pylatest nodes with html translator
+        xclient.register_table()
+        # show full diff (note: python3 unittest diff is much better)
+        self.maxDiff = None
 
     def test_teststep_empty(self):
         rst_input = '.. test_step:: 1'
