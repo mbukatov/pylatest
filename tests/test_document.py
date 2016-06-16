@@ -148,6 +148,15 @@ class TestTestActions(unittest.TestCase):
             (2, '2.step', '2.result'),
             (3, '3.step', '3.result'), ])
 
+    def test_actions_iter_twofull_auto_id_firstonly(self):
+        self.actions.add("test_step", "1.step", 1)
+        self.actions.add("test_result", "1.result")
+        self.actions.add("test_step", "2.step")
+        self.actions.add("test_result", "2.result")
+        self.assertEqual(
+            list(self.actions),
+            [(1, '1.step', '1.result'), (2, '2.step', '2.result')])
+
 
 class TestSectionTuples(unittest.TestCase):
     """
