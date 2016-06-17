@@ -64,7 +64,10 @@ class TestActionDirective(rst.Directive):
         # with action_id == 1
         # note:
         # action is couple of test step and result with the same action_id
-        action_id = int(self.arguments[0])
+        if len(self.arguments) == 0:
+            action_id = None
+        else:
+            action_id = int(self.arguments[0])
         # first of all, parse text content of this directive
         # into anonymous node element (can't be used directly in the tree)
         node = nodes.Element()
@@ -107,6 +110,16 @@ class TestActionTableDirective(TestActionDirective):
     transform_class = TestStepsTableTransform
 
 
+class TestActionTableDirectiveAutoId(TestActionTableDirective):
+    """
+    Implementation of ``test_step`` and ``test_result`` directives for
+    direct consumption, with optional argument for action id.
+    """
+
+    required_arguments = 0
+    optional_arguments = 1
+
+
 class TestActionPlainDirective(TestActionDirective):
     """
     Implementation of ``test_step`` and ``test_result`` directives for
@@ -114,6 +127,16 @@ class TestActionPlainDirective(TestActionDirective):
     """
 
     transform_class = TestStepsPlainTransform
+
+
+class TestActionPlainDirectiveAutoId(TestActionPlainDirective):
+    """
+    Implementation of ``test_step`` and ``test_result`` directives for
+    direct consumption, with optional argument for action id.
+    """
+
+    required_arguments = 0
+    optional_arguments = 1
 
 
 class TestMetadataDirective(rst.Directive):

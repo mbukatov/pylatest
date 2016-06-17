@@ -190,6 +190,80 @@ class TestTestActionsPlain(TestBasePlain):
         self.check_html_body(rst_input, exp_result)
 
 
+class TestTestActionsPlainAutoId(TestTestActionsPlain):
+    """
+    Test cases of autoid directive ... runs all test cases of superclass
+    and some special cases when action id is ommited. Note that one can't
+    ommit action id for 1st test step directive!
+    """
+
+    def setUp(self):
+        # register custom pylatest nodes with html translator
+        xclient.register_plain(auto_id=True)
+        # show full diff (note: python3 unittest diff is much better)
+        self.maxDiff = None
+
+    def test_test_action_simple_autoid(self):
+        rst_input = textwrap.dedent('''\
+        .. test_step:: 1
+
+            Ceterum censeo Carthaginem esse delendam.
+
+        .. test_result::
+
+            This city is no more ... it has ceased to be ...
+        ''')
+        exp_result = textwrap.dedent('''\
+        <div class="document">
+        <p><div action_id="1" action_name="step" class="pylatest_action">
+        Ceterum censeo Carthaginem esse delendam.
+        </div>
+        <div action_id="1" action_name="result" class="pylatest_action">
+        This city is no more ... it has ceased to be ...
+        </div>
+        </p>
+        </div>
+        ''')
+        self.check_html_body(rst_input, exp_result)
+
+    def test_test_actions_two_autoid(self):
+        rst_input = textwrap.dedent('''\
+        .. test_step:: 1
+
+            Ceterum censeo Carthaginem esse delendam.
+
+        .. test_result::
+
+            This city is no more ... it has ceased to be ...
+
+        .. test_step::
+
+            Step foo.
+
+        .. test_result::
+
+            Result bar.
+        ''')
+        exp_result = textwrap.dedent('''\
+        <div class="document">
+        <p><div action_id="1" action_name="step" class="pylatest_action">
+        Ceterum censeo Carthaginem esse delendam.
+        </div>
+        <div action_id="1" action_name="result" class="pylatest_action">
+        This city is no more ... it has ceased to be ...
+        </div>
+        <div action_id="2" action_name="step" class="pylatest_action">
+        Step foo.
+        </div>
+        <div action_id="2" action_name="result" class="pylatest_action">
+        Result bar.
+        </div>
+        </p>
+        </div>
+        ''')
+        self.check_html_body(rst_input, exp_result)
+
+
 class TestTestActionsTable(TestBasePlain):
     """
     Test of test action directives and transformations.
@@ -309,6 +383,97 @@ class TestTestActionsTable(TestBasePlain):
             Step foo.
 
         .. test_result:: 2
+
+            Result bar.
+        ''')
+        exp_result = textwrap.dedent('''\
+        <div class="document">
+        <table border="1" class="docutils">
+        <colgroup>
+        <col width="2%" />
+        <col width="49%" />
+        <col width="49%" />
+        </colgroup>
+        <thead valign="bottom">
+        <tr><th class="head">&nbsp;</th>
+        <th class="head">Step</th>
+        <th class="head">Expected Result</th>
+        </tr>
+        </thead>
+        <tbody valign="top">
+        <tr><td>1</td>
+        <td>Ceterum censeo Carthaginem esse delendam.</td>
+        <td>This city is no more ... it has ceased to be ...</td>
+        </tr>
+        <tr><td>2</td>
+        <td>Step foo.</td>
+        <td>Result bar.</td>
+        </tr>
+        </tbody>
+        </table>
+        </div>
+        ''')
+        self.check_html_body(rst_input, exp_result)
+
+
+class TestTestActionsTableAutoId(TestTestActionsTable):
+
+    def setUp(self):
+        # register custom pylatest nodes with html translator
+        xclient.register_table(auto_id=True)
+        # show full diff (note: python3 unittest diff is much better)
+        self.maxDiff = None
+
+    def test_test_action_simple_autoid(self):
+        rst_input = textwrap.dedent('''\
+        .. test_step:: 1
+
+            Ceterum censeo Carthaginem esse delendam.
+
+        .. test_result::
+
+            This city is no more ... it has ceased to be ...
+        ''')
+        exp_result = textwrap.dedent('''\
+        <div class="document">
+        <table border="1" class="docutils">
+        <colgroup>
+        <col width="2%" />
+        <col width="49%" />
+        <col width="49%" />
+        </colgroup>
+        <thead valign="bottom">
+        <tr><th class="head">&nbsp;</th>
+        <th class="head">Step</th>
+        <th class="head">Expected Result</th>
+        </tr>
+        </thead>
+        <tbody valign="top">
+        <tr><td>1</td>
+        <td>Ceterum censeo Carthaginem esse delendam.</td>
+        <td>This city is no more ... it has ceased to be ...</td>
+        </tr>
+        </tbody>
+        </table>
+        </div>
+        ''')
+        self.check_html_body(rst_input, exp_result)
+
+    def test_test_actions_two_autoid(self):
+        rst_input = textwrap.dedent('''\
+        .. test_step:: 1
+
+            Ceterum censeo Carthaginem esse delendam.
+
+        .. test_result::
+
+            This city is no more ... it has ceased to be ...
+
+        .. test_step::
+
+            Step foo.
+
+        .. test_result::
 
             Result bar.
         ''')
