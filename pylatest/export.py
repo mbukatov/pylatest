@@ -109,7 +109,7 @@ def export_plainhtml(body_tree):
     """
     xml_export = XmlExportDoc()
     actions = get_actions(body_tree)
-    for action_id, step, result in actions.iter_action():
+    for action_id, action_name, content in actions.iter_action():
         xml_export.add_action(action_id, action_name, content)
     for section in SECTIONS_PLAINHTML:
         content = get_section(body_tree, section)
