@@ -27,7 +27,7 @@ import argparse
 
 from lxml import etree
 
-from pylatest.document import SECTIONS_PLAINHTML, ACTION_NAMES
+from pylatest.document import TestCaseDoc, ACTION_NAMES
 from pylatest.xdocutils.client import publish_parts_wrapper, register_plain
 
 
@@ -117,7 +117,7 @@ def export_plainhtml(body_tree):
             if content is None:
                 continue
             xml_export.add_action(action_id, action_name, content)
-    for section in SECTIONS_PLAINHTML:
+    for section in TestCaseDoc.SECTIONS_PLAINHTML:
         content = get_section(body_tree, section)
         if content is None:
             continue

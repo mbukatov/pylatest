@@ -30,7 +30,7 @@ import sys
 from docutils.core import publish_doctree
 from docutils import nodes
 
-from pylatest.document import SECTIONS, HEADER, SECTIONS_ALL
+from pylatest.document import TestCaseDoc
 import pylatest.xdocutils.client
 import pylatest.xdocutils.nodes
 
@@ -164,7 +164,7 @@ def detect_docstring_sections(docstring):
     title_condition = lambda node: \
         isinstance(node, nodes.title) or isinstance(node, nodes.subtitle)
     for node in nodetree.traverse(title_condition):
-        if node.astext() in SECTIONS:
+        if TestCaseDoc.has_section(node.astext()):
             detected_sections.append(node.astext())
 
     # try to count all pylatest step/result directives
@@ -188,8 +188,9 @@ def detect_docstring_sections(docstring):
         # 2) this title contains name of the test case,
         #    so that title text doesn't match predefined set of sections
         title_index = nodetree.first_child_matching_class(nodes.title)
-        if title_index == 0 and nodetree[title_index].astext() not in SECTIONS:
-            detected_sections.insert(1, HEADER)
+        if title_index == 0 and \
+                not TestCaseDoc.has_section(nodetree[title_index].astext()):
+            detected_sections.insert(1, TestCaseDoc._HEAD.title)
 
     return detected_sections, test_directive_count
 
@@ -340,12 +341,12 @@ class PylatestDocument(object):
                     self.add_docstring(def_section, 1)
 
         # report missing sections
-        for section in SECTIONS_ALL:
-            if section not in self._section_dict:
-                if section == "Test Steps" and len(self._docstrings) > 1:
+        for section in TestCaseDoc.SECTIONS_ALL:
+            if section.title not in self._section_dict:
+                if section == TestCaseDoc.STEPS and len(self._docstrings) > 1:
                     # test steps may be in standalone directives
                     continue
-                msg = "{0:s} section is missing.".format(section)
+                msg = "{0} section is missing.".format(section)
                 self._add_error(msg)
 
         # when everything is just in a single string
@@ -356,12 +357,12 @@ class PylatestDocument(object):
         # document is splitted across multiple docstrings
         rst_list = []
         docstrings_used = set()
-        for section in SECTIONS_ALL:
-            docstrings = self._section_dict.get(section)
-            if docstrings is None and section == "Test Steps":
+        for section in TestCaseDoc.SECTIONS_ALL:
+            docstrings = self._section_dict.get(section.title)
+            if docstrings is None and section == TestCaseDoc.STEPS:
                 # put together test steps
                 if len(self._test_actions) > 0:
-                    rst_list.append("Test Steps\n==========")
+                    rst_list.append(section.get_rst_header())
                     teststeps = "\n\n".join(self._test_actions)
                     rst_list.append(teststeps)
                 else:
@@ -370,7 +371,7 @@ class PylatestDocument(object):
             if docstrings is None:
                 continue
             if len(docstrings) > 1:
-                msg = "multiple docstrings with {0:s} section found"
+                msg = "multiple docstrings with {0} section found"
                 self._add_error(msg.format(section))
             # case with multiple docstrings for one section is invalid,
             # but add them all anyway to make debugging easier

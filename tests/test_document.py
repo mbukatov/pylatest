@@ -20,22 +20,51 @@ import unittest
 import textwrap
 import os
 
-import pylatest.document
-from pylatest.document import SECTIONS, HEADER, SECTIONS_ALL
+from pylatest.document import Section, TestCaseDoc
 
 
-class TestSectionTuples(unittest.TestCase):
+class TestTestCcaseDocSections(unittest.TestCase):
     """
     Test properties of SECTION and SECTION_ALL tuples.
     """
 
     def test_section_vs_sectionall_len(self):
-        self.assertEqual(len(SECTIONS) + 1, len(SECTIONS_ALL))
+        self.assertEqual(
+            len(TestCaseDoc.SECTIONS) + 1,
+            len(TestCaseDoc.SECTIONS_ALL))
 
     def test_header_membership(self):
-        self.assertIn(HEADER, SECTIONS_ALL)
-        self.assertNotIn(HEADER, SECTIONS)
+        self.assertIn(TestCaseDoc._HEAD, TestCaseDoc.SECTIONS_ALL)
+        self.assertNotIn(TestCaseDoc._HEAD, TestCaseDoc.SECTIONS)
 
     def test_sectionsall_contains_section(self):
-        for section in SECTIONS:
-            self.assertIn(section, SECTIONS_ALL)
+        for section in TestCaseDoc.SECTIONS:
+            self.assertIn(section, TestCaseDoc.SECTIONS_ALL)
+
+    def test_has_section(self):
+        self.assertTrue(TestCaseDoc.has_section(title="Description"))
+        self.assertTrue(TestCaseDoc.has_section("Test Steps"))
+        self.assertFalse(TestCaseDoc.has_section(title="Requirements"))
+        self.assertFalse(TestCaseDoc.has_section("Foo Bar"))
+
+
+class TestSection(unittest.TestCase):
+
+    def test_sections_eq(self):
+        s1 = Section("Test Steps")
+        s2 = Section("Test Steps")
+        s3 = Section("Requirements")
+        self.assertEqual(s1, s2)
+        self.assertNotEqual(s2, s3)
+        self.assertNotEqual(s1, s3)
+
+    def test_plainhtml_id(self):
+        s1 = Section("Description")
+        self.assertEqual(s1.html_id, "description")
+
+    def test_get_rst_header(self):
+        s1 = Section("Test Case Description")
+        exp_output = textwrap.dedent('''\
+        Test Case Description
+        =====================''')
+        self.assertEqual(s1.get_rst_header(), exp_output)

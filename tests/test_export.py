@@ -21,7 +21,7 @@ import unittest
 
 from lxml import etree
 
-from pylatest.document import SECTIONS_PLAINHTML, ACTION_NAMES
+from pylatest.document import TestCaseDoc, ACTION_NAMES
 from pylatest.xdocutils.client import register_plain
 import pylatest.export as export
 
@@ -67,7 +67,7 @@ def add_section_div(elem, section_id):
     """
     Adds a section div element (with a headline) with given into given element.
     """
-    # note: section_id comes from pylatest.document.SECTIONS_PLAINHTML
+    # note: section_id comes from pylatest.document.TestCaseDoc.SECTIONS_PLAINHTML
     div_attrs = {
         'id': str(section_id),
         'class': 'section'}
@@ -154,7 +154,7 @@ class TestGetStuffFromHtmlPlain(unittest.TestCase):
 
     def test_get_section_empty(self):
         body_tree = get_empty_body_tree()
-        for section in SECTIONS_PLAINHTML:
+        for section in TestCaseDoc.SECTIONS_PLAINHTML:
             self.assertIsNone(export.get_section(body_tree, section))
 
     def test_get_section_actually_nothing(self):
@@ -163,19 +163,19 @@ class TestGetStuffFromHtmlPlain(unittest.TestCase):
         add_section_div(body_tree, 'foo')
         add_section_div(body_tree, 'bar')
         # checking
-        for section in SECTIONS_PLAINHTML:
+        for section in TestCaseDoc.SECTIONS_PLAINHTML:
             self.assertIsNone(export.get_section(body_tree, section))
 
     def test_get_section_single(self):
         # construct input
         body_tree, p_el = get_singleparagraph_body_tree()
         add_section_div(body_tree, 'foo')
-        section_el = add_section_div(body_tree, SECTIONS_PLAINHTML[0])
+        section_el = add_section_div(body_tree, TestCaseDoc.SECTIONS_PLAINHTML[0])
         add_section_div(body_tree, 'bar')
         # run, run
-        result_el = export.get_section(body_tree, SECTIONS_PLAINHTML[0])
+        result_el = export.get_section(body_tree, TestCaseDoc.SECTIONS_PLAINHTML[0])
         # checking
         self.assertIsNotNone(result_el)
         self.assertEqual(result_el, section_el)
-        for section in SECTIONS_PLAINHTML[1:]:
+        for section in TestCaseDoc.SECTIONS_PLAINHTML[1:]:
             self.assertIsNone(export.get_section(body_tree, section))

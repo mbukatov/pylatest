@@ -20,9 +20,9 @@ import unittest
 import textwrap
 import os
 
-import pylatest.xdocutils.client
-import pylatest.document
+from pylatest.document import TestCaseDoc
 import pylatest.pysource as pysource
+import pylatest.xdocutils.client
 
 
 HERE = os.path.abspath(os.path.dirname(__file__))
@@ -207,7 +207,7 @@ class TestPylatestDocstringProcessing(unittest.TestCase):
         .. test_metadata:: date 2015-11-06
         .. test_metadata:: comment Hello world.
         ''')
-        expected_result = ([pylatest.document.HEADER], 0)
+        expected_result = ([TestCaseDoc._HEAD.title], 0)
         actual_result = pysource.detect_docstring_sections(src)
         self.assertEqual(actual_result, expected_result)
 
@@ -357,7 +357,7 @@ class TestPylatestDocstringProcessing(unittest.TestCase):
             There are no files, output should be empty.
         ''')
         # note that order of sections is not defined
-        expected_result = (sorted([pylatest.document.HEADER, "Test Steps"]), 2)
+        expected_result = (sorted([TestCaseDoc._HEAD.title, "Test Steps"]), 2)
         actual_result = pysource.detect_docstring_sections(src)
         actual_result = (sorted(actual_result[0]), actual_result[1])
         self.assertEqual(actual_result, expected_result)
@@ -385,7 +385,7 @@ class TestPylatestDocstringProcessing(unittest.TestCase):
         #. The end.
         ''')
         # note that order of sections is not defined
-        expected_sections = [pylatest.document.HEADER, "Test Steps", "Teardown"]
+        expected_sections = [TestCaseDoc._HEAD.title, "Test Steps", "Teardown"]
         expected_result = (sorted(expected_sections), 0)
         actual_result = pysource.detect_docstring_sections(src)
         actual_result = (sorted(actual_result[0]), actual_result[1])
