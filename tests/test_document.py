@@ -21,6 +21,141 @@ import textwrap
 import os
 
 from pylatest.document import Section, TestCaseDoc
+import pylatest.document
+
+
+class TestTestActions(unittest.TestCase):
+    """
+    Tests of pylatest.document.TestActions class.
+    """
+
+    def setUp(self):
+        self.actions = pylatest.document.TestActions()
+
+    def test_actions_null(self):
+        self.assertEqual(len(self.actions), 0)
+
+    def test_actions_iter_null(self):
+        self.assertEqual(list(self.actions), [])
+        self.assertEqual(list(self.actions.iter_content()), [])
+
+    def test_actions_add_onefull(self):
+        self.actions.add("test_step", "1.step", 1)
+        self.assertEqual(len(self.actions), 1)
+        self.actions.add("test_result", "1.result", 1)
+        self.assertEqual(len(self.actions), 1)
+        self.assertEqual(
+            list(self.actions.iter_content()), ["1.step", "1.result"])
+        self.assertEqual(
+            list(self.actions),
+            [(1, '1.step', '1.result')])
+
+    def test_actions_add_error(self):
+        with self.assertRaises(pylatest.document.PylatestActionsError):
+            self.actions.add("test_foobar", "1.foobar", 1)
+        self.assertEqual(len(self.actions), 0)
+
+    def test_actions_add_onestep(self):
+        self.actions.add("test_step", "1.step", 1)
+        self.assertEqual(len(self.actions), 1)
+        self.assertEqual(
+            list(self.actions.iter_content()), ["1.step"])
+        self.assertEqual(
+            list(self.actions),
+            [(1, '1.step', None)])
+
+    def test_actions_add_oneresult(self):
+        self.actions.add("test_result", "1.result", 1)
+        self.assertEqual(len(self.actions), 1)
+        self.assertEqual(
+            list(self.actions.iter_content()), ["1.result"])
+        self.assertEqual(
+            list(self.actions),
+            [(1, None, '1.result')])
+
+    def test_actions_add_result(self):
+        self.actions.add_result("1.result", 1)
+        self.assertEqual(len(self.actions), 1)
+        self.assertEqual(
+            list(self.actions.iter_content()), ["1.result"])
+        self.assertEqual(
+            list(self.actions),
+            [(1, None, '1.result')])
+
+    def test_actions_add_step(self):
+        self.actions.add_step("1.step", 1)
+        self.assertEqual(len(self.actions), 1)
+        self.assertEqual(
+            list(self.actions.iter_content()), ["1.step"])
+        self.assertEqual(
+            list(self.actions),
+            [(1, '1.step', None)])
+
+    def test_actions_add_clash(self):
+        self.actions.add("test_step", "1.step-1", 1)
+        self.actions.add("test_result", "1.result", 1)
+        self.assertEqual(len(self.actions), 1)
+        self.actions.add("test_step", "1.step-2", 1)
+        self.assertEqual(len(self.actions), 1)
+        self.assertEqual(
+            list(self.actions.iter_content()), ["1.step-2", "1.result"])
+        self.assertEqual(
+            list(self.actions),
+            [(1, '1.step-2', '1.result')])
+
+    def test_actions_add_clash_enforce_id(self):
+        self.actions = pylatest.document.TestActions(enforce_id=True)
+        self.actions.add("test_step", "1.step", 1)
+        self.actions.add("test_result", "1.result", 1)
+        self.assertEqual(len(self.actions), 1)
+        with self.assertRaises(pylatest.document.PylatestActionsError):
+            self.actions.add("test_step", "1.step-clash", 1)
+        self.assertEqual(len(self.actions), 1)
+        self.assertEqual(
+            list(self.actions.iter_content()), ["1.step", "1.result"])
+        self.assertEqual(
+            list(self.actions),
+            [(1, '1.step', '1.result')])
+
+    def test_actions_iter_twofull(self):
+        self.actions.add("test_step", "1.step", 1)
+        self.actions.add("test_result", "1.result", 1)
+        self.actions.add("test_step", "2.step", 2)
+        self.actions.add("test_result", "2.result", 2)
+        self.assertEqual(
+            list(self.actions),
+            [(1, '1.step', '1.result'), (2, '2.step', '2.result')])
+
+    def test_actions_add_auto_id(self):
+        self.actions.add_step("1.step")
+        self.assertEqual(list(self.actions), [(1, '1.step', None)])
+        self.actions.add_step("2.step")
+        self.assertEqual(
+            list(self.actions),
+            [(1, '1.step', None), (2, '2.step', None)])
+        self.actions.add_result("2.result")
+        self.assertEqual(
+            list(self.actions),
+            [(1, '1.step', None), (2, '2.step', '2.result')])
+        self.actions.add_result("3.result")
+        self.assertEqual(list(self.actions), [
+            (1, '1.step', None),
+            (2, '2.step', '2.result'),
+            (3, None, '3.result'), ])
+        self.actions.add_step("3.step")
+        self.assertEqual(list(self.actions), [
+            (1, '1.step', None),
+            (2, '2.step', '2.result'),
+            (3, '3.step', '3.result'), ])
+
+    def test_actions_iter_twofull_auto_id_firstonly(self):
+        self.actions.add("test_step", "1.step", 1)
+        self.actions.add("test_result", "1.result")
+        self.actions.add("test_step", "2.step")
+        self.actions.add("test_result", "2.result")
+        self.assertEqual(
+            list(self.actions),
+            [(1, '1.step', '1.result'), (2, '2.step', '2.result')])
 
 
 class TestTestCcaseDocSections(unittest.TestCase):

@@ -47,7 +47,7 @@ def testparse(rst_str):
     return document.pformat()
 
 
-class TestDirectivesBase(unittest.TestCase):
+class TestBasePlain(unittest.TestCase):
 
     def setUp(self):
         # register custom pylatest nodes with html translator
@@ -60,7 +60,7 @@ class TestDirectivesBase(unittest.TestCase):
         self.assertEqual(result, exp_result)
 
 
-class TestDirectives(TestDirectivesBase):
+class TestDocutilsPlain(TestBasePlain):
     """
     Make sure that docutils isn't broken.
     """
@@ -85,7 +85,95 @@ class TestDirectives(TestDirectivesBase):
         self.check_directive(rst_input, exp_result)
 
 
-class TestTestMetadataDirective(TestDirectivesBase):
+class TestTestActionsDirectivePlain(TestBasePlain):
+
+    def test_teststep_empty(self):
+        rst_input = '.. test_step:: 1'
+        exp_result = textwrap.dedent('''\
+        <document source="testparse() method">
+            <pending>
+                .. internal attributes:
+                     .transform: pylatest.xdocutils.transforms.TestStepsPlainTransform
+                     .details:
+                       action_id: 1
+                       action_name: 'test_step'
+                       nodes:
+                         <Element>
+        ''')
+        self.check_directive(rst_input, exp_result)
+
+    def test_teststep_empty_noid(self):
+        rst_input = '.. test_step::'
+        exp_result = textwrap.dedent('''\
+        <document source="testparse() method">
+            <system_message level="3" line="1" source="testparse() method" type="ERROR">
+                <paragraph>
+                    Error in "test_step" directive:
+                    1 argument(s) required, 0 supplied.
+                <literal_block xml:space="preserve">
+                    .. test_step::
+        ''')
+        self.check_directive(rst_input, exp_result)
+
+    def test_testresult_empty(self):
+        rst_input = '.. test_result:: 1'
+        exp_result = textwrap.dedent('''\
+        <document source="testparse() method">
+            <pending>
+                .. internal attributes:
+                     .transform: pylatest.xdocutils.transforms.TestStepsPlainTransform
+                     .details:
+                       action_id: 1
+                       action_name: 'test_result'
+                       nodes:
+                         <Element>
+        ''')
+        self.check_directive(rst_input, exp_result)
+
+    def test_teststep_simple(self):
+        rst_input = textwrap.dedent('''\
+        .. test_step:: 7
+
+            Some content.
+        ''')
+        exp_result = textwrap.dedent('''\
+        <document source="testparse() method">
+            <pending>
+                .. internal attributes:
+                     .transform: pylatest.xdocutils.transforms.TestStepsPlainTransform
+                     .details:
+                       action_id: 7
+                       action_name: 'test_step'
+                       nodes:
+                         <Element>
+                             <paragraph>
+                                 Some content.
+        ''')
+        self.check_directive(rst_input, exp_result)
+
+    def test_testresult_simple(self):
+        rst_input = textwrap.dedent('''\
+        .. test_result:: 7
+
+            Some content.
+        ''')
+        exp_result = textwrap.dedent('''\
+        <document source="testparse() method">
+            <pending>
+                .. internal attributes:
+                     .transform: pylatest.xdocutils.transforms.TestStepsPlainTransform
+                     .details:
+                       action_id: 7
+                       action_name: 'test_result'
+                       nodes:
+                         <Element>
+                             <paragraph>
+                                 Some content.
+        ''')
+        self.check_directive(rst_input, exp_result)
+
+
+class TestTestMetadataDirectivePlain(TestBasePlain):
 
     def test_testmetadata_empty(self):
         rst_input = '.. test_metadata:: author'
@@ -156,7 +244,7 @@ class TestTestMetadataDirective(TestDirectivesBase):
         self.check_directive(rst_input, exp_result)
 
 
-class TestRequirementPlainDirective(TestDirectivesBase):
+class TestRequirementDirectivePlain(TestBasePlain):
 
     def test_testmetadata_full_nooptions(self):
         rst_input = textwrap.dedent('''\
@@ -192,7 +280,7 @@ class TestRequirementPlainDirective(TestDirectivesBase):
         self.check_directive(rst_input, exp_result)
 
 
-class TestRequirementSectionDirective(TestDirectivesBase):
+class TestRequirementDirectiveTable(TestBasePlain):
 
     def setUp(self):
         # register custom pylatest nodes with html translator

@@ -21,7 +21,7 @@ import unittest
 
 from lxml import etree
 
-from pylatest.document import TestCaseDoc, ACTION_NAMES
+from pylatest.document import TestActions, TestCaseDoc
 from pylatest.xdocutils.client import register_plain
 import pylatest.export as export
 
@@ -134,7 +134,7 @@ class TestGetStuffFromHtmlPlain(unittest.TestCase):
 
     def test_get_actions_empty(self):
         body_tree = get_empty_body_tree()
-        self.assertEqual(export.get_actions(body_tree), {})
+        self.assertEqual(export.get_actions(body_tree), TestActions())
 
     def test_get_actions_singleaction(self):
         # construct input
@@ -144,13 +144,13 @@ class TestGetStuffFromHtmlPlain(unittest.TestCase):
         result_div_el = add_action_div(p_el, '1', 'result')
         result_div_el.text = "This is the expected result."
         # construct expected output
-        exp_res = {1: {
-            'test_step': etree.tostring(step_div_el),
-            'test_result': etree.tostring(result_div_el)}, }
+        exp_res = TestActions()
+        exp_res.add_step(etree.tostring(step_div_el))
+        exp_res.add_result(etree.tostring(result_div_el))
         # run, run
-        action_dict = export.get_actions(body_tree)
+        actions = export.get_actions(body_tree)
         # checking
-        self.assertDictEqual(action_dict, exp_res)
+        self.assertEqual(actions, exp_res)
 
     def test_get_section_empty(self):
         body_tree = get_empty_body_tree()

@@ -23,6 +23,120 @@ types (eg. list of section titles) and other general functions.
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
+class PylatestDocumentError(Exception):
+    pass
+
+
+class PylatestActionsError(PylatestDocumentError):
+    pass
+
+
+class TestActions(object):
+    """
+    List of test actions, content of *Test Steps* section of a test case
+    document.
+
+    Action is couple of a test step and result with the same *action id*.
+
+    Example
+    -------
+
+    Here is the rst source text of some *test action* with *action id* 42::
+
+        .. test_step:: 42
+
+            some step here
+
+        .. test_result:: 42
+
+            some result here
+
+    And the expected structure of actions dict::
+
+        actions_dict = {42: {'test_step': node_a, 'test_result': node_b}}
+
+    where node_a and node_b are pending nodes of the step and resul directives.
+    """
+
+    ACTION_NAMES = ('test_step', 'test_result')
+    """
+    List of valid names of all pylatest actions.
+
+    note: htmlplain div element uses just 'step' and 'result' - TODO: refactor?
+    """
+
+    # TODO: consider changing inner representation (replace action_dict with
+    # something else).
+
+    def __init__(self, enforce_id=False):
+        self._actions_dict = {}
+        self._enforce_id = enforce_id
+
+    def __len__(self):
+        return len(self._actions_dict)
+
+    def __eq__(self, other):
+        return self._actions_dict == other._actions_dict
+
+    def __iter__(self):
+        """
+        Iterate over actions, yielding: *action id* and content of test step
+        and test result (None is used if step or result is not specified).
+        """
+        for action_id, action_dict in sorted(self._actions_dict.items()):
+            step = action_dict.get('test_step')
+            result = action_dict.get('test_result')
+            yield action_id, step, result
+
+    def iter_action(self):
+        """
+        Iterate over all actions, but yield each test step or result as
+        a single item in a tuple: action_id, action_name, content.
+        """
+        for action_id, action_dict in sorted(self._actions_dict.items()):
+            for name in self.ACTION_NAMES:
+                content = action_dict.get(name)
+                if content is None:
+                    continue
+                yield action_id, name, content
+
+    def iter_content(self):
+        """
+        Iterate over all content.
+        """
+        for _, _, content in self.iter_action():
+            yield content
+
+    def _get_id(self, action_name):
+        if len(self._actions_dict) == 0:
+            return 1
+        last_id = max(self._actions_dict.keys())
+        if self._actions_dict[last_id].get(action_name) is None:
+            return last_id
+        else:
+            return last_id + 1
+
+    def add(self, action_name, content, action_id=None):
+        if action_name not in self.ACTION_NAMES:
+            msg = "invalid action_name: {0}".format(action_name)
+            raise PylatestActionsError(msg)
+        if action_id is None:
+            action_id = self._get_id(action_name)
+        if self._enforce_id:
+            action_dict = self._actions_dict.get(action_id)
+            if action_dict is not None \
+                    and action_dict.get(action_name) is not None:
+                msg = "id error: such action has been already added"
+                raise PylatestActionsError(msg)
+        self._actions_dict.setdefault(action_id, {})[action_name] = content
+
+    def add_step(self, content, action_id=None):
+        self.add("test_step", content, action_id)
+
+    def add_result(self, content, action_id=None):
+        self.add("test_result", content, action_id)
+
+
 class Section(object):
     """
     A section in pylatest reStructuredText document.
@@ -100,15 +214,3 @@ class TestCaseDoc(object):
             if section.title == title:
                 return True
         return False
-
-
-# TODO: remove during merge
-
-"""
-List of action_name items of all pylatest actions.
-
-*Pylatest action* is couple of test step and result with the same *action id*.
-
-note: htmlplain div element uses just 'step' and 'result' - TODO: refactor?
-"""
-ACTION_NAMES = ("test_step", "test_result")

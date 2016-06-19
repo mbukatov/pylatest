@@ -34,7 +34,7 @@ from pylatest.xdocutils.transforms import TestMetadataPlainTransform
 import pylatest.xdocutils.nodes
 
 
-class TestStepsDirective(rst.Directive):
+class TestActionDirective(rst.Directive):
     """
     Base class with implementation of ``test_step`` and ``test_result`` rst
     directives.
@@ -64,7 +64,10 @@ class TestStepsDirective(rst.Directive):
         # with action_id == 1
         # note:
         # action is couple of test step and result with the same action_id
-        action_id = int(self.arguments[0])
+        if len(self.arguments) == 0:
+            action_id = None
+        else:
+            action_id = int(self.arguments[0])
         # first of all, parse text content of this directive
         # into anonymous node element (can't be used directly in the tree)
         node = nodes.Element()
@@ -97,7 +100,7 @@ class TestStepsDirective(rst.Directive):
         return [pending]
 
 
-class TestStepsTableDirective(TestStepsDirective):
+class TestActionTableDirective(TestActionDirective):
     """
     Implementation of ``test_step`` and ``test_result`` directives for
     direct consumption (transformation will generate proper table from
@@ -107,13 +110,33 @@ class TestStepsTableDirective(TestStepsDirective):
     transform_class = TestStepsTableTransform
 
 
-class TestStepsPlainDirective(TestStepsDirective):
+class TestActionTableDirectiveAutoId(TestActionTableDirective):
+    """
+    Implementation of ``test_step`` and ``test_result`` directives for
+    direct consumption, with optional argument for action id.
+    """
+
+    required_arguments = 0
+    optional_arguments = 1
+
+
+class TestActionPlainDirective(TestActionDirective):
     """
     Implementation of ``test_step`` and ``test_result`` directives for
     further processing, eg. checking particular part of resulting document.
     """
 
     transform_class = TestStepsPlainTransform
+
+
+class TestActionPlainDirectiveAutoId(TestActionPlainDirective):
+    """
+    Implementation of ``test_step`` and ``test_result`` directives for
+    direct consumption, with optional argument for action id.
+    """
+
+    required_arguments = 0
+    optional_arguments = 1
 
 
 class TestMetadataDirective(rst.Directive):

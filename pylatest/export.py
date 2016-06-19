@@ -27,7 +27,7 @@ import argparse
 
 from lxml import etree
 
-from pylatest.document import TestCaseDoc, ACTION_NAMES
+from pylatest.document import TestActions, TestCaseDoc
 from pylatest.xdocutils.client import publish_parts_wrapper, register_plain
 
 
@@ -77,17 +77,14 @@ def get_actions(tree):
     """
     Extracts pylatest actions from given html tree.
     """
-    # Action is couple of test step and result with the same action id.
-    # Expected structure eg. for pending nodes of 1st step and result:
-    # ``actions_dict = {1: {'test_step': node_a, 'test_result': node_b}}``
-    actions_dict = {}
+    actions = TestActions()
     # check all pylatest action div elements
     for div_el in tree.xpath('//div[@class="pylatest_action"]'):
         action_id = int(div_el.get("action_id"))
         action_name = "test_{0}".format(div_el.get("action_name"))
         content = etree.tostring(div_el, method='html')
-        actions_dict.setdefault(action_id, {})[action_name] = content
-    return actions_dict
+        actions.add(action_name, content, action_id)
+    return actions
 
 def get_section(tree, section_id):
     """
@@ -110,13 +107,9 @@ def export_plainhtml(body_tree):
     Translate given rst document into xml.
     """
     xml_export = XmlExportDoc()
-    actions_dict = get_actions(body_tree)
-    for action_id, action_dict in sorted(actions_dict.items()):
-        for action_name in ACTION_NAMES:
-            content = action_dict.get(action_name)
-            if content is None:
-                continue
-            xml_export.add_action(action_id, action_name, content)
+    actions = get_actions(body_tree)
+    for action_id, action_name, content in actions.iter_action():
+        xml_export.add_action(action_id, action_name, content)
     for section in TestCaseDoc.SECTIONS_PLAINHTML:
         content = get_section(body_tree, section)
         if content is None:
