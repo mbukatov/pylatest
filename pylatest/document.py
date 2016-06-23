@@ -68,7 +68,7 @@ class TestActions(object):
     # TODO: consider changing inner representation (replace action_dict with
     # something else).
 
-    def __init__(self, enforce_id=False):
+    def __init__(self, enforce_id=True):
         self._actions_dict = {}
         self._enforce_id = enforce_id
 
