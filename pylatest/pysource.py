@@ -160,9 +160,11 @@ def detect_docstring_sections(docstring):
     # is not that great here - TODO: reconfigure (logging involved?)
 
     # try to find any pylatest section
+    def title_condition(node):
+        return isinstance(node, nodes.title) \
+            or isinstance(node, nodes.subtitle)
+
     detected_sections = []
-    title_condition = lambda node: \
-        isinstance(node, nodes.title) or isinstance(node, nodes.subtitle)
     for node in nodetree.traverse(title_condition):
         if node.astext() in SECTIONS:
             detected_sections.append(node.astext())
