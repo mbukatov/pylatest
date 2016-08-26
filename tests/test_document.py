@@ -193,17 +193,6 @@ class TestSection(unittest.TestCase):
         self.assertNotEqual(s2, s3)
         self.assertNotEqual(s1, s3)
 
-    def test_sections_eq_withcontent(self):
-        s1 = Section("Test Steps")
-        s2 = Section("Test Steps")
-        self.assertEqual(s1, s2)
-        s1.content = "foo"
-        self.assertNotEqual(s1, s2)
-        s2.content = "foo"
-        self.assertEqual(s1, s2)
-        s2.content = "bar"
-        self.assertNotEqual(s1, s2)
-
     def test_plainhtml_id(self):
         s1 = Section("Description")
         self.assertEqual(s1.html_id, "description")
@@ -214,22 +203,3 @@ class TestSection(unittest.TestCase):
         Test Case Description
         =====================''')
         self.assertEqual(s1.get_rst_header(), exp_output)
-
-    def test_get_rst_content_empty(self):
-        s1 = Section("Test Case Description")
-        self.assertIsNone(s1.content)
-        exp_output = textwrap.dedent('''\
-        Test Case Description
-        =====================''')
-        self.assertEqual(s1.get_rst(), exp_output)
-
-    def test_get_rst_content_simple(self):
-        s1 = Section("Test Case Description")
-        self.assertIsNone(s1.content)
-        s1.content = "Hello World!"
-        exp_output = textwrap.dedent('''\
-        Test Case Description
-        =====================
-
-        Hello World!''')
-        self.assertEqual(s1.get_rst(), exp_output)

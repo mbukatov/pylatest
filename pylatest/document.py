@@ -144,14 +144,13 @@ class Section(object):
 
     def __init__(self, title, html_id=True):
         self.title = title
-        self.content = None
         if html_id:
             self.html_id = title.lower()
         else:
             self.html_id = None
 
     def __eq__(self, other):
-        return self.title == other.title and self.content == other.content
+        return self.title == other.title
 
     def __hash__(self):
         return hash(self.title)
@@ -164,16 +163,6 @@ class Section(object):
         Generate rst header code for this section.
         """
         return str(self.title) + '\n' + ('=' * len(self.title))
-
-    def get_rst(self):
-        """
-        Generate rst code (including both header and content) for this section.
-        """
-        if self.content is not None:
-            rst_content = self.get_rst_header() + '\n\n' + str(self.content)
-        else:
-            rst_content = self.get_rst_header()
-        return rst_content
 
 
 class TestCaseDoc(object):
