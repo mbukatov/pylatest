@@ -19,6 +19,8 @@
 import unittest
 import textwrap
 import os
+import sys
+import codecs
 
 import pylatest.xdocutils.client
 import pylatest.document
@@ -31,8 +33,16 @@ HERE = os.path.abspath(os.path.dirname(__file__))
 def read_file(dirname, name):
     filename = os.path.join(
         HERE, "pysource-{0}".format(dirname), "testcase.{0}".format(name))
-    with open(filename, 'r') as python_file:
-        content = python_file.read()
+    if sys.version_info[0] == 2:
+        # python compat hack: python2 ast module can't handle unicode input
+        # for some reason (so that codecs.open() can't be used here)
+        with open(filename, 'r') as python_file:
+            content = python_file.read()
+    else:
+        # specify encoding properly so that it would work with LC_ALL=C
+        # for more details, see python3 and locale.getpreferredencoding
+        with codecs.open(filename, 'r', encoding='utf8') as python_file:
+            content = python_file.read()
     return content
 
 
