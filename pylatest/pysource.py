@@ -30,7 +30,7 @@ import sys
 from docutils.core import publish_doctree
 from docutils import nodes
 
-from pylatest.document import TestCaseDoc
+from pylatest.document import TestCaseDoc, RstTestCaseDoc, Section
 import pylatest.xdocutils.client
 import pylatest.xdocutils.nodes
 
@@ -82,17 +82,17 @@ def classify_docstring(docstring):
 def extract_documents(source):
     """
     Try to extract pylatest docstrings from given string (content of
-    a python source file) and generate PylatestDocument(s) from it.
+    a python source file) and generate ExtractedTestCase(s) from it.
 
     Args:
         source(string): content of a python source file
 
     Returns:
-        list of PylatestDocument items generated from given python source
+        list of ExtractedTestCase items generated from given python source
     """
     # doc_id (aka testcase id) -> pylatest document object (aka test case doc)
     doc_dict = {}
-    default_doc = PylatestDocument()
+    default_doc = ExtractedTestCase()
     for docstring, lineno in get_string_literals(source):
         is_pylatest_str, doc_id_list, content = classify_docstring(docstring)
         if is_pylatest_str:
@@ -103,7 +103,7 @@ def extract_documents(source):
                 status = default_doc.add_docstring(content, lineno)
                 continue
             for doc_id in doc_id_list:
-                doc = doc_dict.setdefault(doc_id, PylatestDocument())
+                doc = doc_dict.setdefault(doc_id, ExtractedTestCase())
                 status = doc.add_docstring(content, lineno)
                 # TODO: do some debug output
                 # (status is True for a valid pylatest data)
@@ -148,7 +148,8 @@ def detect_docstring_sections(docstring):
         content(string): content of an pylatest docstring
 
     Returns:
-        tuple: (list of detected sections, number of test action directives)
+        tuple: list of detected sections (Section objects),
+               number of test action directives
     """
     # parse docstring to get rst node tree
     nodetree = publish_doctree(source=docstring)
@@ -164,8 +165,9 @@ def detect_docstring_sections(docstring):
     title_condition = lambda node: \
         isinstance(node, nodes.title) or isinstance(node, nodes.subtitle)
     for node in nodetree.traverse(title_condition):
-        if TestCaseDoc.has_section(node.astext()):
-            detected_sections.append(node.astext())
+        section = Section(title=node.astext())
+        if section in TestCaseDoc.SECTIONS:
+            detected_sections.append(section)
 
     # try to count all pylatest step/result directives
     test_directive_count = 0
@@ -188,14 +190,14 @@ def detect_docstring_sections(docstring):
         # 2) this title contains name of the test case,
         #    so that title text doesn't match predefined set of sections
         title_index = nodetree.first_child_matching_class(nodes.title)
-        if title_index == 0 and \
-                not TestCaseDoc.has_section(nodetree[title_index].astext()):
-            detected_sections.insert(1, TestCaseDoc._HEAD.title)
+        title_value = nodetree[title_index].astext()
+        if title_index == 0 and not TestCaseDoc.has_section(title=title_value):
+            detected_sections.insert(1, TestCaseDoc._HEAD)
 
     return detected_sections, test_directive_count
 
 
-class PylatestDocument(object):
+class ExtractedTestCase(object):
     """
     Pylatest rst document (test case description) extracted from python
     source code (implementing the test case).
@@ -294,14 +296,14 @@ class PylatestDocument(object):
             self._add_test_actions(docstring, lineno)
             status_success = True
         elif len(sections) > 0 and test_directive_count == 0:
-            if "Test Steps" in sections:
+            if TestCaseDoc.STEPS in sections:
                 # we have Test Steps section without test step directives
                 msg = "found 'Test Steps' section without test step direcives"
                 self._add_error(msg, lineno)
             self._add_section(docstring, lineno, sections)
             status_success = True
         elif len(sections) > 0 and test_directive_count > 0:
-            if "Test Steps" not in sections:
+            if TestCaseDoc.STEPS not in sections:
                 msg = ("docstring with multiple sections contains test step"
                       " directives, but no 'Test Steps' section was found")
                 self._add_error(msg, lineno)
@@ -342,7 +344,7 @@ class PylatestDocument(object):
 
         # report missing sections
         for section in TestCaseDoc.SECTIONS_ALL:
-            if section.title not in self._section_dict:
+            if section not in self._section_dict:
                 if section == TestCaseDoc.STEPS and len(self._docstrings) > 1:
                     # test steps may be in standalone directives
                     continue
@@ -358,7 +360,7 @@ class PylatestDocument(object):
         rst_list = []
         docstrings_used = set()
         for section in TestCaseDoc.SECTIONS_ALL:
-            docstrings = self._section_dict.get(section.title)
+            docstrings = self._section_dict.get(section)
             if docstrings is None and section == TestCaseDoc.STEPS:
                 # put together test steps
                 if len(self._test_actions) > 0:

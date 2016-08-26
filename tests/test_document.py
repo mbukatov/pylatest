@@ -20,7 +20,7 @@ import unittest
 import textwrap
 import os
 
-from pylatest.document import Section, TestCaseDoc
+from pylatest.document import Section, TestCaseDoc, RstTestCaseDoc
 import pylatest.document
 
 
@@ -181,6 +181,12 @@ class TestTestCcaseDocSections(unittest.TestCase):
         self.assertTrue(TestCaseDoc.has_section("Test Steps"))
         self.assertFalse(TestCaseDoc.has_section(title="Requirements"))
         self.assertFalse(TestCaseDoc.has_section("Foo Bar"))
+
+
+class TestRstTestCaseDoc(unittest.TestCase):
+
+    def test_null(self):
+        tc = RstTestCaseDoc()
 
 
 class TestSection(unittest.TestCase):

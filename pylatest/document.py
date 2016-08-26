@@ -140,6 +140,8 @@ class TestActions(object):
 class Section(object):
     """
     A section in pylatest reStructuredText document.
+
+    This class is concerned just with document structure.
     """
 
     def __init__(self, title, html_id=True):
@@ -155,9 +157,22 @@ class Section(object):
     def __hash__(self):
         return hash(self.title)
 
+    def __lt__(self, other):
+        return self.title < other.title
+
+    def __le__(self, other):
+        return self.title <= other.title
+
+    def __gt__(self, other):
+        return self.title > other.title
+
+    def __ge__(self, other):
+        return self.title >= other.title
+
     def __str__(self):
         return "Section {0}".format(self.title)
 
+    # TODO: move out?
     def get_rst_header(self):
         """
         Generate rst header code for this section.
@@ -168,6 +183,8 @@ class Section(object):
 class TestCaseDoc(object):
     """
     Pylatest test case document.
+
+    This class is concerned just with document structure.
     """
 
     DESCR = Section("Description")
@@ -214,3 +231,22 @@ class TestCaseDoc(object):
             if section.title == title:
                 return True
         return False
+
+
+# TODO: what exactly to move there?
+class RstTestCaseDoc(TestCaseDoc):
+    """
+    Pylatest test case document in ReStructuredText format.
+
+    This class handles content as well, not just a document structure.
+    """
+
+    def __init__(self):
+        self._content = {}
+        self.actions = TestActions()
+        for section in self.SECTIONS:
+            self._content[section] = None
+
+    def get_content(self, section):
+        if section not in self._content:
+            raise PylatestDocumentError("Invalid section: {0}".format(section))

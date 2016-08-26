@@ -207,7 +207,7 @@ class TestPylatestDocstringProcessing(unittest.TestCase):
         .. test_metadata:: date 2015-11-06
         .. test_metadata:: comment Hello world.
         ''')
-        expected_result = ([TestCaseDoc._HEAD.title], 0)
+        expected_result = ([TestCaseDoc._HEAD], 0)
         actual_result = pysource.detect_docstring_sections(src)
         self.assertEqual(actual_result, expected_result)
 
@@ -226,7 +226,7 @@ class TestPylatestDocstringProcessing(unittest.TestCase):
 
         See :BZ:`439858` for more details.
         ''')
-        expected_result = (["Description"], 0)
+        expected_result = ([TestCaseDoc.DESCR], 0)
         actual_result = pysource.detect_docstring_sections(src)
         self.assertEqual(actual_result, expected_result)
 
@@ -253,7 +253,7 @@ class TestPylatestDocstringProcessing(unittest.TestCase):
             # dnf install foobar
             # systemctl enable foobard
         ''')
-        expected_result = (["Setup"], 0)
+        expected_result = ([TestCaseDoc.SETUP], 0)
         actual_result = pysource.detect_docstring_sections(src)
         self.assertEqual(actual_result, expected_result)
 
@@ -268,7 +268,7 @@ class TestPylatestDocstringProcessing(unittest.TestCase):
 
         #. The end.
         ''')
-        expected_result = (["Teardown"], 0)
+        expected_result = ([TestCaseDoc.TEARD], 0)
         actual_result = pysource.detect_docstring_sections(src)
         self.assertEqual(actual_result, expected_result)
 
@@ -333,7 +333,7 @@ class TestPylatestDocstringProcessing(unittest.TestCase):
 
             There are no files, output should be empty.
         ''')
-        expected_result = (["Test Steps"], 2)
+        expected_result = ([TestCaseDoc.STEPS], 2)
         actual_result = pysource.detect_docstring_sections(src)
         self.assertEqual(actual_result, expected_result)
 
@@ -357,7 +357,7 @@ class TestPylatestDocstringProcessing(unittest.TestCase):
             There are no files, output should be empty.
         ''')
         # note that order of sections is not defined
-        expected_result = (sorted([TestCaseDoc._HEAD.title, "Test Steps"]), 2)
+        expected_result = (sorted([TestCaseDoc._HEAD, TestCaseDoc.STEPS]), 2)
         actual_result = pysource.detect_docstring_sections(src)
         actual_result = (sorted(actual_result[0]), actual_result[1])
         self.assertEqual(actual_result, expected_result)
@@ -385,7 +385,7 @@ class TestPylatestDocstringProcessing(unittest.TestCase):
         #. The end.
         ''')
         # note that order of sections is not defined
-        expected_sections = [TestCaseDoc._HEAD.title, "Test Steps", "Teardown"]
+        expected_sections = [TestCaseDoc._HEAD, TestCaseDoc.STEPS, TestCaseDoc.TEARD]
         expected_result = (sorted(expected_sections), 0)
         actual_result = pysource.detect_docstring_sections(src)
         actual_result = (sorted(actual_result[0]), actual_result[1])
