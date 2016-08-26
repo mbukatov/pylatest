@@ -51,7 +51,7 @@ class TestActions(object):
 
             some result here
 
-    And the expected structure of actions dict::
+    And the expected structure of actions dict (see self._actions_dict)::
 
         actions_dict = {42: {'test_step': node_a, 'test_result': node_b}}
 
