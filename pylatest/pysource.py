@@ -203,6 +203,11 @@ class ExtractedTestCase(object):
     source code (implementing the test case).
     """
 
+    SECTIONS_DEF = (TestCaseDoc.DESCR, TestCaseDoc.SETUP, TestCaseDoc.TEARD)
+    """
+    List of sections which could be defined in default document.
+    """
+
     def __init__(self):
         # content
         self._docstrings = []
@@ -334,7 +339,7 @@ class ExtractedTestCase(object):
 
         # import default sections
         if self.default_doc is not None:
-            for section in ("Description", "Setup", "Teardown"):
+            for section in self.SECTIONS_DEF:
                 if section not in self.sections \
                     and section in self.default_doc.sections:
                     # TODO: log this event (info or debug)
