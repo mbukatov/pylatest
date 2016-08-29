@@ -172,7 +172,7 @@ class Section(object):
     def __str__(self):
         return "Section {0}".format(self.title)
 
-    # TODO: move out?
+    # TODO: move out int RstTestCaseDoc??
     def get_rst_header(self):
         """
         Generate rst header code for this section.
@@ -242,11 +242,93 @@ class RstTestCaseDoc(TestCaseDoc):
     """
 
     def __init__(self):
-        self._content = {}
-        self.actions = TestActions()
-        for section in self.SECTIONS:
-            self._content[section] = None
+        self._section_dict = {}
+        """
+        Section name -> list of docstrings.
+        """
+        self._test_actions = []
+        """
+        dosctrings with test step/result directives only
+        """
 
-    def get_content(self, section):
-        if section not in self._content:
-            raise PylatestDocumentError("Invalid section: {0}".format(section))
+        self._errors = []
+        """
+        errors dict, line number here
+        """
+
+    def is_empty(self):
+        """
+        Return True if the document is empty.
+        """
+        retunr len(self._section_dict) == 0:
+
+    def has_errors(self):
+        """
+        Return True if errors were logged during parsing and generation.
+        """
+        return len(self._errors) > 0
+
+    def sections(self):
+        """
+        Return list of non empty sections of this document.
+        """
+        return []
+
+    def sections_missing(self):
+        """
+        Return list missing sections of this document.
+        """
+        missing_list = []
+        for section in TestCaseDoc.SECTIONS_ALL:
+            if section not in self._section_dict:
+                if section == TestCaseDoc.STEPS and len(self._docstrings) > 1:
+                    # test steps may be in standalone directives
+                    continue
+                missing.append(section)
+        return missing_list
+
+    def check(self):
+        """
+        Perform sanity check of this document.
+        """
+        errors = []
+        return errors
+
+    def add_docstring(self, docstring, lineno):
+        """
+        Add docstring which contains given sections.
+        """
+        sections, test_directive_count = detect_docstring_sections(docstring)
+
+        if len(sections) == 0 and test_directive_count == 0:
+            status_success = False
+        elif len(sections) == 0 and test_directive_count > 0:
+            self._add_test_actions(docstring, lineno)
+            status_success = True
+        elif len(sections) > 0 and test_directive_count == 0:
+            if TestCaseDoc.STEPS in sections:
+                # we have Test Steps section without test step directives
+                msg = "found 'Test Steps' section without test step direcives"
+                self._add_error(msg, lineno)
+            self._add_section(docstring, lineno, sections)
+            status_success = True
+        elif len(sections) > 0 and test_directive_count > 0:
+            if TestCaseDoc.STEPS not in sections:
+                msg = ("docstring with multiple sections contains test step"
+                      " directives, but no 'Test Steps' section was found")
+                self._add_error(msg, lineno)
+            self._add_section(docstring, lineno, sections)
+            status_success = True
+
+        if status_success:
+            self.is_empty = False
+        return status_success
+
+    def get_rst(self):
+        """
+        Generate rst document.
+        """
+        if self.is_empty():
+            return ""
+
+        return "\n\n".join(rst_list) + '\n'

@@ -111,6 +111,7 @@ def extract_document_fragments(source):
             docfr.default = default_docfr
     return docfr_dict
 
+# TODO: move to document.py
 # TODO: this doesn't work because node tree still contains pending elements
 # instead of test step nodes - with single exception: the very first test
 # step - WTF? all metadata nodes are generated just fine ...
@@ -125,6 +126,7 @@ def _teststeps_condition(node):
             return True
     return False
 
+# TODO: move to document.py
 def _teststeps_condition_hack(node):
     """
     Traverse condition for filtering nodes of test steps directives.
@@ -136,6 +138,7 @@ def _teststeps_condition_hack(node):
         return True
     return False
 
+# TODO: move to document.py
 def detect_docstring_sections(docstring):
     """
     Parse given docstring and try to detect which sections of pylatest
@@ -200,6 +203,11 @@ class TestCaseDocFragments(object):
     source code (implementing the test case).
     """
 
+    SECTIONS_DEF = (TestCaseDoc.DESCR, TestCaseDoc.SETUP, TestCaseDoc.TEARD)
+    """
+    List of sections which could be defined in default document.
+    """
+
     def __init__(self):
         self.docstrings = {}
         """
@@ -221,6 +229,24 @@ class TestCaseDocFragments(object):
         """
         self.docstrings[lineno] = docstring
 
+    def build_doc(self, ignore_errors=True):
+        """
+        Build RstTestCaseDoc object based on pylatest string literals (aka
+        document fragments) stored in this object.
+        """
+        rst_doc = RstTestCaseDoc()
+
+        # import default sections
+        if self.default_doc is not None:
+            for section in self.SECTIONS_DEF:
+                if section not in self.sections \
+                    and section in self.default_doc.sections:
+                    # TODO: log this event (info or debug)
+                    # TODO: improve error checks (we assume few things here)
+                    def_section = self.default_doc._section_dict[section][0]
+                    self.add_docstring(def_section, 1)
+
+
 
 class ExtractedTestCase(object):
     """
@@ -228,40 +254,35 @@ class ExtractedTestCase(object):
     source code (implementing the test case).
     """
 
-    SECTIONS_DEF = (TestCaseDoc.DESCR, TestCaseDoc.SETUP, TestCaseDoc.TEARD)
-    """
-    List of sections which could be defined in default document.
-    """
-
     def __init__(self):
-        # content
-        self._docstrings = []
-        """
-        list of docstrings with at least one section
-        """
-        self._section_dict = {}
-        """
-        section name -> list of docstrings
-        """
-        self._test_actions = []
-        """
-        dosctrings with test step/result directives only
-        """
-        self.default_doc = None
-        """
-        document object with default content
-        """
-        # errors
-        self._err_dict = {}
-        """
-        lineno -> list of err msg
-        """
-        self._run_errs = []
-        """
-        runtile error list (after reading docstrings)
-        """
-        # state
-        self.is_empty = True
+        # # content
+        # self._docstrings = []
+        # """
+        # list of docstrings with at least one section
+        # """
+        # self._section_dict = {}
+        # """
+        # section name -> list of docstrings
+        # """
+        # self._test_actions = []
+        # """
+        # dosctrings with test step/result directives only
+        # """
+        # self.default_doc = None
+        # """
+        # document object with default content
+        # """
+        # # errors
+        # self._err_dict = {}
+        # """
+        # lineno -> list of err msg
+        # """
+        # self._run_errs = []
+        # """
+        # runtile error list (after reading docstrings)
+        # """
+        # # state
+        # self.is_empty = True
 
     def _add_error(self, msg, lineno=None):
         """
@@ -355,31 +376,31 @@ class ExtractedTestCase(object):
         """
         Recreate pylatest test case description from docstring fragments.
         """
-        # reset err list
-        self._run_errs = []
+        # # reset err list
+        # self._run_errs = []
 
-        # nothing has been found
-        if len(self._docstrings) == 0:
-            return ""
+        # # nothing has been found
+        # if len(self._docstrings) == 0:
+        #     return ""
 
-        # import default sections
-        if self.default_doc is not None:
-            for section in self.SECTIONS_DEF:
-                if section not in self.sections \
-                    and section in self.default_doc.sections:
-                    # TODO: log this event (info or debug)
-                    # TODO: improve error checks (we assume few things here)
-                    def_section = self.default_doc._section_dict[section][0]
-                    self.add_docstring(def_section, 1)
+        # # import default sections
+        # if self.default_doc is not None:
+        #     for section in self.SECTIONS_DEF:
+        #         if section not in self.sections \
+        #             and section in self.default_doc.sections:
+        #             # TODO: log this event (info or debug)
+        #             # TODO: improve error checks (we assume few things here)
+        #             def_section = self.default_doc._section_dict[section][0]
+        #             self.add_docstring(def_section, 1)
 
-        # report missing sections
-        for section in TestCaseDoc.SECTIONS_ALL:
-            if section not in self._section_dict:
-                if section == TestCaseDoc.STEPS and len(self._docstrings) > 1:
-                    # test steps may be in standalone directives
-                    continue
-                msg = "{0} section is missing.".format(section)
-                self._add_error(msg)
+        # # report missing sections
+        # for section in TestCaseDoc.SECTIONS_ALL:
+        #     if section not in self._section_dict:
+        #         if section == TestCaseDoc.STEPS and len(self._docstrings) > 1:
+        #             # test steps may be in standalone directives
+        #             continue
+        #         msg = "{0} section is missing.".format(section)
+        #         self._add_error(msg)
 
         # when everything is just in a single string
         if len(self._docstrings) == 1:
