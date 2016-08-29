@@ -392,6 +392,117 @@ class TestPylatestDocstringProcessing(unittest.TestCase):
         self.assertEqual(actual_result, expected_result)
 
 
+class TestTestCaseDocFragments(unittest.TestCase):
+    """
+    Tests of pylatest.pysource.TestCaseDocFragments class.
+    """
+
+    def setUp(self):
+        self.fragments = pysource.TestCaseDocFragments()
+
+    def test_docfragments_null(self):
+        self.assertEqual(len(self.fragments), 0)
+        self.assertIsNone(self.fragments.default)
+
+    def test_docfragments_add_one(self):
+        self.fragments.add_docstring("foo bar baz", 11)
+        self.assertEqual(len(self.fragments), 1)
+        self.assertIsNone(self.fragments.default)
+        self.assertEqual(self.fragments.docstrings.get(11), "foo bar baz")
+
+    def test_docfragments_add_few(self):
+        self.fragments.add_docstring("foo", 1)
+        self.assertEqual(len(self.fragments), 1)
+        self.assertIsNone(self.fragments.default)
+        for i in range(10):
+            self.fragments.add_docstring("just another_one", i + 10)
+        self.assertEqual(len(self.fragments), 11)
+        self.assertIsNone(self.fragments.default)
+
+
+class TestExtractDocumentFragments(unittest.TestCase):
+    """
+    Test extraction of pylatest document fragments (pylatest string literals)
+    from python source file - function ``pysource.extract_document_fragments``
+
+    Input data (python source files) and expected output (pylatest rst file)
+    are stored in ``./pysource-onecaseperfile/`` directory.
+    """
+
+    def setUp(self):
+        # show full diff (note: python3 unittest diff is much better)
+        self.maxDiff = None
+        # commons steps required for all test cases
+        pylatest.xdocutils.client.register_plain()
+
+    def test_extract_document_fragments_null_str(self):
+        doc_fragment_dict = pysource.extract_document_fragments("")
+        self.assertEqual(len(doc_fragment_dict), 0)
+        self.assertEqual(doc_fragment_dict, {})
+
+    def test_extract_document_fragments_null(self):
+        source = read_file("onecaseperfile", "null.py")
+        doc_fragment_dict = pysource.extract_document_fragments(source)
+        self.assertEqual(len(doc_fragment_dict), 0)
+        self.assertEqual(doc_fragment_dict, {})
+
+    def test_extract_document_fragments_onecaseperfile_single(self):
+        source = read_file("onecaseperfile", "single.py")
+        doc_fragment_dict = pysource.extract_document_fragments(source)
+        self.assertEqual(len(doc_fragment_dict), 1)
+        doc_fragments = doc_fragment_dict[None]
+        self.assertEqual(len(doc_fragments), 1)
+        self.assertIsNone(doc_fragments.default)
+
+    def test_extract_document_fragments_onecaseperfile_splitted_nested(self):
+        source = read_file("onecaseperfile", "splitted-nested.py")
+        doc_fragment_dict = pysource.extract_document_fragments(source)
+        # there is just a single test case in the file
+        # (as 'onecaseperfile' directory name suggests)
+        self.assertEqual(len(doc_fragment_dict), 1)
+        # pylatest strings are without pylatest ids
+        doc_fragments = doc_fragment_dict[None]
+        # there are 9 pylatest strings in given file
+        self.assertEqual(len(doc_fragments), 9)
+        # the default doc feature is not used in given file
+        self.assertIsNone(doc_fragments.default)
+        # pylatest string literal which ends on line 95 in splitted-neste.py file
+        fragment_line95 = textwrap.dedent('''\
+        .. test_step:: 1
+
+            List files in the volume: ``ls -a /mnt/helloworld``''')
+        self.assertEqual(doc_fragments.docstrings[95], fragment_line95)
+
+    def test_extract_document_fragments_multiplecasesperfile_splitted_nested(self):
+        source = read_file("multiplecasesperfile", "splitted-nested.py")
+        doc_fragment_dict = pysource.extract_document_fragments(source)
+        self.assertEqual(len(doc_fragment_dict), 2)
+        # number of expected pylatest strings for each pylatest doc id
+        expected_fragments = {
+            'test01': 9,
+            'test02': 7,
+            }
+        for doc_id, doc_fragments in doc_fragment_dict.items():
+            # default doc feature is not used in the file
+            self.assertIsNone(doc_fragments.default)
+            # check expected number of pylatest strings
+            self.assertEqual(len(doc_fragments), expected_fragments[doc_id])
+        # check that some pylatest strings are the same in both doc fragments
+        for linenum in (77, 96):
+            self.assertEqual(
+                doc_fragment_dict['test01'].docstrings[linenum],
+                doc_fragment_dict['test02'].docstrings[linenum],)
+
+    def test_extract_documents_splitted_nested_withdefault(self):
+        source = read_file("multiplecasesperfile", "splitted-nested-default.py")
+        doc_fragment_dict = pysource.extract_document_fragments(source)
+        self.assertEqual(len(doc_fragment_dict), 2)
+        for doc_id, doc_fragments in doc_fragment_dict.items():
+            # default doc is used in the file (for setup and teardown strings)
+            self.assertIsNotNone(doc_fragments.default)
+            self.assertEqual(len(doc_fragments.default), 2)
+
+
 class TestPylatestDocumentExtractionOneCaseOneFile(unittest.TestCase):
     """
     Test extraction of entire pylatest document from single python source file.

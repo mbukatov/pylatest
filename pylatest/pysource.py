@@ -79,20 +79,20 @@ def classify_docstring(docstring):
     else:
         return (False, [], docstring)
 
-def extract_documents(source):
+def extract_document_fragments(source):
     """
     Try to extract pylatest docstrings from given string (content of
-    a python source file) and generate ExtractedTestCase(s) from it.
+    a python source file) and generate TestCaseDocFragments objects from it.
 
     Args:
         source(string): content of a python source file
 
     Returns:
-        list of ExtractedTestCase items generated from given python source
+        dict of TestCaseDocFragments items generated from given python source
     """
-    # doc_id (aka testcase id) -> pylatest document object (aka test case doc)
-    doc_dict = {}
-    default_doc = ExtractedTestCase()
+    # doc_id (aka testcase id) -> pylatest document fragments object
+    docfr_dict = {}
+    default_docfr = TestCaseDocFragments()
     for docstring, lineno in get_string_literals(source):
         is_pylatest_str, doc_id_list, content = classify_docstring(docstring)
         if is_pylatest_str:
@@ -100,19 +100,16 @@ def extract_documents(source):
                 # when no id is detected, create special document without id
                 doc_id_list = [None]
             elif "default" in doc_id_list:
-                status = default_doc.add_docstring(content, lineno)
+                default_docfr.add_docstring(content, lineno)
                 continue
             for doc_id in doc_id_list:
-                doc = doc_dict.setdefault(doc_id, ExtractedTestCase())
-                status = doc.add_docstring(content, lineno)
-                # TODO: do some debug output
-                # (status is True for a valid pylatest data)
-                assert status is True
+                docfr = docfr_dict.setdefault(doc_id, TestCaseDocFragments())
+                docfr.add_docstring(content, lineno)
     # allow all document objects to find defaults if needed
-    if not default_doc.is_empty:
-        for doc in doc_dict.values():
-            doc.default_doc = default_doc
-    return doc_dict
+    if len(default_docfr) > 0:
+        for docfr in docfr_dict.values():
+            docfr.default = default_docfr
+    return docfr_dict
 
 # TODO: this doesn't work because node tree still contains pending elements
 # instead of test step nodes - with single exception: the very first test
@@ -195,6 +192,34 @@ def detect_docstring_sections(docstring):
             detected_sections.insert(1, TestCaseDoc._HEAD)
 
     return detected_sections, test_directive_count
+
+
+class TestCaseDocFragments(object):
+    """
+    Pylatest strings of with a test case description extracted from python
+    source code (implementing the test case).
+    """
+
+    def __init__(self):
+        self.docstrings = {}
+        """
+        List of docstrings with at least one section, line number -> string
+        """
+        self.default = None
+        """
+        Document Fragments object with default content
+        """
+
+    def __len__(self):
+        return len(self.docstrings)
+
+    def add_docstring(self, docstring, lineno):
+        """
+        Args:
+            docstring (str): content of single docstring expression
+            lineno (int): line number of the docstring
+        """
+        self.docstrings[lineno] = docstring
 
 
 class ExtractedTestCase(object):
@@ -432,7 +457,7 @@ def main():
 
     with open(args.filepath, 'r') as python_file:
         source_content = python_file.read()
-        doc_dict = extract_documents(source_content)
+        doc_dict = extract_document_fragments(source_content)
 
     retcode = 0
 
