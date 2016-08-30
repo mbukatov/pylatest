@@ -169,6 +169,7 @@ class ExtractedTestCase(object):
     """
 
     def __init__(self):
+        pass
         # # content
         # self._docstrings = []
         # """
@@ -316,10 +317,10 @@ class ExtractedTestCase(object):
         #         msg = "{0} section is missing.".format(section)
         #         self._add_error(msg)
 
-        # when everything is just in a single string
-        if len(self._docstrings) == 1:
-            content_string = self._docstrings[0]
-            return content_string + '\n'
+        # # when everything is just in a single string
+        # if len(self._docstrings) == 1:
+        #     content_string = self._docstrings[0]
+        #     return content_string + '\n'
 
         # document is splitted across multiple docstrings
         rst_list = []

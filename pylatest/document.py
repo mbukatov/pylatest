@@ -331,15 +331,20 @@ class RstTestCaseDoc(TestCaseDoc):
     """
 
     def __init__(self):
+        self._docstrings = []
+        """
+        List of all docstrings with at least one section
+        """
         self._section_dict = {}
         """
-        Section name -> list of docstrings.
+        Section name -> list of docstrings (index for the list of docstrings).
         """
         self._test_actions = []
         """
         dosctrings with test step/result directives only
         """
 
+        # ??
         self._errors = []
         """
         errors dict, line number here
@@ -349,7 +354,7 @@ class RstTestCaseDoc(TestCaseDoc):
         """
         Return True if the document is empty.
         """
-        retunr len(self._section_dict) == 0:
+        return len(self._docstrings) == 0
 
     def has_errors(self):
         """
@@ -413,11 +418,16 @@ class RstTestCaseDoc(TestCaseDoc):
             self.is_empty = False
         return status_success
 
-    def get_rst(self):
+    def get_rst(self, ignore_errors=False):
         """
         Generate rst document.
         """
         if self.is_empty():
             return ""
+
+        # when everything is just in a single string
+        if len(self._docstrings) == 1:
+            content_string = self._docstrings[0]
+            return content_string + '\n'
 
         return "\n\n".join(rst_list) + '\n'
