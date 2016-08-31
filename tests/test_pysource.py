@@ -283,129 +283,129 @@ class TestExtractDocumentFragments(unittest.TestCase):
             self.assertEqual(len(doc_fragments.default), 2)
 
 
-class TestPylatestDocumentExtractionOneCaseOneFile(unittest.TestCase):
-    """
-    Test extraction of entire pylatest document from single python source file.
+# class TestPylatestDocumentExtractionOneCaseOneFile(unittest.TestCase):
+#     """
+#     Test extraction of entire pylatest document from single python source file.
 
-    Input data (python source files) and expected output (pylatest rst file)
-    are stored in ``./pysource-onecaseperfile/`` directory.
-    """
+#     Input data (python source files) and expected output (pylatest rst file)
+#     are stored in ``./pysource-onecaseperfile/`` directory.
+#     """
 
-    def setUp(self):
-        # show full diff (note: python3 unittest diff is much better)
-        self.maxDiff = None
-        # commons steps required for all test cases
-        pylatest.xdocutils.client.register_plain()
+#     def setUp(self):
+#         # show full diff (note: python3 unittest diff is much better)
+#         self.maxDiff = None
+#         # commons steps required for all test cases
+#         pylatest.xdocutils.client.register_plain()
 
-    def _test_extract_document_noerrors(self, testname):
-        source = read_file("onecaseperfile", testname)
-        expected_result = read_file("onecaseperfile", "rst")
-        doc_dict = pysource.extract_documents(source)
-        self.assertEqual(len(doc_dict), 1)
-        doc = doc_dict[None]
-        self.assertEqual(list(doc.errors()), [])
-        self.assertEqual(doc.recreate(), expected_result)
-        self.assertEqual(list(doc.errors_lastrecreate()), [])
-        self.assertFalse(doc.has_errors())
+#     def _test_extract_document_noerrors(self, testname):
+#         source = read_file("onecaseperfile", testname)
+#         expected_result = read_file("onecaseperfile", "rst")
+#         doc_dict = pysource.extract_documents(source)
+#         self.assertEqual(len(doc_dict), 1)
+#         doc = doc_dict[None]
+#         self.assertEqual(list(doc.errors()), [])
+#         self.assertEqual(doc.recreate(), expected_result)
+#         self.assertEqual(list(doc.errors_lastrecreate()), [])
+#         self.assertFalse(doc.has_errors())
 
-    def _test_extract_document_mangled(self, testname, resultname):
-        source = read_file("onecaseperfile", testname)
-        expected_result = read_file("onecaseperfile", resultname)
-        doc_dict = pysource.extract_documents(source)
-        self.assertEqual(len(doc_dict), 1)
-        doc = doc_dict[None]
-        self.assertEqual(doc.recreate(), expected_result)
-        self.assertTrue(doc.has_errors())
+#     def _test_extract_document_mangled(self, testname, resultname):
+#         source = read_file("onecaseperfile", testname)
+#         expected_result = read_file("onecaseperfile", resultname)
+#         doc_dict = pysource.extract_documents(source)
+#         self.assertEqual(len(doc_dict), 1)
+#         doc = doc_dict[None]
+#         self.assertEqual(doc.recreate(), expected_result)
+#         self.assertTrue(doc.has_errors())
 
-    def test_extract_document_null(self):
-        source = read_file("onecaseperfile", "null.py")
-        doc_dict = pysource.extract_documents(source)
-        self.assertEqual(doc_dict, {})
+#     def test_extract_document_null(self):
+#         source = read_file("onecaseperfile", "null.py")
+#         doc_dict = pysource.extract_documents(source)
+#         self.assertEqual(doc_dict, {})
 
-    def test_extract_document_single(self):
-        self._test_extract_document_noerrors("single.py")
+#     def test_extract_document_single(self):
+#         self._test_extract_document_noerrors("single.py")
 
-    def test_extract_document_splitted(self):
-        self._test_extract_document_noerrors("splitted.py")
+#     def test_extract_document_splitted(self):
+#         self._test_extract_document_noerrors("splitted.py")
 
-    def test_extract_document_splitted_stepsjoined(self):
-        self._test_extract_document_noerrors("splitted-stepsjoined.py")
+#     def test_extract_document_splitted_stepsjoined(self):
+#         self._test_extract_document_noerrors("splitted-stepsjoined.py")
 
-    def test_extract_document_splitted_nested(self):
-        self._test_extract_document_noerrors("splitted-nested.py")
+#     def test_extract_document_splitted_nested(self):
+#         self._test_extract_document_noerrors("splitted-nested.py")
 
-    def test_extract_document_splitted_nested_randomorder(self):
-        self._test_extract_document_noerrors("splitted-nested-randomorder.py")
+#     def test_extract_document_splitted_nested_randomorder(self):
+#         self._test_extract_document_noerrors("splitted-nested-randomorder.py")
 
-    def test_extract_document_single_setupmissing(self):
-        self._test_extract_document_mangled(
-            "single-setupmissing.py", "setupmissing.rst")
+#     def test_extract_document_single_setupmissing(self):
+#         self._test_extract_document_mangled(
+#             "single-setupmissing.py", "setupmissing.rst")
 
-    def test_extract_document_single_stepsmissing(self):
-        self._test_extract_document_mangled(
-            "single-stepsmissing.py", "stepsmissing.rst")
+#     def test_extract_document_single_stepsmissing(self):
+#         self._test_extract_document_mangled(
+#             "single-stepsmissing.py", "stepsmissing.rst")
 
-    def test_extract_document_single_descriptionmissing(self):
-        self._test_extract_document_mangled(
-            "single-descriptionmissing.py", "descriptionmissing.rst")
+#     def test_extract_document_single_descriptionmissing(self):
+#         self._test_extract_document_mangled(
+#             "single-descriptionmissing.py", "descriptionmissing.rst")
 
-    def test_extract_document_single_descriptionmissing_setupmissing(self):
-        self._test_extract_document_mangled(
-            "single-descriptionmissing-setupmissing.py",
-            "descriptionmissing-setupmissing.rst")
+#     def test_extract_document_single_descriptionmissing_setupmissing(self):
+#         self._test_extract_document_mangled(
+#             "single-descriptionmissing-setupmissing.py",
+#             "descriptionmissing-setupmissing.rst")
 
-    def test_extract_document_single_stepsmissing_teardownmissing(self):
-        self._test_extract_document_mangled(
-            "single-stepsmissing-teardownmissing.py",
-            "stepsmissing-teardownmissing.rst")
+#     def test_extract_document_single_stepsmissing_teardownmissing(self):
+#         self._test_extract_document_mangled(
+#             "single-stepsmissing-teardownmissing.py",
+#             "stepsmissing-teardownmissing.rst")
 
-    def test_extract_document_splitted_descriptionmissing(self):
-        self._test_extract_document_mangled(
-            "splitted-descriptionmissing.py", "descriptionmissing.rst")
+#     def test_extract_document_splitted_descriptionmissing(self):
+#         self._test_extract_document_mangled(
+#             "splitted-descriptionmissing.py", "descriptionmissing.rst")
 
-    def test_extract_document_splitted_setupmissing(self):
-        self._test_extract_document_mangled(
-            "splitted-setupmissing.py", "setupmissing.rst")
+#     def test_extract_document_splitted_setupmissing(self):
+#         self._test_extract_document_mangled(
+#             "splitted-setupmissing.py", "setupmissing.rst")
 
 
-class TestPylatestDocumentsExtractionMultipleCasesPerFile(unittest.TestCase):
-    """
-    Test extraction of multiple pylatest documents from single python file.
+# class TestPylatestDocumentsExtractionMultipleCasesPerFile(unittest.TestCase):
+#     """
+#     Test extraction of multiple pylatest documents from single python file.
 
-    Input data (python source files) and expected output (pylatest rst files)
-    are stored in ``./pysource-multiplecasesperfile/`` directory.
-    """
+#     Input data (python source files) and expected output (pylatest rst files)
+#     are stored in ``./pysource-multiplecasesperfile/`` directory.
+#     """
 
-    def setUp(self):
-        # show full diff (note: python3 unittest diff is much better)
-        self.maxDiff = None
-        # common steps required for all test cases
-        pylatest.xdocutils.client.register_plain()
+#     def setUp(self):
+#         # show full diff (note: python3 unittest diff is much better)
+#         self.maxDiff = None
+#         # common steps required for all test cases
+#         pylatest.xdocutils.client.register_plain()
 
-    def _test_extract_documents_noerrors(self, doc_num, testname):
-        source = read_file("multiplecasesperfile", testname)
-        doc_dict = pysource.extract_documents(source)
-        self.assertEqual(len(doc_dict), doc_num)
-        for doc_id, doc in doc_dict.items():
-            if doc_id is None:
-                doc_id = "none"
-            filename = "{}.rst".format(doc_id)
-            expected_result = read_file("multiplecasesperfile", filename)
-            self.assertEqual(list(doc.errors()), [])
-            self.assertEqual(doc.recreate(), expected_result)
-            self.assertEqual(list(doc.errors_lastrecreate()), [])
-            self.assertFalse(doc.has_errors())
+#     def _test_extract_documents_noerrors(self, doc_num, testname):
+#         source = read_file("multiplecasesperfile", testname)
+#         doc_dict = pysource.extract_documents(source)
+#         self.assertEqual(len(doc_dict), doc_num)
+#         for doc_id, doc in doc_dict.items():
+#             if doc_id is None:
+#                 doc_id = "none"
+#             filename = "{}.rst".format(doc_id)
+#             expected_result = read_file("multiplecasesperfile", filename)
+#             self.assertEqual(list(doc.errors()), [])
+#             self.assertEqual(doc.recreate(), expected_result)
+#             self.assertEqual(list(doc.errors_lastrecreate()), [])
+#             self.assertFalse(doc.has_errors())
 
-    def test_extract_documents_splitted_nested(self):
-        self._test_extract_documents_noerrors(2, "splitted-nested.py")
+#     def test_extract_documents_splitted_nested(self):
+#         self._test_extract_documents_noerrors(2, "splitted-nested.py")
 
-    def test_extract_documents_splitted_nested_withdefault(self):
-        self._test_extract_documents_noerrors(2, "splitted-nested-default.py")
+#     def test_extract_documents_splitted_nested_withdefault(self):
+#         self._test_extract_documents_noerrors(2, "splitted-nested-default.py")
 
-    def test_extract_documents_splitted_nested_withdefault_override(self):
-        pyfilename = "splitted-nested-default-override.py"
-        self._test_extract_documents_noerrors(3, pyfilename)
+#     def test_extract_documents_splitted_nested_withdefault_override(self):
+#         pyfilename = "splitted-nested-default-override.py"
+#         self._test_extract_documents_noerrors(3, pyfilename)
 
-    def test_extract_documents_splitted_nested_withdefault_override_null(self):
-        pyfilename = "splitted-nested-default-override-null.py"
-        self._test_extract_documents_noerrors(3, pyfilename)
+#     def test_extract_documents_splitted_nested_withdefault_override_null(self):
+#         pyfilename = "splitted-nested-default-override-null.py"
+#         self._test_extract_documents_noerrors(3, pyfilename)
