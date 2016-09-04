@@ -111,7 +111,6 @@ def extract_doc_fragments(source):
             docfr.default = default_docfr
     return docfr_dict
 
-# TODO: move to document.py
 # TODO: this doesn't work because node tree still contains pending elements
 # instead of test step nodes - with single exception: the very first test
 # step - WTF? all metadata nodes are generated just fine ...
@@ -126,7 +125,6 @@ def _teststeps_condition(node):
             return True
     return False
 
-# TODO: move to document.py
 def _teststeps_condition_hack(node):
     """
     Traverse condition for filtering nodes of test steps directives.
@@ -138,7 +136,6 @@ def _teststeps_condition_hack(node):
         return True
     return False
 
-# TODO: move to document.py
 def detect_docstring_sections(docstring):
     """
     Parse given docstring and try to detect which sections of pylatest
