@@ -196,25 +196,24 @@ class TestRstTestCaseDoc(unittest.TestCase):
         tc.add_section("string content", 42, [TestCaseDoc.DESCR])
         self.assertFalse(tc.is_empty())
         self.assertEqual(tc.sections, [TestCaseDoc.DESCR])
-        self.assertEqual(tc.missing_sections, [
-            TestCaseDoc._HEAD,
-            TestCaseDoc.SETUP,
-            TestCaseDoc.STEPS,
-            TestCaseDoc.TEARD])
+        self.assertEqual(
+            sorted(tc.missing_sections + tc.sections),
+            sorted(TestCaseDoc.SECTIONS_ALL))
 
     def test_rsttestcasedoc_add_section_multiple(self):
         tc = RstTestCaseDoc()
-        tc.add_section("string content", 42, [TestCaseDoc._HEAD, TestCaseDoc.DESCR])
+        sections_list = [TestCaseDoc._HEAD, TestCaseDoc.DESCR]
+        tc.add_section("string content", 42, sections_list)
         self.assertFalse(tc.is_empty())
-        self.assertEqual(sorted(tc.sections), sorted([TestCaseDoc._HEAD, TestCaseDoc.DESCR]))
-        self.assertEqual(sorted(tc.missing_sections), sorted([
-            TestCaseDoc.SETUP,
-            TestCaseDoc.STEPS,
-            TestCaseDoc.TEARD]))
+        self.assertEqual(sorted(tc.sections), sorted(sections_list))
+        self.assertEqual(
+            sorted(tc.missing_sections + tc.sections),
+            sorted(TestCaseDoc.SECTIONS_ALL))
 
     def test_rsttestcasedoc_add_section_few_multiple(self):
         tc = RstTestCaseDoc()
-        tc.add_section("header and description", 10, [TestCaseDoc._HEAD, TestCaseDoc.DESCR])
+        tc.add_section("header and description", 10,
+            [TestCaseDoc._HEAD, TestCaseDoc.DESCR])
         tc.add_section("setup", 42, [TestCaseDoc.SETUP])
         tc.add_section("teardown", 150, [TestCaseDoc.TEARD])
         self.assertFalse(tc.is_empty())
@@ -224,17 +223,18 @@ class TestRstTestCaseDoc(unittest.TestCase):
             TestCaseDoc.SETUP,
             TestCaseDoc.TEARD]))
         self.assertEqual(tc.missing_sections, [TestCaseDoc.STEPS])
+        self.assertEqual(
+            sorted(tc.missing_sections + tc.sections),
+            sorted(TestCaseDoc.SECTIONS_ALL))
 
     def test_rsttestcasedoc_add_testaction_simple(self):
         tc = RstTestCaseDoc()
         tc.add_test_action("test step", 10)
         self.assertFalse(tc.is_empty())
         self.assertEqual(tc.sections, [TestCaseDoc.STEPS])
-        self.assertEqual(sorted(tc.missing_sections), sorted([
-            TestCaseDoc._HEAD,
-            TestCaseDoc.DESCR,
-            TestCaseDoc.SETUP,
-            TestCaseDoc.TEARD]))
+        self.assertEqual(
+            sorted(tc.missing_sections + tc.sections),
+            sorted(TestCaseDoc.SECTIONS_ALL))
 
     def test_rsttestcasedoc_add_testaction_multiple(self):
         tc = RstTestCaseDoc()
@@ -243,11 +243,9 @@ class TestRstTestCaseDoc(unittest.TestCase):
         tc.add_test_action("another test step", 20)
         self.assertFalse(tc.is_empty())
         self.assertEqual(tc.sections, [TestCaseDoc.STEPS])
-        self.assertEqual(sorted(tc.missing_sections), sorted([
-            TestCaseDoc._HEAD,
-            TestCaseDoc.DESCR,
-            TestCaseDoc.SETUP,
-            TestCaseDoc.TEARD]))
+        self.assertEqual(
+            sorted(tc.missing_sections + tc.sections),
+            sorted(TestCaseDoc.SECTIONS_ALL))
 
 
 class TestSection(unittest.TestCase):
