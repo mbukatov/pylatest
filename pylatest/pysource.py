@@ -79,9 +79,9 @@ def classify_docstring(docstring):
     else:
         return (False, [], docstring)
 
-def extract_document_fragments(source):
+def extract_doc_fragments(source):
     """
-    Try to extract pylatest docstrings from given string (content of
+    Try to extract pylatest document fragments from given string (content of
     a python source file) and generate TestCaseDocFragments objects from it.
 
     Args:
@@ -100,11 +100,11 @@ def extract_document_fragments(source):
                 # when no id is detected, create special document without id
                 doc_id_list = [None]
             elif "default" in doc_id_list:
-                default_docfr.add_docstring(content, lineno)
+                default_docfr.add_fragment(content, lineno)
                 continue
             for doc_id in doc_id_list:
                 docfr = docfr_dict.setdefault(doc_id, TestCaseDocFragments())
-                docfr.add_docstring(content, lineno)
+                docfr.add_fragment(content, lineno)
     # allow all document objects to find defaults if needed
     if len(default_docfr) > 0:
         for docfr in docfr_dict.values():
@@ -216,7 +216,7 @@ class TestCaseDocFragments(object):
     def __len__(self):
         return len(self.docstrings)
 
-    def add_docstring(self, docstring, lineno):
+    def add_fragment(self, docstring, lineno):
         """
         Args:
             docstring (str): content of single docstring expression
@@ -282,7 +282,7 @@ def main():
 
     with open(args.filepath, 'r') as python_file:
         source_content = python_file.read()
-        doc_fragments = extract_document_fragments(source_content)
+        doc_fragments = extract_doc_fragments(source_content)
 
     retcode = 0
 

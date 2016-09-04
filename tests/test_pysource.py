@@ -405,17 +405,17 @@ class TestTestCaseDocFragments(unittest.TestCase):
         self.assertIsNone(self.fragments.default)
 
     def test_docfragments_add_one(self):
-        self.fragments.add_docstring("foo bar baz", 11)
+        self.fragments.add_fragment("foo bar baz", 11)
         self.assertEqual(len(self.fragments), 1)
         self.assertIsNone(self.fragments.default)
         self.assertEqual(self.fragments.docstrings.get(11), "foo bar baz")
 
     def test_docfragments_add_few(self):
-        self.fragments.add_docstring("foo", 1)
+        self.fragments.add_fragment("foo", 1)
         self.assertEqual(len(self.fragments), 1)
         self.assertIsNone(self.fragments.default)
         for i in range(10):
-            self.fragments.add_docstring("just another_one", i + 10)
+            self.fragments.add_fragment("just another_one", i + 10)
         self.assertEqual(len(self.fragments), 11)
         self.assertIsNone(self.fragments.default)
 
