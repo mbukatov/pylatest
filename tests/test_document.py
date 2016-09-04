@@ -158,9 +158,31 @@ class TestTestActions(unittest.TestCase):
             [(1, '1.step', '1.result'), (2, '2.step', '2.result')])
 
 
-class TestTestCcaseDocSections(unittest.TestCase):
+class TestSection(unittest.TestCase):
+
+    def test_sections_eq(self):
+        s1 = Section("Test Steps")
+        s2 = Section("Test Steps")
+        s3 = Section("Requirements")
+        self.assertEqual(s1, s2)
+        self.assertNotEqual(s2, s3)
+        self.assertNotEqual(s1, s3)
+
+    def test_plainhtml_id(self):
+        s1 = Section("Description")
+        self.assertEqual(s1.html_id, "description")
+
+    def test_get_rst_header(self):
+        s1 = Section("Test Case Description")
+        exp_output = textwrap.dedent('''\
+        Test Case Description
+        =====================''')
+        self.assertEqual(s1.get_rst_header(), exp_output)
+
+
+class TestTestCaseDoc(unittest.TestCase):
     """
-    Test properties of SECTION and SECTION_ALL tuples.
+    Test properties of TestCaseDoc class.
     """
 
     def test_section_vs_sectionall_len(self):
@@ -246,25 +268,3 @@ class TestRstTestCaseDoc(unittest.TestCase):
         self.assertEqual(
             sorted(tc.missing_sections + tc.sections),
             sorted(TestCaseDoc.SECTIONS_ALL))
-
-
-class TestSection(unittest.TestCase):
-
-    def test_sections_eq(self):
-        s1 = Section("Test Steps")
-        s2 = Section("Test Steps")
-        s3 = Section("Requirements")
-        self.assertEqual(s1, s2)
-        self.assertNotEqual(s2, s3)
-        self.assertNotEqual(s1, s3)
-
-    def test_plainhtml_id(self):
-        s1 = Section("Description")
-        self.assertEqual(s1.html_id, "description")
-
-    def test_get_rst_header(self):
-        s1 = Section("Test Case Description")
-        exp_output = textwrap.dedent('''\
-        Test Case Description
-        =====================''')
-        self.assertEqual(s1.get_rst_header(), exp_output)
