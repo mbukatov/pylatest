@@ -310,42 +310,6 @@ class RstTestCaseDoc(TestCaseDoc):
                 missing_list.append(section)
         return missing_list
 
-    def check(self):
-        """
-        Perform sanity check of this document.
-        """
-        errors = []
-        return errors
-
-    # move out?
-    def add_docstring(self, docstring, lineno):
-        """
-        Add docstring which contains given sections.
-        """
-        sections, test_directive_count = detect_docstring_sections(docstring)
-
-        if len(sections) == 0 and test_directive_count == 0:
-            status_success = False
-        elif len(sections) == 0 and test_directive_count > 0:
-            self.add_test_action(docstring, lineno)
-            status_success = True
-        elif len(sections) > 0 and test_directive_count == 0:
-            if TestCaseDoc.STEPS in sections:
-                # we have Test Steps section without test step directives
-                msg = "found 'Test Steps' section without test step direcives"
-                # self._add_error(msg, lineno)
-            self.add_section(docstring, lineno, sections)
-            status_success = True
-        elif len(sections) > 0 and test_directive_count > 0:
-            if TestCaseDoc.STEPS not in sections:
-                msg = ("docstring with multiple sections contains test step"
-                      " directives, but no 'Test Steps' section was found")
-                # self._add_error(msg, lineno)
-            self.add_section(docstring, lineno, sections)
-            status_success = True
-
-        return status_success
-
     def get_rst(self, ignore_errors=False):
         """
         Generate rst document.
