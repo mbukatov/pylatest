@@ -136,6 +136,8 @@ def _teststeps_condition_hack(node):
         return True
     return False
 
+# TODO: this function will be deprecated, but let it here for now (reference
+# and testing purposes)
 def detect_docstring_sections(docstring):
     """
     Parse given docstring and try to detect which sections of pylatest
@@ -205,9 +207,17 @@ class TestCaseDocFragments(object):
         """
         List of docstrings with at least one section, line number -> string
         """
+
         self.default = None
         """
         Document Fragments object with default content
+        """
+
+        # TODO: set to a proper value
+        self.source_file = ""
+        """
+        Name of the source file from which this string literal (doc fragment)
+        has been extracted.
         """
 
     def __len__(self):
@@ -221,50 +231,51 @@ class TestCaseDocFragments(object):
         """
         self.docstrings[lineno] = docstring
 
+    # TODO: next time start here
+    # TODO: cache of the build (if nothing changed - for merging def doc.)
+    def build_doc(self, ignore_errors=True):
+        """
+        Build RstTestCaseDoc object based on pylatest string literals (aka
+        document fragments) stored in this object.
+        """
+        if self.default is not None:
+            rst_doc = self.default.build_doc()
+        else:
+            rst_doc = RstTestCaseDoc()
 
-def _extract_fragment(self, docstring, lineno):
-    """
-    Add docstring which contains given sections.
-    """
-    sections, test_directive_count = detect_docstring_sections(docstring)
+        for lineno, doc_str in self.docstrings.items():
+            # parse docstring to get rst node tree
+            nodetree = publish_doctree(source=docstring)
 
-    if len(sections) == 0 and test_directive_count == 0:
-        status_success = False
-    elif len(sections) == 0 and test_directive_count > 0:
-        self.add_test_action(docstring, lineno)
-        status_success = True
-    elif len(sections) > 0 and test_directive_count == 0:
-        if TestCaseDoc.STEPS in sections:
-            # we have Test Steps section without test step directives
-            msg = "found 'Test Steps' section without test step direcives"
-            # self._add_error(msg, lineno)
-        self.add_section(docstring, lineno, sections)
-        status_success = True
-    elif len(sections) > 0 and test_directive_count > 0:
-        if TestCaseDoc.STEPS not in sections:
-            msg = ("docstring with multiple sections contains test step"
-                  " directives, but no 'Test Steps' section was found")
-            # self._add_error(msg, lineno)
-        self.add_section(docstring, lineno, sections)
-        status_success = True
+            # TODO: functions to create:
+            # get_section_nodes() -> [node]
+            # get_actions_nodes() -> [node]
+            # extract_node(nodetree, node, str_val) -> str_val_of_node
+            # But what to do with header pseudo section?
+            #  - no explicit header
+            #  - some pylatest nodes
 
-    return status_success
+            if len(sections) == 0 and test_directive_count == 0:
+                continue
+            elif len(sections) == 0 and test_directive_count > 0:
+                self.add_test_action(docstring, lineno)
+                status_success = True
+            elif len(sections) > 0 and test_directive_count == 0:
+                if TestCaseDoc.STEPS in sections:
+                    # we have Test Steps section without test step directives
+                    msg = "found 'Test Steps' section without test step direcives"
+                    # self._add_error(msg, lineno)
+                self.add_section(docstring, lineno, sections)
+                status_success = True
+            elif len(sections) > 0 and test_directive_count > 0:
+                if TestCaseDoc.STEPS not in sections:
+                    msg = ("docstring with multiple sections contains test step"
+                          " directives, but no 'Test Steps' section was found")
+                    # self._add_error(msg, lineno)
+                self.add_section(docstring, lineno, sections)
+                status_success = True
 
-
-def _build_doc(self, ignore_errors=True):
-    """
-    Build RstTestCaseDoc object based on pylatest string literals (aka
-    document fragments) stored in this object.
-    """
-    rst_doc = RstTestCaseDoc()
-
-    # import data from default fragments first
-    if self.default is not None:
-        for lineno, string in self.default.docstrings.items():
-            rst_doc.add_docstring(string, lineno)
-
-    for lineno, string in self.docstrings.items():
-        rst_doc.add_docstring(string, lineno)
+        return rst_doc
 
 
 def main():
