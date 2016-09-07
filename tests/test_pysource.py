@@ -423,7 +423,7 @@ class TestTestCaseDocFragments(unittest.TestCase):
 class TestExtractDocumentFragments(unittest.TestCase):
     """
     Test extraction of pylatest document fragments (pylatest string literals)
-    from python source file - function ``pysource.extract_document_fragments``
+    from python source file - function ``pysource.extract_doc_fragments``
 
     Input data (python source files) and expected output (pylatest rst file)
     are stored in ``./pysource-onecaseperfile/`` directory.
@@ -435,28 +435,28 @@ class TestExtractDocumentFragments(unittest.TestCase):
         # commons steps required for all test cases
         pylatest.xdocutils.client.register_plain()
 
-    def test_extract_document_fragments_null_str(self):
-        doc_fragment_dict = pysource.extract_document_fragments("")
+    def test_extract_doc_fragments_null_str(self):
+        doc_fragment_dict = pysource.extract_doc_fragments("")
         self.assertEqual(len(doc_fragment_dict), 0)
         self.assertEqual(doc_fragment_dict, {})
 
-    def test_extract_document_fragments_null(self):
+    def test_extract_doc_fragments_null(self):
         source = read_file("onecaseperfile", "null.py")
-        doc_fragment_dict = pysource.extract_document_fragments(source)
+        doc_fragment_dict = pysource.extract_doc_fragments(source)
         self.assertEqual(len(doc_fragment_dict), 0)
         self.assertEqual(doc_fragment_dict, {})
 
-    def test_extract_document_fragments_onecaseperfile_single(self):
+    def test_extract_doc_fragments_onecaseperfile_single(self):
         source = read_file("onecaseperfile", "single.py")
-        doc_fragment_dict = pysource.extract_document_fragments(source)
+        doc_fragment_dict = pysource.extract_doc_fragments(source)
         self.assertEqual(len(doc_fragment_dict), 1)
         doc_fragments = doc_fragment_dict[None]
         self.assertEqual(len(doc_fragments), 1)
         self.assertIsNone(doc_fragments.default)
 
-    def test_extract_document_fragments_onecaseperfile_splitted_nested(self):
+    def test_extract_doc_fragments_onecaseperfile_splitted_nested(self):
         source = read_file("onecaseperfile", "splitted-nested.py")
-        doc_fragment_dict = pysource.extract_document_fragments(source)
+        doc_fragment_dict = pysource.extract_doc_fragments(source)
         # there is just a single test case in the file
         # (as 'onecaseperfile' directory name suggests)
         self.assertEqual(len(doc_fragment_dict), 1)
@@ -473,9 +473,9 @@ class TestExtractDocumentFragments(unittest.TestCase):
             List files in the volume: ``ls -a /mnt/helloworld``''')
         self.assertEqual(doc_fragments.docstrings[95], fragment_line95)
 
-    def test_extract_document_fragments_multiplecasesperfile_splitted_nested(self):
+    def test_extract_doc_fragments_multiplecasesperfile_splitted_nested(self):
         source = read_file("multiplecasesperfile", "splitted-nested.py")
-        doc_fragment_dict = pysource.extract_document_fragments(source)
+        doc_fragment_dict = pysource.extract_doc_fragments(source)
         self.assertEqual(len(doc_fragment_dict), 2)
         # number of expected pylatest strings for each pylatest doc id
         expected_fragments = {
@@ -495,7 +495,7 @@ class TestExtractDocumentFragments(unittest.TestCase):
 
     def test_extract_documents_splitted_nested_withdefault(self):
         source = read_file("multiplecasesperfile", "splitted-nested-default.py")
-        doc_fragment_dict = pysource.extract_document_fragments(source)
+        doc_fragment_dict = pysource.extract_doc_fragments(source)
         self.assertEqual(len(doc_fragment_dict), 2)
         for doc_id, doc_fragments in doc_fragment_dict.items():
             # default doc is used in the file (for setup and teardown strings)
