@@ -255,13 +255,21 @@ class RstTestCaseDoc(TestCaseDoc):
         """
         List of all docstrings with at least one section.
         """
+
         self._section_dict = {}
         """
         Index for the list of docstrings: section name -> list of docstrings.
         """
+
         self._test_actions = []
         """
         Dosctrings with test step/result directives only.
+        """
+
+        # TODO: set to a proper value
+        self._source_file = None
+        """
+        Name of the source file from which this document has been extracted.
         """
 
     def add_section(self, docstring, lineno, sections):
