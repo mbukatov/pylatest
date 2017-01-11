@@ -32,6 +32,17 @@ from pylatest.document import TestCaseDoc, Section
 import pylatest.xdocutils.nodes
 
 
+def find_sections(rst_source):
+    # parse rst_source string to get rst node tree
+    nodetree = publish_doctree(source=rst_source)
+    sections = []
+    # TODO: Look for section node and then get title one? Only when needed.
+    for node in nodetree.traverse(lambda n: isinstance(n, nodes.title)):
+        title = node.astext()
+        sections.append((node.line, title))
+    return sections
+
+
 # TODO: this doesn't work because node tree still contains pending elements
 # instead of test step nodes - with single exception: the very first test
 # step - WTF? all metadata nodes are generated just fine ...

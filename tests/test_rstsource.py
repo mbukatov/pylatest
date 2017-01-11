@@ -25,6 +25,66 @@ import pylatest.rstsource as rstsource
 import pylatest.xdocutils.client
 
 
+class TestFindSections(unittest.TestCase):
+
+    def setUp(self):
+        # commons steps required for all test cases
+        pylatest.xdocutils.client.register_plain()
+
+    def test_find_sections_empty(self):
+        self.assertEqual(rstsource.find_sections(""), [])
+
+    def test_find_sections_simple(self):
+        src = textwrap.dedent('''\
+        Hello World
+        ***********
+
+        There are nothing there.
+
+        ''')
+        self.assertEqual(
+            rstsource.find_sections(src),
+            [(2, "Hello World")])
+
+    def test_find_sections_multilevel(self):
+        src = textwrap.dedent('''\
+        This should not be there actually.
+
+        ===============
+         Status Report
+        ===============
+
+        Lieber ein Spatz in der Hand als eine Taube auf dem Dach.
+
+        Header One
+        ==========
+
+        Here is some text.
+
+        .. while this line tries to hide itself
+
+        Achtung
+        ```````
+
+        In this piece of code, we can see a similar issue::
+
+           def foo(bar):
+               return False
+
+        Header Two
+        ==========
+
+        And here we have some text again.
+        ''')
+        exp_sections = [
+            (5, "Status Report"),
+            (10, "Header One"),
+            (17, "Achtung"),
+            (25, "Header Two"),
+            ]
+        self.assertEqual(rstsource.find_sections(src), exp_sections)
+
+
 class TestPylatestDocstringProcessing(unittest.TestCase):
     """
     Test processing of pylatest docstrings.
