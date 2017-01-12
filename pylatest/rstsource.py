@@ -33,13 +33,15 @@ import pylatest.xdocutils.nodes
 
 
 def find_sections(rst_source):
+    """
+    Finds all top level sections in given rst document.
+    """
     # parse rst_source string to get rst node tree
     nodetree = publish_doctree(source=rst_source)
     sections = []
-    # TODO: Look for section node and then get title one? Only when needed.
-    for node in nodetree.traverse(lambda n: isinstance(n, nodes.title)):
-        title = node.astext()
-        sections.append((node.line, title))
+    for node in [n for n in nodetree.children if isinstance(n, nodes.section)]:
+        title = node.children[0].astext()
+        sections.append((node.line - 1, title))
     return sections
 
 

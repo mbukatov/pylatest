@@ -31,24 +31,89 @@ class TestFindSections(unittest.TestCase):
         # commons steps required for all test cases
         pylatest.xdocutils.client.register_plain()
 
-    def test_find_sections_empty(self):
+    def test_find_sections_emptydoc(self):
         self.assertEqual(rstsource.find_sections(""), [])
 
-    def test_find_sections_simple(self):
+    def test_find_sections_docwithoutsections_one(self):
         src = textwrap.dedent('''\
         Hello World
         ***********
 
-        There are nothing there.
-
+        There are no sections, just a document title.
         ''')
-        self.assertEqual(
-            rstsource.find_sections(src),
-            [(2, "Hello World")])
+        self.assertEqual(rstsource.find_sections(src), [])
+
+    def test_find_sections_docwithoutsections_two(self):
+        src = textwrap.dedent('''\
+        =============
+         Hello World
+        =============
+
+        Again, there are no sections, just a document title.
+        ''')
+        self.assertEqual(rstsource.find_sections(src), [])
+
+    def test_find_sections_simpledoc(self):
+        src = textwrap.dedent('''\
+        Section One
+        ***********
+
+        Foo.
+
+        Section Two
+        ***********
+
+        Bar.
+        ''')
+        exp_sections = [
+            (1, "Section One"),
+            (6, "Section Two"),
+            ]
+        self.assertEqual(rstsource.find_sections(src), exp_sections)
+
 
     def test_find_sections_multilevel(self):
         src = textwrap.dedent('''\
-        This should not be there actually.
+        ===============
+         Status Report
+        ===============
+
+        Lieber ein Spatz in der Hand als eine Taube auf dem Dach.
+
+        Header One
+        ==========
+
+        Here is some text.
+
+        .. while this line tries to hide itself
+
+        Achtung
+        ```````
+
+        In this piece of code, we can see a similar issue::
+
+           def foo(bar):
+               return False
+
+        Header Two
+        ==========
+
+        And here we have some text again.
+
+        Header Three
+        ============
+        ''')
+        exp_sections = [
+            (9, "Header One"),
+            (24, "Header Two"),
+            (29, "Header Three"),
+            ]
+        self.assertEqual(rstsource.find_sections(src), exp_sections)
+
+    def test_find_sections_multilevel(self):
+        src = textwrap.dedent('''\
+        Having some text like this before any title will make this rst
+        document to lack a title.
 
         ===============
          Status Report
@@ -78,9 +143,6 @@ class TestFindSections(unittest.TestCase):
         ''')
         exp_sections = [
             (5, "Status Report"),
-            (10, "Header One"),
-            (17, "Achtung"),
-            (25, "Header Two"),
             ]
         self.assertEqual(rstsource.find_sections(src), exp_sections)
 
