@@ -32,6 +32,23 @@ from pylatest.document import TestCaseDoc, Section
 import pylatest.xdocutils.nodes
 
 
+class RstSection(object):
+
+    def __init__(self, title, start_line, end_line=None):
+        self.title = title
+        self.start_line = start_line
+        self.end_line = end_line
+
+    def __eq__(self, other):
+        return self.title == other.title \
+               and self.start_line == other.start_line \
+               and self.end_line == other.end_line
+
+    def __repr__(self):
+        template = "RstSection('{}', {}, {})"
+        return template.format(self.title, self.start_line, self.end_line)
+
+
 def find_sections(rst_source):
     """
     Finds all top level sections in given rst document.
@@ -39,9 +56,20 @@ def find_sections(rst_source):
     # parse rst_source string to get rst node tree
     nodetree = publish_doctree(source=rst_source)
     sections = []
+    prev_section = None
     for node in [n for n in nodetree.children if isinstance(n, nodes.section)]:
         title = node.children[0].astext()
-        sections.append((node.line - 1, title))
+        section = RstSection(title, node.line - 1)
+        sections.append(section)
+        if prev_section is not None:
+            prev_section.end_line = node.line - 2
+        prev_section = section
+    # last section ends on the last line of the rst source
+    if prev_section is not None:
+        last_line = rst_source.count('\n')
+        if rst_source[-1] != "\n":
+            last_lie += 1
+        prev_section.end_line = last_line
     return sections
 
 

@@ -66,8 +66,8 @@ class TestFindSections(unittest.TestCase):
         Bar.
         ''')
         exp_sections = [
-            (1, "Section One"),
-            (6, "Section Two"),
+            rstsource.RstSection("Section One", 1, 5),
+            rstsource.RstSection("Section Two", 6, 9),
             ]
         self.assertEqual(rstsource.find_sections(src), exp_sections)
 
@@ -104,9 +104,9 @@ class TestFindSections(unittest.TestCase):
         ============
         ''')
         exp_sections = [
-            (9, "Header One"),
-            (24, "Header Two"),
-            (29, "Header Three"),
+            rstsource.RstSection("Header One", 9, 23),
+            rstsource.RstSection("Header Two", 24, 28),
+            rstsource.RstSection("Header Three", 29, 30),
             ]
         self.assertEqual(rstsource.find_sections(src), exp_sections)
 
@@ -142,7 +142,7 @@ class TestFindSections(unittest.TestCase):
         And here we have some text again.
         ''')
         exp_sections = [
-            (5, "Status Report"),
+            rstsource.RstSection("Status Report", 5, 28),
             ]
         self.assertEqual(rstsource.find_sections(src), exp_sections)
 
