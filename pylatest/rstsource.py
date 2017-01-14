@@ -58,6 +58,21 @@ class RstSection(object):
         return template.format(self.title, self.start_line, self.end_line)
 
 
+class RstTestAction(object):
+
+    def __init__(self, start_line, end_line=None):
+        self.start_line = start_line
+        self.end_line = end_line
+
+    def __eq__(self, other):
+        return self.start_line == other.start_line \
+               and self.end_line == other.end_line
+
+    def __repr__(self):
+        template = "RstTestAction({}, {})"
+        return template.format(self.start_line, self.end_line)
+
+
 def find_sections(rst_source):
     """
     Finds all top level sections in given rst document.
@@ -101,6 +116,45 @@ def _teststeps_condition_hack(node):
     if isinstance(node, nodes.pending):
         return True
     return False
+
+
+def find_actions(rst_source):
+    # parse rst_source string to get rst node tree
+    nodetree = publish_doctree(source=rst_source)
+
+    actions = []
+    for node in nodetree.traverse(_teststeps_condition):
+        # we can't get line of the directive node directly, because docutils
+        # doesn't provide it (node.line is None), but we can use the fact that
+        # a paragraph node (which contains content of the directive) has line
+        # attribute initialized properly
+        #
+        # pseudoxml tree of directive node looks like this:
+        #
+        # <test_result_node action_id="1">   # no line value for this node
+        #     <paragraph>                    # we have line value here
+        #         There are no files, output should be empty.
+        start_line = node.children[0].line - 2
+        # to get end line of a content of the directive node, we have to do
+        # another hack (docutils node objects doesn't contain any information
+        # about end line ) - we use next sibling node as a hint
+        siblings = node.traverse(
+            include_self=False,
+            descend=False,
+            siblings=True,
+            )
+        if len(siblings) > 0:
+            next_node = siblings[0]
+            # TODO: what if the next_node is not another directive?
+            end_line = next_node.children[0].line - 3
+        else:
+            end_line = None
+        # TODO: figure out end_line for last directive node (when end_line is
+        # None) - we can't just reuse last line here
+        # TODO: extract mode info about the node, eg. type (is it result or
+        # step?) and pylatest id
+        actions.append(RstTestAction(start_line, end_line))
+    return actions
 
 
 # TODO: this function will be deprecated, but let it here for now (reference

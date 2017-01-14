@@ -186,6 +186,64 @@ class TestFindSections(unittest.TestCase):
         self.assertEqual(rstsource.find_sections(src), exp_sections)
 
 
+class TestFindActions(unittest.TestCase):
+
+    def setUp(self):
+        # commons steps required for all test cases
+        pylatest.xdocutils.client.register_plain()
+
+    def test_find_actions_emptydoc(self):
+        self.assertEqual(rstsource.find_actions(""), [])
+
+    def test_find_actions_something(self):
+        src = textwrap.dedent('''\
+        header one
+        ==========
+
+        .. test_step:: 1
+
+            list files in the volume: ``ls -a /mnt/helloworld``
+
+        .. test_result:: 1
+
+            there are no files, output should be empty.
+
+        .. test_step:: 2
+
+            donec et mollis dolor::
+
+                $ foo --extra sth
+                $ bar -vvv
+
+        .. test_result:: 2
+
+            Maecenas congue ligula ac quam viverra nec
+            consectetur ante hendrerit.
+
+        .. test_step:: 3
+
+            This one has no matching test result.
+
+        .. test_result:: 4
+
+            And this result has no test step.
+
+        .. test_step:: 5
+
+            List files in the volume: ``ls -a /mnt/helloworld``
+        ''')
+        exp_actions = [
+            rstsource.RstTestAction(4, 7),
+            rstsource.RstTestAction(8, 11),
+            rstsource.RstTestAction(12, 18),
+            rstsource.RstTestAction(19, 23),
+            rstsource.RstTestAction(24, 27),
+            rstsource.RstTestAction(28, 31),
+            rstsource.RstTestAction(32, 34),
+            ]
+        self.assertEqual(rstsource.find_actions(src), exp_actions)
+
+
 class TestPylatestDocstringProcessing(unittest.TestCase):
     """
     Test processing of pylatest docstrings.
