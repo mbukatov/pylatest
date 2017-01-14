@@ -73,19 +73,13 @@ def find_sections(rst_source):
     return sections
 
 
-# TODO: this doesn't work because node tree still contains pending elements
-# instead of test step nodes - with single exception: the very first test
-# step - WTF? all metadata nodes are generated just fine ...
 def _teststeps_condition(node):
     """
     Traverse condition for filtering nodes of test steps directives.
     """
-    test_steps_directives = ("test_step_node", "test_result_node")
-    for pylatest_node in test_steps_directives:
-        node_class = getattr(pylatest.xdocutils.nodes, pylatest_node)
-        if isinstance(node, node_class):
-            return True
-    return False
+    return (
+        isinstance(node, pylatest.xdocutils.nodes.test_step_node) or
+        isinstance(node, pylatest.xdocutils.nodes.test_result_node))
 
 
 def _teststeps_condition_hack(node):
