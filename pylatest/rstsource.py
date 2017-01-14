@@ -32,6 +32,15 @@ from pylatest.document import TestCaseDoc, Section
 import pylatest.xdocutils.nodes
 
 
+def _debug(nodetree):
+    """
+    Debug function for development purposes only.
+    """
+    print(nodetree.pformat())
+    for node in nodetree.traverse():
+        print("{}\t{}".format(node.line, node.tagname))
+
+
 class RstSection(object):
 
     def __init__(self, title, start_line, end_line=None):
