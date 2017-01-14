@@ -110,6 +110,45 @@ class TestFindSections(unittest.TestCase):
             ]
         self.assertEqual(rstsource.find_sections(src), exp_sections)
 
+    def test_find_sections_multilevel_with_testmetadata(self):
+        src = textwrap.dedent('''\
+        =============
+         Test FooBar
+        =============
+
+        .. test_metadata:: author foo@example.com
+        .. test_metadata:: date 2015-11-06
+
+        Header One
+        ==========
+
+        Here is some text.
+
+        .. while this line tries to hide itself
+
+        Achtung
+        ```````
+
+        In this piece of code, we can see a similar issue::
+
+           def foo(bar):
+               return False
+
+        Header Two
+        ==========
+
+        And here we have some text again.
+
+        Header Three
+        ============
+        ''')
+        exp_sections = [
+            rstsource.RstSection("Header One", 8, 22),
+            rstsource.RstSection("Header Two", 23, 27),
+            rstsource.RstSection("Header Three", 28, 29),
+            ]
+        self.assertEqual(rstsource.find_sections(src), exp_sections)
+
     def test_find_sections_multilevel(self):
         src = textwrap.dedent('''\
         Having some text like this before any title will make this rst
