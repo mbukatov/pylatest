@@ -104,9 +104,9 @@ class TestFindSections(unittest.TestCase):
         ============
         ''')
         exp_sections = [
-            rstsource.RstSection("Header One", 9, 23),
-            rstsource.RstSection("Header Two", 24, 28),
-            rstsource.RstSection("Header Three", 29, 30),
+            rstsource.RstSection("Header One", 7, 21),
+            rstsource.RstSection("Header Two", 22, 26),
+            rstsource.RstSection("Header Three", 27, 28),
             ]
         self.assertEqual(rstsource.find_sections(src), exp_sections)
 
@@ -149,7 +149,7 @@ class TestFindSections(unittest.TestCase):
             ]
         self.assertEqual(rstsource.find_sections(src), exp_sections)
 
-    def test_find_sections_multilevel(self):
+    def test_find_sections_multilevel_startswithline(self):
         src = textwrap.dedent('''\
         Having some text like this before any title will make this rst
         document to lack a title.
