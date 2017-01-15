@@ -179,6 +179,14 @@ def detect_docstring_sections(docstring):
     # and report rst parsing errors in a useful way immediately
     # Also note that publish_doctree() reports the errors to stderr, which
     # is not that great here - TODO: reconfigure (logging involved?)
+    #
+    # Moreover: when some error occurs, eg. directive can't be parsed
+    # properly because of some syntax problem, the resulting document tree
+    # will contain those pending nodes ... but depending how serious the
+    # error is, the docutils tools may not even produce any output (in which
+    # case, leftover pending nodes don't concern us) ... only when the issue
+    # is not serious enough, the output will be generated - and we need to
+    # cope with leftover pending nodes
 
     # try to find any pylatest section
     detected_sections = []
