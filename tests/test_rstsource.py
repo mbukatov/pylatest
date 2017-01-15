@@ -192,12 +192,91 @@ class TestFindActions(unittest.TestCase):
         # commons steps required for all test cases
         pylatest.xdocutils.client.register_plain()
 
-    def test_find_actions_emptydoc(self):
+    def test_find_actions_null(self):
         self.assertEqual(rstsource.find_actions(""), [])
 
-    def test_find_actions_something(self):
+    def test_find_actions_emptydoc(self):
         src = textwrap.dedent('''\
-        header one
+        Test Steps
+        ==========
+
+        There are no rst directives.
+        ''')
+        self.assertEqual(rstsource.find_actions(src), [])
+
+    def test_find_actions_somedoc_noaction(self):
+        src = textwrap.dedent('''\
+        =============
+         Test FooBar
+        =============
+
+        .. test_metadata:: author foo@example.com
+        .. test_metadata:: date 2015-11-06
+
+        Header One
+        ==========
+
+        Here is some text.
+
+        .. while this line tries to hide itself
+
+        Achtung
+        ```````
+
+        In this piece of code, we can see a similar issue::
+
+           def foo(bar):
+               return False
+
+        Test Steps
+        ==========
+
+        There are no rst directives in this section.
+        ''')
+        self.assertEqual(rstsource.find_actions(src), [])
+
+    def test_find_actions_somedoc_oneaction(self):
+        src = textwrap.dedent('''\
+        =============
+         Test FooBar
+        =============
+
+        .. test_metadata:: author foo@example.com
+        .. test_metadata:: date 2015-11-06
+
+        Header One
+        ==========
+
+        Here is some text.
+
+        .. while this line tries to hide itself
+
+        Achtung
+        ```````
+
+        .. test_step:: 1
+
+            Maecenas congue ligula ac quam viverra nec
+            consectetur ante hendrerit.
+
+        In this piece of code, we can see a similar issue::
+
+           def foo(bar):
+               return False
+
+        Test Steps
+        ==========
+
+        There are no rst directives in this section.
+        ''')
+        exp_actions = [
+            rstsource.RstTestAction(18, 22),
+            ]
+        self.assertEqual(rstsource.find_actions(src), exp_actions)
+
+    def test_find_actions_real_looking_test_steps_section(self):
+        src = textwrap.dedent('''\
+        Test Steps
         ==========
 
         .. test_step:: 1
@@ -228,9 +307,16 @@ class TestFindActions(unittest.TestCase):
 
             And this result has no test step.
 
+            Donec et mollis dolor::
+
+                $ foo --extra sth
+                $ bar -vvv
+
         .. test_step:: 5
 
             List files in the volume: ``ls -a /mnt/helloworld``
+
+            This is the last step.
         ''')
         exp_actions = [
             rstsource.RstTestAction(4, 7),
@@ -238,8 +324,8 @@ class TestFindActions(unittest.TestCase):
             rstsource.RstTestAction(12, 18),
             rstsource.RstTestAction(19, 23),
             rstsource.RstTestAction(24, 27),
-            rstsource.RstTestAction(28, 31),
-            rstsource.RstTestAction(32, 34),
+            rstsource.RstTestAction(28, 36),
+            rstsource.RstTestAction(37, 41),
             ]
         self.assertEqual(rstsource.find_actions(src), exp_actions)
 
