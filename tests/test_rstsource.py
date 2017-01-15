@@ -422,6 +422,84 @@ class TestFindActions(unittest.TestCase):
             ]
         self.assertEqual(rstsource.find_actions(src), exp_actions)
 
+    # note: there is no way checking of mixed content like that would work
+    # this is because of pylatest tranformations, which translates pending
+    # nodes into particular action nodes
+    # the only way to have this would include disabling transform phase during
+    # rst parsing in pylatest.rstsource module
+    def _test_find_actions_mixed(self):
+        src = textwrap.dedent('''\
+        This looks little fishy.
+
+        .. test_step:: 1
+
+            list files in the volume: ``ls -a /mnt/helloworld``
+
+        This just some line. Ignore it.
+
+        .. test_result:: 1
+
+            there are no files, output should be empty.
+
+        And another one! Let's ignore it as well.
+
+        .. test_step:: 2
+
+            donec et mollis dolor::
+
+                $ foo --extra sth
+                $ bar -vvv
+
+        Test Steps
+        ==========
+
+        This doesn't make any sense.
+
+        .. test_result:: 2
+
+            Maecenas congue ligula ac quam viverra nec
+            consectetur ante hendrerit.
+
+        Test Steps Subsection
+        `````````````````````
+
+        Yay!
+
+        .. test_step:: 3
+
+            This one has no matching test result.
+
+        .. test_result:: 4
+
+            And this result has no test step.
+
+            Donec et mollis dolor::
+
+                $ foo --extra sth
+                $ bar -vvv
+
+        Foo Bar Baz Section
+        ===================
+
+        Really, this looks weird. But find_sections() should work anyway.
+
+        .. test_step:: 5
+
+            List files in the volume: ``ls -a /mnt/helloworld``
+
+            This is the last step.
+        ''')
+        exp_actions = [
+            rstsource.RstTestAction(3, 5),
+            rstsource.RstTestAction(9, 11),
+            rstsource.RstTestAction(15, 20),
+            rstsource.RstTestAction(27, 30),
+            rstsource.RstTestAction(37, 39),
+            rstsource.RstTestAction(41, 48),
+            rstsource.RstTestAction(55, 59),
+            ]
+        self.assertEqual(rstsource.find_actions(src), exp_actions)
+
     def test_find_actions_real_looking_test_steps_section(self):
         src = textwrap.dedent('''\
         Test Steps
