@@ -282,6 +282,20 @@ class TestFindActions(unittest.TestCase):
             ]
         self.assertEqual(rstsource.find_actions(src), exp_actions)
 
+    def test_find_actions_minimal_single_action_highid(self):
+        src = textwrap.dedent('''\
+        .. test_step:: 3
+
+            Maecenas congue ligula ac quam viverra nec
+            consectetur ante hendrerit.
+
+            This directive is the last node in this rst document.
+        ''')
+        exp_actions = [
+            rstsource.RstTestAction(1, 6),
+            ]
+        self.assertEqual(rstsource.find_actions(src), exp_actions)
+
     def test_find_actions_minimal_two_actions(self):
         src = textwrap.dedent('''\
         .. test_step:: 1
