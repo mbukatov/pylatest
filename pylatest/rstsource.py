@@ -158,7 +158,7 @@ def find_actions(rst_source):
             )
         if len(next_siblings) > 0:
             next_node = next_siblings[0]
-            end_line = next_node.children[0].line - 3
+            end_line = next_node.children[0].line - 4
         else:
             # when there are no next sibling nodes (this is the last directive
             # node in given subtree), we need to get to go up in the node tree
@@ -186,9 +186,9 @@ def find_actions(rst_source):
                 # type of next node needs to be considered to give corrent
                 # end line number
                 if next_node.tagname == "section":
-                    end_line = next_node.line - 2
+                    end_line = next_node.line - 3
                 else:
-                    end_line = next_node.line - 1
+                    end_line = next_node.line - 2
             else:
                 # ok, it seems this node is the last one in the rst source
                 end_line = get_last_line_num(rst_source)
