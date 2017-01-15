@@ -158,7 +158,6 @@ def find_actions(rst_source):
             )
         if len(next_siblings) > 0:
             next_node = next_siblings[0]
-            # TODO: what if the next_node is not another directive?
             end_line = next_node.children[0].line - 3
         else:
             # when there are no next sibling nodes (this is the last directive
