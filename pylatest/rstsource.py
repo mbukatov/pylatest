@@ -73,6 +73,22 @@ class RstTestAction(object):
         return template.format(self.start_line, self.end_line)
 
 
+def get_last_line_num(str_value):
+    """
+    Returns 1-based line number (as used for text files) of the last line in
+    given string.
+    """
+    if len(str_value) == 0:
+        # special case: even empty string would be on the 1st line
+        # when we ignore the rule about having '\n' in the end of *each* line
+        return 1
+    last_line = str_value.count('\n')
+    # account for missing last '\n' character
+    if str_value[-1] != "\n":
+        last_line += 1
+    return last_line
+
+
 def find_sections(rst_source):
     """
     Finds all top level sections in given rst document.
@@ -90,10 +106,7 @@ def find_sections(rst_source):
         prev_section = section
     # last section ends on the last line of the rst source
     if prev_section is not None:
-        last_line = rst_source.count('\n')
-        if rst_source[-1] != "\n":
-            last_lie += 1
-        prev_section.end_line = last_line
+        prev_section.end_line = get_last_line_num(rst_source)
     return sections
 
 
@@ -138,19 +151,48 @@ def find_actions(rst_source):
         # to get end line of a content of the directive node, we have to do
         # another hack (docutils node objects doesn't contain any information
         # about end line ) - we use next sibling node as a hint
-        siblings = node.traverse(
+        next_siblings = node.traverse(
             include_self=False,
             descend=False,
             siblings=True,
             )
-        if len(siblings) > 0:
-            next_node = siblings[0]
+        if len(next_siblings) > 0:
+            next_node = next_siblings[0]
             # TODO: what if the next_node is not another directive?
             end_line = next_node.children[0].line - 3
         else:
-            end_line = None
-        # TODO: figure out end_line for last directive node (when end_line is
-        # None) - we can't just reuse last line here
+            # when there are no next sibling nodes (this is the last directive
+            # node in given subtree), we need to get to go up in the node tree
+            # to get to the next node
+            following_nodes = node.traverse(
+                include_self=False,
+                descend=False,
+                ascend=True,
+                siblings=False,
+                )
+            if len(following_nodes) > 0:
+                # there are other nodes in the document tree after this node,
+                # but on the higher level, see this example:
+                #
+                # <paragraph>
+                #     <test_step_node action_id="1">
+                #         <paragraph>
+                #             Maecenas congue ligula ac quam viverra nec
+                #             consectetur ante hendrerit.
+                #         <paragraph>
+                #             And that's all!
+                # <paragraph>
+                #     There is some other text after the directive.
+                next_node = following_nodes[0]
+                # type of next node needs to be considered to give corrent
+                # end line number
+                if next_node.tagname == "section":
+                    end_line = next_node.line - 2
+                else:
+                    end_line = next_node.line - 1
+            else:
+                # ok, it seems this node is the last one in the rst source
+                end_line = get_last_line_num(rst_source)
         # TODO: extract mode info about the node, eg. type (is it result or
         # step?) and pylatest id
         actions.append(RstTestAction(start_line, end_line))

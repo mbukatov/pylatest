@@ -186,6 +186,39 @@ class TestFindSections(unittest.TestCase):
         self.assertEqual(rstsource.find_sections(src), exp_sections)
 
 
+class TestGetLastLine(unittest.TestCase):
+
+    def test_get_last_line_num_null(self):
+        self.assertEqual(rstsource.get_last_line_num(""), 1)
+
+    def test_get_last_line_num_one(self):
+        src = textwrap.dedent('''\
+        1
+        ''')
+        self.assertEqual(rstsource.get_last_line_num(src), 1)
+
+    def test_get_last_line_num_one_nonewline(self):
+        src = "1"
+        self.assertEqual(rstsource.get_last_line_num(src), 1)
+
+    def test_get_last_line_num_four(self):
+        src = textwrap.dedent('''\
+        1
+        2
+        3
+        4
+        ''')
+        self.assertEqual(rstsource.get_last_line_num(src), 4)
+
+    def test_get_last_line_num_four_nonewline(self):
+        src = textwrap.dedent('''\
+        1
+        2
+        3
+        4''')
+        self.assertEqual(rstsource.get_last_line_num(src), 4)
+
+
 class TestFindActions(unittest.TestCase):
 
     def setUp(self):
@@ -234,6 +267,88 @@ class TestFindActions(unittest.TestCase):
         There are no rst directives in this section.
         ''')
         self.assertEqual(rstsource.find_actions(src), [])
+
+    def test_find_actions_simpledoc_endline_theend(self):
+        src = textwrap.dedent('''\
+        Test Steps
+        ==========
+
+        .. test_step:: 1
+
+            Maecenas congue ligula ac quam viverra nec
+            consectetur ante hendrerit.
+
+            This directive is the last node in this rst document.
+
+        ''')
+        exp_actions = [
+            rstsource.RstTestAction(4, 10),
+            ]
+        self.assertEqual(rstsource.find_actions(src), exp_actions)
+
+    def test_find_actions_simpledoc_endline_paragraph(self):
+        src = textwrap.dedent('''\
+        Test Steps
+        ==========
+
+        .. test_step:: 1
+
+            Maecenas congue ligula ac quam viverra nec
+            consectetur ante hendrerit.
+
+            And that's all!
+
+        There is some other text after the directive.
+        ''')
+        exp_actions = [
+            rstsource.RstTestAction(4, 10),
+            ]
+        self.assertEqual(rstsource.find_actions(src), exp_actions)
+
+    def test_find_actions_simpledoc_endline_section(self):
+        src = textwrap.dedent('''\
+        Test Steps
+        ==========
+
+        .. test_step:: 1
+
+            Maecenas congue ligula ac quam viverra nec
+            consectetur ante hendrerit.
+
+            And that's all!
+
+        New Section
+        ===========
+
+        There is new section after the directive.
+        ''')
+        exp_actions = [
+            rstsource.RstTestAction(4, 10),
+            ]
+        self.assertEqual(rstsource.find_actions(src), exp_actions)
+
+    def test_find_actions_simpledoc_endline_anotherdirective(self):
+        src = textwrap.dedent('''\
+        Test Steps
+        ==========
+
+        .. test_step:: 1
+
+            Maecenas congue ligula ac quam viverra nec
+            consectetur ante hendrerit.
+
+            And that's all!
+
+        .. test_step:: 2
+
+            Maecenas congue ligula ac quam viverra nec
+            consectetur ante hendrerit.
+        ''')
+        exp_actions = [
+            rstsource.RstTestAction(4, 10),
+            rstsource.RstTestAction(11, 14),
+            ]
+        self.assertEqual(rstsource.find_actions(src), exp_actions)
 
     def test_find_actions_somedoc_oneaction(self):
         src = textwrap.dedent('''\
