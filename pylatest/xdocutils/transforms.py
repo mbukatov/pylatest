@@ -189,34 +189,6 @@ class TestStepsTableTransform(TestStepsTransform):
         return table_node
 
 
-class TestStepsPlainTransform(TestStepsTransform):
-    """
-    Wrapp content from pending test step nodes in div element so that test
-    steps are adressable via xpath (works with html output only).
-    """
-
-    _node_names = ('test_step_node', 'test_result_node')
-    """
-    Class names of rst tree nodes (for html plain output) of both *test
-    step* and *test result* of a test action.
-    """
-
-    def _create_content(self):
-        p_node = nodes.paragraph()
-        for action_id, step_nodes, result_nodes in self._actions:
-            for action_nodes, node_name in \
-                    zip((step_nodes, result_nodes), self._node_names):
-                if action_nodes is None:
-                    continue
-                node = getattr(pylatest.xdocutils.nodes, node_name)()
-                # add all content nodes into step or result node
-                for c_node in action_nodes.details['nodes']:
-                    node += c_node
-                node.attributes['action_id'] = action_id
-                p_node += node
-        return p_node
-
-
 class TestMetadataTransform(PylatestTransform):
     """
     Base trasformation class for test metadata directive.

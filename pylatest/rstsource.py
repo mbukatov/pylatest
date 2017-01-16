@@ -119,18 +119,6 @@ def _teststeps_condition(node):
         isinstance(node, pylatest.xdocutils.nodes.test_result_node))
 
 
-def _teststeps_condition_hack(node):
-    """
-    Traverse condition for filtering nodes of test steps directives.
-
-    This is a quick hack to overcome issue with ``_teststeps_condition()``.
-    """
-    # TODO: proper check (of at least transformation class) goes here
-    if isinstance(node, nodes.pending):
-        return True
-    return False
-
-
 def find_actions(rst_source):
     # parse rst_source string to get rst node tree
     nodetree = publish_doctree(source=rst_source)
@@ -158,7 +146,12 @@ def find_actions(rst_source):
             )
         if len(next_siblings) > 0:
             next_node = next_siblings[0]
-            end_line = next_node.children[0].line - 4
+            if next_node.tagname in ("test_step_node", "test_result_node"):
+                end_line = next_node.children[0].line - 4
+            elif next_node.tagname == "section":
+                end_line = next_node.line - 3
+            else:
+                end_line = next_node.line - 2
         else:
             # when there are no next sibling nodes (this is the last directive
             # node in given subtree), we need to get to go up in the node tree
@@ -241,8 +234,6 @@ def detect_docstring_sections(docstring):
     # try to count all pylatest step/result directives
     test_directive_count = 0
     for node in nodetree.traverse(_teststeps_condition):
-        test_directive_count += 1
-    for node in nodetree.traverse(_teststeps_condition_hack):
         test_directive_count += 1
 
     # try to detect header pseudo section (contains name and metadata)

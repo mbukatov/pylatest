@@ -115,8 +115,8 @@ class TestRst2HtmlBodyTree(unittest.TestCase):
         # TODO: if the pylatest directive is unknown, error goes to stderr!
         html_body = export.rst2htmlbodytree(rst_content)
         # construct expected tree
-        html_body_expected, p_el = get_singleparagraph_body_tree()
-        div_el = add_action_div(p_el, '1', 'step')
+        html_body_expected = get_empty_body_tree()
+        div_el = add_action_div(html_body_expected, '1', 'step')
         div_el.text = '\nThis is just a test.\n'
         self.assertEqual(
             etree.tostring(html_body),

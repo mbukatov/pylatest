@@ -441,7 +441,7 @@ class TestFindActions(unittest.TestCase):
     # nodes into particular action nodes
     # the only way to have this would include disabling transform phase during
     # rst parsing in pylatest.rstsource module
-    def _test_find_actions_mixed(self):
+    def test_find_actions_mixed(self):
         src = textwrap.dedent('''\
         This looks little fishy.
 

@@ -91,14 +91,7 @@ class TestTestActionsDirectivePlain(TestBasePlain):
         rst_input = '.. test_step:: 1'
         exp_result = textwrap.dedent('''\
         <document source="testparse() method">
-            <pending>
-                .. internal attributes:
-                     .transform: pylatest.xdocutils.transforms.TestStepsPlainTransform
-                     .details:
-                       action_id: 1
-                       action_name: 'test_step'
-                       nodes:
-                         <Element>
+            <test_step_node action_id="1">
         ''')
         self.check_directive(rst_input, exp_result)
 
@@ -119,14 +112,7 @@ class TestTestActionsDirectivePlain(TestBasePlain):
         rst_input = '.. test_result:: 1'
         exp_result = textwrap.dedent('''\
         <document source="testparse() method">
-            <pending>
-                .. internal attributes:
-                     .transform: pylatest.xdocutils.transforms.TestStepsPlainTransform
-                     .details:
-                       action_id: 1
-                       action_name: 'test_result'
-                       nodes:
-                         <Element>
+            <test_result_node action_id="1">
         ''')
         self.check_directive(rst_input, exp_result)
 
@@ -138,16 +124,9 @@ class TestTestActionsDirectivePlain(TestBasePlain):
         ''')
         exp_result = textwrap.dedent('''\
         <document source="testparse() method">
-            <pending>
-                .. internal attributes:
-                     .transform: pylatest.xdocutils.transforms.TestStepsPlainTransform
-                     .details:
-                       action_id: 7
-                       action_name: 'test_step'
-                       nodes:
-                         <Element>
-                             <paragraph>
-                                 Some content.
+            <test_step_node action_id="7">
+                <paragraph>
+                    Some content.
         ''')
         self.check_directive(rst_input, exp_result)
 
@@ -159,16 +138,9 @@ class TestTestActionsDirectivePlain(TestBasePlain):
         ''')
         exp_result = textwrap.dedent('''\
         <document source="testparse() method">
-            <pending>
-                .. internal attributes:
-                     .transform: pylatest.xdocutils.transforms.TestStepsPlainTransform
-                     .details:
-                       action_id: 7
-                       action_name: 'test_result'
-                       nodes:
-                         <Element>
-                             <paragraph>
-                                 Some content.
+            <test_result_node action_id="7">
+                <paragraph>
+                    Some content.
         ''')
         self.check_directive(rst_input, exp_result)
 
