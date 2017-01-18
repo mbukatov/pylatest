@@ -60,17 +60,22 @@ class RstSection(object):
 
 class RstTestAction(object):
 
-    def __init__(self, start_line, end_line=None):
+    def __init__(self, action_id, action_name, start_line, end_line=None):
+        self.action_id = action_id
+        self.action_name = action_name
         self.start_line = start_line
         self.end_line = end_line
 
     def __eq__(self, other):
-        return self.start_line == other.start_line \
+        return self.action_id == other.action_id \
+               and self.action_name == other.action_name \
+               and self.start_line == other.start_line \
                and self.end_line == other.end_line
 
     def __repr__(self):
-        template = "RstTestAction({}, {})"
-        return template.format(self.start_line, self.end_line)
+        template = "RstTestAction({}, {}, {}, {})"
+        return template.format(
+            self.action_id, self.action_name, self.start_line, self.end_line)
 
 
 def get_last_line_num(str_value):
@@ -185,9 +190,10 @@ def find_actions(rst_source):
             else:
                 # ok, it seems this node is the last one in the rst source
                 end_line = get_last_line_num(rst_source)
-        # TODO: extract mode info about the node, eg. type (is it result or
-        # step?) and pylatest id
-        actions.append(RstTestAction(start_line, end_line))
+        action_id = node.attributes['action_id']
+        action_name = node.tagname[:-5] # dropping '_node' suffix
+        action = RstTestAction(action_id, action_name, start_line, end_line)
+        actions.append(action)
     return actions
 
 

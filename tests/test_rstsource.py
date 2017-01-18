@@ -278,7 +278,7 @@ class TestFindActions(unittest.TestCase):
             This directive is the last node in this rst document.
         ''')
         exp_actions = [
-            rstsource.RstTestAction(1, 6),
+            rstsource.RstTestAction(1, "test_step", 1, 6),
             ]
         self.assertEqual(rstsource.find_actions(src), exp_actions)
 
@@ -292,7 +292,7 @@ class TestFindActions(unittest.TestCase):
             This directive is the last node in this rst document.
         ''')
         exp_actions = [
-            rstsource.RstTestAction(1, 6),
+            rstsource.RstTestAction(3, "test_step", 1, 6),
             ]
         self.assertEqual(rstsource.find_actions(src), exp_actions)
 
@@ -311,8 +311,8 @@ class TestFindActions(unittest.TestCase):
             consectetur ante hendrerit.
         ''')
         exp_actions = [
-            rstsource.RstTestAction(1, 6),
-            rstsource.RstTestAction(8, 11),
+            rstsource.RstTestAction(1, "test_step", 1, 6),
+            rstsource.RstTestAction(2, "test_step", 8, 11),
             ]
         self.assertEqual(rstsource.find_actions(src), exp_actions)
 
@@ -321,7 +321,7 @@ class TestFindActions(unittest.TestCase):
         Test Steps
         ==========
 
-        .. test_step:: 1
+        .. test_step:: 10
 
             Maecenas congue ligula ac quam viverra nec
             consectetur ante hendrerit.
@@ -329,7 +329,7 @@ class TestFindActions(unittest.TestCase):
             This directive is the last node in this rst document.
         ''')
         exp_actions = [
-            rstsource.RstTestAction(4, 9),
+            rstsource.RstTestAction(10, "test_step", 4, 9),
             ]
         self.assertEqual(rstsource.find_actions(src), exp_actions)
 
@@ -338,7 +338,7 @@ class TestFindActions(unittest.TestCase):
         Test Steps
         ==========
 
-        .. test_step:: 1
+        .. test_step:: 5
 
             Maecenas congue ligula ac quam viverra nec
             consectetur ante hendrerit.
@@ -348,7 +348,7 @@ class TestFindActions(unittest.TestCase):
         There is some other text after the directive.
         ''')
         exp_actions = [
-            rstsource.RstTestAction(4, 9),
+            rstsource.RstTestAction(5, "test_step", 4, 9),
             ]
         self.assertEqual(rstsource.find_actions(src), exp_actions)
 
@@ -370,7 +370,7 @@ class TestFindActions(unittest.TestCase):
         There is new section after the directive.
         ''')
         exp_actions = [
-            rstsource.RstTestAction(4, 9),
+            rstsource.RstTestAction(1, "test_step", 4, 9),
             ]
         self.assertEqual(rstsource.find_actions(src), exp_actions)
 
@@ -392,8 +392,8 @@ class TestFindActions(unittest.TestCase):
             consectetur ante hendrerit.
         ''')
         exp_actions = [
-            rstsource.RstTestAction(4, 9),
-            rstsource.RstTestAction(11, 14),
+            rstsource.RstTestAction(1, "test_step", 4, 9),
+            rstsource.RstTestAction(2, "test_step", 11, 14),
             ]
         self.assertEqual(rstsource.find_actions(src), exp_actions)
 
@@ -432,7 +432,7 @@ class TestFindActions(unittest.TestCase):
         There are no rst directives in this section.
         ''')
         exp_actions = [
-            rstsource.RstTestAction(18, 21),
+            rstsource.RstTestAction(1, "test_step", 18, 21),
             ]
         self.assertEqual(rstsource.find_actions(src), exp_actions)
 
@@ -504,13 +504,13 @@ class TestFindActions(unittest.TestCase):
             This is the last step.
         ''')
         exp_actions = [
-            rstsource.RstTestAction(3, 5),
-            rstsource.RstTestAction(9, 11),
-            rstsource.RstTestAction(15, 20),
-            rstsource.RstTestAction(27, 30),
-            rstsource.RstTestAction(37, 39),
-            rstsource.RstTestAction(41, 48),
-            rstsource.RstTestAction(55, 59),
+            rstsource.RstTestAction(1, "test_step", 3, 5),
+            rstsource.RstTestAction(1, "test_result", 9, 11),
+            rstsource.RstTestAction(2, "test_step", 15, 20),
+            rstsource.RstTestAction(2, "test_result", 27, 30),
+            rstsource.RstTestAction(3, "test_step", 37, 39),
+            rstsource.RstTestAction(4, "test_result", 41, 48),
+            rstsource.RstTestAction(5, "test_step", 55, 59),
             ]
         self.assertEqual(rstsource.find_actions(src), exp_actions)
 
@@ -559,13 +559,13 @@ class TestFindActions(unittest.TestCase):
             This is the last step.
         ''')
         exp_actions = [
-            rstsource.RstTestAction(4, 6),
-            rstsource.RstTestAction(8, 10),
-            rstsource.RstTestAction(12, 17),
-            rstsource.RstTestAction(19, 22),
-            rstsource.RstTestAction(24, 26),
-            rstsource.RstTestAction(28, 35),
-            rstsource.RstTestAction(37, 41),
+            rstsource.RstTestAction(1, "test_step", 4, 6),
+            rstsource.RstTestAction(1, "test_result", 8, 10),
+            rstsource.RstTestAction(2, "test_step", 12, 17),
+            rstsource.RstTestAction(2, "test_result", 19, 22),
+            rstsource.RstTestAction(3, "test_step", 24, 26),
+            rstsource.RstTestAction(4, "test_result", 28, 35),
+            rstsource.RstTestAction(5, "test_step", 37, 41),
             ]
         self.assertEqual(rstsource.find_actions(src), exp_actions)
 
