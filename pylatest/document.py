@@ -129,12 +129,13 @@ class TestActions(object):
                 msg = "id error: such action has been already added"
                 raise PylatestActionsError(msg)
         self._actions_dict.setdefault(action_id, {})[action_name] = content
+        return action_id
 
     def add_step(self, content, action_id=None):
-        self.add("test_step", content, action_id)
+        return self.add("test_step", content, action_id)
 
     def add_result(self, content, action_id=None):
-        self.add("test_result", content, action_id)
+        return self.add("test_result", content, action_id)
 
 
 class Section(object):

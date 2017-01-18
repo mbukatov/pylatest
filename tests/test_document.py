@@ -148,6 +148,18 @@ class TestTestActions(unittest.TestCase):
             (2, '2.step', '2.result'),
             (3, '3.step', '3.result'), ])
 
+    def test_actions_add_auto_id_value(self):
+        auto_id = self.actions.add_step("1.step")
+        self.assertEqual(auto_id, 1)
+        auto_id = self.actions.add_step("2.step")
+        self.assertEqual(auto_id, 2)
+        auto_id = self.actions.add_result("2.result")
+        self.assertEqual(auto_id, 2)
+        auto_id = self.actions.add_result("3.result")
+        self.assertEqual(auto_id, 3)
+        auto_id = self.actions.add_step("3.step")
+        self.assertEqual(auto_id, 3)
+
     def test_actions_iter_twofull_auto_id_firstonly(self):
         self.actions.add("test_step", "1.step", 1)
         self.actions.add("test_result", "1.result")
