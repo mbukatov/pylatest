@@ -100,6 +100,7 @@ def find_sections(rst_source):
     """
     # parse rst_source string to get rst node tree
     nodetree = publish_doctree(source=rst_source)
+    # look for rst sections
     sections = []
     prev_section = None
     for node in [n for n in nodetree.children if isinstance(n, nodes.section)]:
@@ -112,6 +113,24 @@ def find_sections(rst_source):
     # last section ends on the last line of the rst source
     if prev_section is not None:
         prev_section.end_line = get_last_line_num(rst_source)
+    # check if the node tree contains test metadata nodes
+    contains_meta = False
+    for node in nodetree.traverse(lambda n:
+            isinstance(n, pylatest.xdocutils.nodes.test_metadata_node)):
+        # TODO: this completelly ignores location of such metadata nodes
+        # in the node tree, report True only when metadata node is not inside
+        # some section
+        contains_meta = True
+        break
+    # look for metadata fragment and report it "as a special section"
+    if contains_meta and nodetree.children[0].tagname == "title":
+        if len(sections) == 0:
+            # rst_source contains just the meta data fragment
+            section = RstSection(None, 1,  get_last_line_num(rst_source))
+            sections.append(section)
+        else:
+            section = RstSection(None, 1, sections[0].start_line - 1)
+            sections.append(section)
     return sections
 
 

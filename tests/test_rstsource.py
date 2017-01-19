@@ -34,6 +34,14 @@ class TestFindSections(unittest.TestCase):
     def test_find_sections_emptydoc(self):
         self.assertEqual(rstsource.find_sections(""), [])
 
+    def test_find_sections_doc_without_title(self):
+        src = textwrap.dedent('''\
+        There is no title or any sections. Just a paragraph.
+
+        Or two.
+        ''')
+        self.assertEqual(rstsource.find_sections(src), [])
+
     def test_find_sections_docwithoutsections_one(self):
         src = textwrap.dedent('''\
         Hello World
@@ -52,6 +60,84 @@ class TestFindSections(unittest.TestCase):
         Again, there are no sections, just a document title.
         ''')
         self.assertEqual(rstsource.find_sections(src), [])
+
+    def test_find_sections_metadata_doc_without_title(self):
+        src = textwrap.dedent('''\
+        There is no title or any sections. Just a paragraph and some metadata.
+
+        .. test_metadata:: author foo@example.com
+        .. test_metadata:: date 2015-11-06
+        .. test_metadata:: This is here just to test metadata processing.
+        ''')
+        self.assertEqual(rstsource.find_sections(src), [])
+
+    def test_find_sections_metadata_simple(self):
+        src = textwrap.dedent('''\
+        Hello World Test Case
+        *********************
+
+        .. test_metadata:: author foo@example.com
+        .. test_metadata:: date 2015-11-06
+        .. test_metadata:: This is here just to test metadata processing.
+
+
+        ''')
+        exp_sections = [
+            rstsource.RstSection(None, 1, 8),
+            ]
+        self.assertEqual(rstsource.find_sections(src), exp_sections)
+
+    def test_find_sections_metadata_with_other_sections(self):
+        src = textwrap.dedent('''\
+        Hello World Test Case
+        *********************
+
+        .. test_metadata:: author foo@example.com
+        .. test_metadata:: date 2015-11-06
+        .. test_metadata:: This is here just to test metadata processing.
+
+        Section One
+        ===========
+
+        Foo.
+
+        Section Two
+        ===========
+
+        Bar.
+        ''')
+        exp_sections = [
+            rstsource.RstSection('Section One', 8, 12),
+            rstsource.RstSection('Section Two', 13, 16),
+            rstsource.RstSection(None, 1, 7),
+            ]
+        self.assertEqual(rstsource.find_sections(src), exp_sections)
+
+    def test_find_sections_metadata_simple_wrong(self):
+        src = textwrap.dedent('''\
+        Hello World Test Case
+        *********************
+
+        .. test_metadata:: author foo@example.com
+        .. test_metadata:: date 2015-11-06
+        .. test_metadata:: This is here just to test metadata processing.
+
+        Section One
+        ***********
+
+        Foo.
+
+        Section Two
+        ***********
+
+        Bar.
+        ''')
+        exp_sections = [
+            rstsource.RstSection("Hello World Test Case", 1, 7),
+            rstsource.RstSection('Section One', 8, 12),
+            rstsource.RstSection('Section Two', 13, 16),
+            ]
+        self.assertEqual(rstsource.find_sections(src), exp_sections)
 
     def test_find_sections_simpledoc(self):
         src = textwrap.dedent('''\
@@ -146,6 +232,7 @@ class TestFindSections(unittest.TestCase):
             rstsource.RstSection("Header One", 8, 22),
             rstsource.RstSection("Header Two", 23, 27),
             rstsource.RstSection("Header Three", 28, 29),
+            rstsource.RstSection(None, 1, 7),
             ]
         self.assertEqual(rstsource.find_sections(src), exp_sections)
 
