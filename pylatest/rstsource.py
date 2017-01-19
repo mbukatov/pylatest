@@ -108,7 +108,7 @@ def find_sections(rst_source):
         section = RstSection(title, node.line - 1)
         sections.append(section)
         if prev_section is not None:
-            prev_section.end_line = node.line - 2
+            prev_section.end_line = node.line - 3
         prev_section = section
     # last section ends on the last line of the rst source
     if prev_section is not None:
@@ -129,7 +129,7 @@ def find_sections(rst_source):
             section = RstSection(None, 1,  get_last_line_num(rst_source))
             sections.append(section)
         else:
-            section = RstSection(None, 1, sections[0].start_line - 1)
+            section = RstSection(None, 1, sections[0].start_line - 2)
             sections.append(section)
     return sections
 

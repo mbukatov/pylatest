@@ -107,9 +107,9 @@ class TestFindSections(unittest.TestCase):
         Bar.
         ''')
         exp_sections = [
-            rstsource.RstSection('Section One', 8, 12),
+            rstsource.RstSection('Section One', 8, 11),
             rstsource.RstSection('Section Two', 13, 16),
-            rstsource.RstSection(None, 1, 7),
+            rstsource.RstSection(None, 1, 6),
             ]
         self.assertEqual(rstsource.find_sections(src), exp_sections)
 
@@ -133,8 +133,8 @@ class TestFindSections(unittest.TestCase):
         Bar.
         ''')
         exp_sections = [
-            rstsource.RstSection("Hello World Test Case", 1, 7),
-            rstsource.RstSection('Section One', 8, 12),
+            rstsource.RstSection("Hello World Test Case", 1, 6),
+            rstsource.RstSection('Section One', 8, 11),
             rstsource.RstSection('Section Two', 13, 16),
             ]
         self.assertEqual(rstsource.find_sections(src), exp_sections)
@@ -152,7 +152,7 @@ class TestFindSections(unittest.TestCase):
         Bar.
         ''')
         exp_sections = [
-            rstsource.RstSection("Section One", 1, 5),
+            rstsource.RstSection("Section One", 1, 4),
             rstsource.RstSection("Section Two", 6, 9),
             ]
         self.assertEqual(rstsource.find_sections(src), exp_sections)
@@ -190,8 +190,8 @@ class TestFindSections(unittest.TestCase):
         ============
         ''')
         exp_sections = [
-            rstsource.RstSection("Header One", 7, 21),
-            rstsource.RstSection("Header Two", 22, 26),
+            rstsource.RstSection("Header One", 7, 20),
+            rstsource.RstSection("Header Two", 22, 25),
             rstsource.RstSection("Header Three", 27, 28),
             ]
         self.assertEqual(rstsource.find_sections(src), exp_sections)
@@ -229,10 +229,10 @@ class TestFindSections(unittest.TestCase):
         ============
         ''')
         exp_sections = [
-            rstsource.RstSection("Header One", 8, 22),
-            rstsource.RstSection("Header Two", 23, 27),
+            rstsource.RstSection("Header One", 8, 21),
+            rstsource.RstSection("Header Two", 23, 26),
             rstsource.RstSection("Header Three", 28, 29),
-            rstsource.RstSection(None, 1, 7),
+            rstsource.RstSection(None, 1, 6),
             ]
         self.assertEqual(rstsource.find_sections(src), exp_sections)
 
