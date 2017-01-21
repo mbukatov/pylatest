@@ -252,54 +252,42 @@ class RstTestCaseDoc(TestCaseDoc):
     """
 
     def __init__(self):
-        self._docstrings = []
-        """
-        List of all docstrings with at least one section.
-        """
-
+        self._test_actions = TestActions()
+        # dictionary: Section -> string with rst source of given section.
         self._section_dict = {}
-        """
-        Index for the list of docstrings: section name -> list of docstrings.
-        """
-
-        self._test_actions = []
-        """
-        Dosctrings with test step/result directives only.
-        """
-
-        # TODO: set to a proper value
+        # name of python source file from which this document was extracted
+        # TODO: set a proper value (lineno values are specified wrt this file)
         self._source_file = None
-        """
-        Name of the source file from which this document has been extracted.
-        """
 
-    def add_section(self, docstring, lineno, sections):
+    def add_section(self, section, content, lineno=None):
         """
         Add string fragment which contains given sections.
         """
-        self._docstrings.append(docstring)
-        for section in sections:
-            self._section_dict.setdefault(section, []).append(docstring)
+        if self._section_dict.get(section) is not None:
+            msg = "section {} is aready present in this document"
+            raise PylatestDocumentError(msg.format(section))
+        self._section_dict[section] = content
+        # TODO: process lineno
 
-    def add_test_action(self, docstring, lineno):
+    def add_test_action(self, action_name, content, action_id, lineno=None):
         """
         Add docstring which contains some test step or result directives.
         """
-        self._test_actions.append(docstring)
+        self._test_actions.add(action_name, content, action_id)
+        # TODO: process lineno
 
     def is_empty(self):
         """
         Return True if the document is empty.
         """
-        return len(self._docstrings) == 0 and len(self._test_actions) == 0
-
-    # TODO: define a order of sections somehow?
+        return len(self._section_dict) == 0 and len(self._test_actions) == 0
 
     @property
     def sections(self):
         """
         Return list of non empty sections of this document.
         """
+        # TODO: define a order of sections somehow?
         section_list = list(self._section_dict.keys())
         if len(self._test_actions) > 0:
             section_list.append(TestCaseDoc.STEPS)
@@ -312,11 +300,12 @@ class RstTestCaseDoc(TestCaseDoc):
         """
         missing_list = []
         for section in TestCaseDoc.SECTIONS_ALL:
-            if section not in self._section_dict:
-                if section == TestCaseDoc.STEPS and len(self._test_actions) > 0:
-                    # test steps may be in standalone directives
-                    continue
-                missing_list.append(section)
+            if section in self._section_dict:
+                continue
+            if section == TestCaseDoc.STEPS and len(self._test_actions) > 0:
+                # test steps may be in standalone directives
+                continue
+            missing_list.append(section)
         return missing_list
 
     def get_rst(self, ignore_errors=False):
@@ -326,10 +315,7 @@ class RstTestCaseDoc(TestCaseDoc):
         if self.is_empty():
             return ""
 
-        # when everything is just in a single string
-        if len(self._docstrings) == 1:
-            content_string = self._docstrings[0]
-            return content_string + '\n'
+        # TODO: change completelly
 
         # document is splitted across multiple docstrings
         rst_list = []

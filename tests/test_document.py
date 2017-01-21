@@ -227,7 +227,7 @@ class TestRstTestCaseDoc(unittest.TestCase):
 
     def test_rsttestcasedoc_add_section_simple(self):
         tc = RstTestCaseDoc()
-        tc.add_section("string content", 42, [TestCaseDoc.DESCR])
+        tc.add_section(TestCaseDoc.DESCR, "string content", lineno=42)
         self.assertFalse(tc.is_empty())
         self.assertEqual(tc.sections, [TestCaseDoc.DESCR])
         self.assertEqual(
@@ -236,20 +236,33 @@ class TestRstTestCaseDoc(unittest.TestCase):
 
     def test_rsttestcasedoc_add_section_multiple(self):
         tc = RstTestCaseDoc()
-        sections_list = [TestCaseDoc._HEAD, TestCaseDoc.DESCR]
-        tc.add_section("string content", 42, sections_list)
+        tc.add_section(TestCaseDoc._HEAD, "header", lineno=42)
+        tc.add_section(TestCaseDoc.DESCR, "description", lineno=83)
         self.assertFalse(tc.is_empty())
-        self.assertEqual(sorted(tc.sections), sorted(sections_list))
+        self.assertEqual(
+            sorted(tc.sections),
+            sorted([TestCaseDoc._HEAD, TestCaseDoc.DESCR]))
+        self.assertEqual(
+            sorted(tc.missing_sections + tc.sections),
+            sorted(TestCaseDoc.SECTIONS_ALL))
+
+    def test_rsttestcasedoc_add_section_multiple_duplicit(self):
+        tc = RstTestCaseDoc()
+        tc.add_section(TestCaseDoc.DESCR, "descr. one", lineno=42)
+        with self.assertRaises(pylatest.document.PylatestDocumentError):
+            tc.add_section(TestCaseDoc.DESCR, "descr. two", lineno=94)
+        self.assertFalse(tc.is_empty())
+        self.assertEqual(sorted(tc.sections), sorted([TestCaseDoc.DESCR]))
         self.assertEqual(
             sorted(tc.missing_sections + tc.sections),
             sorted(TestCaseDoc.SECTIONS_ALL))
 
     def test_rsttestcasedoc_add_section_few_multiple(self):
         tc = RstTestCaseDoc()
-        tc.add_section("header and description", 10,
-            [TestCaseDoc._HEAD, TestCaseDoc.DESCR])
-        tc.add_section("setup", 42, [TestCaseDoc.SETUP])
-        tc.add_section("teardown", 150, [TestCaseDoc.TEARD])
+        tc.add_section(TestCaseDoc._HEAD, "header", lineno=10)
+        tc.add_section(TestCaseDoc.DESCR, "description", lineno=55)
+        tc.add_section(TestCaseDoc.SETUP, "setup", lineno=98)
+        tc.add_section(TestCaseDoc.TEARD, "teardown", lineno=150)
         self.assertFalse(tc.is_empty())
         self.assertEqual(sorted(tc.sections), sorted([
             TestCaseDoc._HEAD,
@@ -261,9 +274,20 @@ class TestRstTestCaseDoc(unittest.TestCase):
             sorted(tc.missing_sections + tc.sections),
             sorted(TestCaseDoc.SECTIONS_ALL))
 
+    def test_rsttestcasedoc_add_testaction_wrong(self):
+        tc = RstTestCaseDoc()
+        with self.assertRaises(pylatest.document.PylatestActionsError):
+            tc.add_test_action("test_foobarbaz", "content", 1)
+        self.assertTrue(tc.is_empty())
+        self.assertEqual(tc.sections, [])
+        self.assertEqual(tc.missing_sections, TestCaseDoc.SECTIONS_ALL)
+        self.assertEqual(
+            sorted(tc.missing_sections + tc.sections),
+            sorted(TestCaseDoc.SECTIONS_ALL))
+
     def test_rsttestcasedoc_add_testaction_simple(self):
         tc = RstTestCaseDoc()
-        tc.add_test_action("test step", 10)
+        tc.add_test_action("test_step", "content", 1)
         self.assertFalse(tc.is_empty())
         self.assertEqual(tc.sections, [TestCaseDoc.STEPS])
         self.assertEqual(
@@ -272,9 +296,20 @@ class TestRstTestCaseDoc(unittest.TestCase):
 
     def test_rsttestcasedoc_add_testaction_multiple(self):
         tc = RstTestCaseDoc()
-        tc.add_test_action("test step", 10)
-        tc.add_test_action("test result", 12)
-        tc.add_test_action("another test step", 20)
+        tc.add_test_action("test_step", "test step", 1)
+        tc.add_test_action("test_result", "test result", 1)
+        tc.add_test_action("test_step", "another test step", 2)
+        self.assertFalse(tc.is_empty())
+        self.assertEqual(tc.sections, [TestCaseDoc.STEPS])
+        self.assertEqual(
+            sorted(tc.missing_sections + tc.sections),
+            sorted(TestCaseDoc.SECTIONS_ALL))
+
+    def test_rsttestcasedoc_add_testaction_multiple_duplicit(self):
+        tc = RstTestCaseDoc()
+        tc.add_test_action("test_step", "test step", 1)
+        with self.assertRaises(pylatest.document.PylatestActionsError):
+            tc.add_test_action("test_step", "another test step", 1)
         self.assertFalse(tc.is_empty())
         self.assertEqual(tc.sections, [TestCaseDoc.STEPS])
         self.assertEqual(
