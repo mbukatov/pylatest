@@ -180,7 +180,7 @@ class Section(object):
         """
         Generate rst header code for this section.
         """
-        return str(self.title) + '\n' + ('=' * len(self.title))
+        return str(self.title) + '\n' + ('=' * len(self.title)) + '\n'
 
 
 class TestCaseDoc(object):
@@ -308,39 +308,25 @@ class RstTestCaseDoc(TestCaseDoc):
             missing_list.append(section)
         return missing_list
 
-    def get_rst(self, ignore_errors=False):
+    def build_rst(self):
         """
         Generate rst document.
         """
         if self.is_empty():
             return ""
-
-        # TODO: change completelly
-
-        # document is splitted across multiple docstrings
-        rst_list = []
-        docstrings_used = set()
+        result_list = []
         for section in TestCaseDoc.SECTIONS_ALL:
-            docstrings = self._section_dict.get(section)
-            if docstrings is None and section == TestCaseDoc.STEPS:
+            content = self._section_dict.get(section)
+            # section "Test steps" requires special care
+            if section == TestCaseDoc.STEPS:
+                if content is not None:
+                    result_list.append(content)
+                elif len(self._test_actions) > 0:
+                    result_list.append(section.get_rst_header())
                 # put together test steps
-                if len(self._test_actions) > 0:
-                    rst_list.append(section.get_rst_header())
-                    teststeps = "\n\n".join(self._test_actions)
-                    rst_list.append(teststeps)
-                else:
-                    msg = "test steps/actions directives are missing"
-                    self._add_error(msg)
-            if docstrings is None:
-                continue
-            if len(docstrings) > 1:
-                msg = "multiple docstrings with {0} section found"
-                self._add_error(msg.format(section))
-            # case with multiple docstrings for one section is invalid,
-            # but add them all anyway to make debugging easier
-            for docstring in docstrings:
-                if docstring not in docstrings_used:
-                    rst_list.append(docstring)
-                    docstrings_used.add(docstring)
-
-        return "\n\n".join(rst_list) + '\n'
+                for content in self._test_actions.iter_content():
+                    result_list.append(content)
+            # while all other sections are included as they are
+            elif content is not None:
+                result_list.append(content)
+        return "\n".join(result_list)

@@ -188,7 +188,8 @@ class TestSection(unittest.TestCase):
         s1 = Section("Test Case Description")
         exp_output = textwrap.dedent('''\
         Test Case Description
-        =====================''')
+        =====================
+        ''')
         self.assertEqual(s1.get_rst_header(), exp_output)
 
 
@@ -315,3 +316,244 @@ class TestRstTestCaseDoc(unittest.TestCase):
         self.assertEqual(
             sorted(tc.missing_sections + tc.sections),
             sorted(TestCaseDoc.SECTIONS_ALL))
+
+
+class TestRstTestCaseDocBuild(unittest.TestCase):
+
+    def test_rsttestcasedoc_build_rst_empty(self):
+        tc = RstTestCaseDoc()
+        self.assertEqual(tc.build_rst(), "")
+
+    def test_rsttestcasedoc_build_rst_onesection(self):
+        tc = RstTestCaseDoc()
+        content = textwrap.dedent('''\
+        Description
+        ===========
+
+        This is just demonstration of usage of pylatest and
+        expected structure of rst document.
+
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam
+        lectus.  Sed sit amet ipsum mauris. Maecenas congue ligula ac quam
+        viverra nec consectetur ante hendrerit. Donec et mollis dolor. Praesent
+        et diam eget libero egestas mattis sit amet vitae augue.
+        ''')
+        tc.add_section(TestCaseDoc.DESCR, content, lineno=55)
+        self.assertEqual(tc.build_rst(), content)
+
+    def test_rsttestcasedoc_build_rst_onesection_header(self):
+        tc = RstTestCaseDoc()
+        content = textwrap.dedent('''\
+        Hello World Test Case
+        *********************
+
+        .. test_metadata:: author foo@example.com
+        .. test_metadata:: date 2015-11-06
+        .. test_metadata:: comment Hello world.
+        ''')
+        tc.add_section(TestCaseDoc._HEAD, content, lineno=11)
+        self.assertEqual(tc.build_rst(), content)
+
+    def test_rsttestcasedoc_build_rst_multiple_sections(self):
+        tc = RstTestCaseDoc()
+        description = textwrap.dedent('''\
+        Description
+        ===========
+
+        There is no Description.
+        ''')
+        setup = textwrap.dedent('''\
+        Setup
+        =====
+
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        ''')
+        expected_rst = textwrap.dedent('''\
+        Description
+        ===========
+
+        There is no Description.
+
+        Setup
+        =====
+
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        ''')
+        tc.add_section(TestCaseDoc.SETUP, setup)
+        tc.add_section(TestCaseDoc.DESCR, description)
+        self.assertEqual(tc.build_rst(), expected_rst)
+
+    def test_rsttestcasedoc_build_rst_single_action(self):
+        tc = RstTestCaseDoc()
+        step_1 = textwrap.dedent('''\
+        .. test_step:: 1
+
+            List files in the volume: ``ls -a /mnt/helloworld``
+        ''')
+        expected_rst = textwrap.dedent('''\
+        Test Steps
+        ==========
+
+        .. test_step:: 1
+
+            List files in the volume: ``ls -a /mnt/helloworld``
+        ''')
+        tc.add_test_action("test_step", step_1, 1)
+        self.assertEqual(tc.build_rst(), expected_rst)
+
+    def test_rsttestcasedoc_build_rst_multiple_actions(self):
+        tc = RstTestCaseDoc()
+        step_1 = textwrap.dedent('''\
+        .. test_step:: 1
+
+            List files in the volume: ``ls -a /mnt/helloworld``
+        ''')
+        result_1 = textwrap.dedent('''\
+        .. test_result:: 1
+
+            There are no files, output should be empty.
+        ''')
+        step_2 = textwrap.dedent('''\
+        .. test_step:: 2
+
+            Donec et mollis dolor::
+
+                $ foo --extra sth
+                $ bar -vvv
+        ''')
+        expected_rst = textwrap.dedent('''\
+        Test Steps
+        ==========
+
+        .. test_step:: 1
+
+            List files in the volume: ``ls -a /mnt/helloworld``
+
+        .. test_result:: 1
+
+            There are no files, output should be empty.
+
+        .. test_step:: 2
+
+            Donec et mollis dolor::
+
+                $ foo --extra sth
+                $ bar -vvv
+        ''')
+        # call `add_test_action` in "random" order
+        tc.add_test_action("test_step", step_2, 2)
+        tc.add_test_action("test_result", result_1, 1)
+        tc.add_test_action("test_step", step_1, 1)
+        self.assertEqual(tc.build_rst(), expected_rst)
+
+    def test_rsttestcasedoc_build_rst_multiple_actions_autoid(self):
+        tc = RstTestCaseDoc()
+        step_1 = textwrap.dedent('''\
+        .. test_step::
+
+            List files in the volume: ``ls -a /mnt/helloworld``
+        ''')
+        result_1 = textwrap.dedent('''\
+        .. test_result::
+
+            There are no files, output should be empty.
+        ''')
+        step_2 = textwrap.dedent('''\
+        .. test_step::
+
+            Donec et mollis dolor::
+
+                $ foo --extra sth
+                $ bar -vvv
+        ''')
+        expected_rst = textwrap.dedent('''\
+        Test Steps
+        ==========
+
+        .. test_step::
+
+            List files in the volume: ``ls -a /mnt/helloworld``
+
+        .. test_result::
+
+            There are no files, output should be empty.
+
+        .. test_step::
+
+            Donec et mollis dolor::
+
+                $ foo --extra sth
+                $ bar -vvv
+        ''')
+        # don't include action ids
+        tc.add_test_action("test_step", step_1, None)
+        tc.add_test_action("test_result", result_1, None)
+        tc.add_test_action("test_step", step_2, None)
+        self.assertEqual(tc.build_rst(), expected_rst)
+
+    def test_rsttestcasedoc_build_rst_multiple_actions_with_section(self):
+        tc = RstTestCaseDoc()
+        section_content = textwrap.dedent('''\
+        Test Steps
+        ==========
+
+        .. test_step:: 1
+
+            Here is the first step.
+
+        .. test_result:: 1
+
+            And the 2nd result.
+        ''')
+        step_2 = textwrap.dedent('''\
+        .. test_step:: 2
+
+            List files in the volume: ``ls -a /mnt/helloworld``
+        ''')
+        result_2 = textwrap.dedent('''\
+        .. test_result:: 2
+
+            There are no files, output should be empty.
+        ''')
+        step_3 = textwrap.dedent('''\
+        .. test_step:: 3
+
+            Donec et mollis dolor::
+
+                $ foo --extra sth
+                $ bar -vvv
+        ''')
+        expected_rst = textwrap.dedent('''\
+        Test Steps
+        ==========
+
+        .. test_step:: 1
+
+            Here is the first step.
+
+        .. test_result:: 1
+
+            And the 2nd result.
+
+        .. test_step:: 2
+
+            List files in the volume: ``ls -a /mnt/helloworld``
+
+        .. test_result:: 2
+
+            There are no files, output should be empty.
+
+        .. test_step:: 3
+
+            Donec et mollis dolor::
+
+                $ foo --extra sth
+                $ bar -vvv
+        ''')
+        # call `add_test_action` in "random" order
+        tc.add_test_action("test_step", step_3, 3)
+        tc.add_test_action("test_result", result_2, 2)
+        tc.add_test_action("test_step", step_2, 2)
+        # and add test case section
+        tc.add_section(TestCaseDoc.STEPS, section_content)
+        self.assertEqual(tc.build_rst(), expected_rst)
