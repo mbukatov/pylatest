@@ -30,6 +30,7 @@ import sys
 from docutils import nodes
 
 from pylatest.document import TestCaseDoc, RstTestCaseDoc, Section
+from pylatest.rstsource import find_actions, find_sections
 import pylatest.xdocutils.client
 
 
@@ -117,6 +118,7 @@ class TestCaseDocFragments(object):
     """
 
     def __init__(self):
+        # TODO: rename
         self.docstrings = {}
         """
         List of docstrings with at least one section, line number -> string
@@ -143,44 +145,40 @@ class TestCaseDocFragments(object):
             docstring (str): content of single docstring expression
             lineno (int): line number of the docstring
         """
+        # TODO: also, why do I store the lineno like this?
         self.docstrings[lineno] = docstring
 
     # TODO: next time start here
-    # TODO: cache of the build (if nothing changed - for merging def doc.)
-    def build_doc(self, ignore_errors=True):
+    def build_doc(self):
         """
         Build RstTestCaseDoc object based on pylatest string literals (aka
         document fragments) stored in this object.
         """
-        if self.default is not None:
-            rst_doc = self.default.build_doc()
+        if self.default is None:
+            doc = RstTestCaseDoc()
         else:
-            rst_doc = RstTestCaseDoc()
-
+            # TODO: this builds the default doc every time, cache the build
+            # (if nothing changed - for merging def doc.)
+            doc = self.default.build_doc()
+        # find pylatest document sections/directives in every fragment
         for lineno, doc_str in self.docstrings.items():
-            # TODO: use the new rstsource functions there
-
-            if len(sections) == 0 and test_directive_count == 0:
-                continue
-            elif len(sections) == 0 and test_directive_count > 0:
-                self.add_test_action(docstring, lineno)
-                status_success = True
-            elif len(sections) > 0 and test_directive_count == 0:
-                if TestCaseDoc.STEPS in sections:
-                    # we have Test Steps section without test step directives
-                    msg = "found 'Test Steps' section without test step direcives"
-                    # self._add_error(msg, lineno)
-                self.add_section(docstring, lineno, sections)
-                status_success = True
-            elif len(sections) > 0 and test_directive_count > 0:
-                if TestCaseDoc.STEPS not in sections:
-                    msg = ("docstring with multiple sections contains test step"
-                          " directives, but no 'Test Steps' section was found")
-                    # self._add_error(msg, lineno)
-                self.add_section(docstring, lineno, sections)
-                status_success = True
-
-        return rst_doc
+            doc_str_lines = doc_str.splitlines()
+            for rst_act in find_actions(doc_str):
+                doc.add_test_action(
+                    rst_act.action_name,
+                    doc_str_lines[rst_act.start_line-1:rst_act.end_line],
+                    rst_act.action_id,
+                    lineno)
+            for rst_sct in find_sections(doc_str):
+                if rst_sct.title is None:
+                    section = TestCaseDoc._HEAD
+                else:
+                    section = Section(rst_sct.title)
+                doc.add_section(
+                    section,
+                    doc_str_lines[rst_sct.start_line-1:rst_sct.end_line],
+                    lineno)
+        return doc
 
 
 def main():

@@ -178,6 +178,7 @@ class TestTestCaseDocFragments(unittest.TestCase):
     """
 
     def setUp(self):
+        pylatest.xdocutils.client.register_plain()
         self.fragments = pysource.TestCaseDocFragments()
 
     def test_docfragments_null(self):
@@ -198,6 +199,54 @@ class TestTestCaseDocFragments(unittest.TestCase):
             self.fragments.add_fragment("just another_one", i + 10)
         self.assertEqual(len(self.fragments), 11)
         self.assertIsNone(self.fragments.default)
+
+    def test_docfragments_build_doc_empty(self):
+        doc = self.fragments.build_doc()
+        self.assertTrue(doc.is_empty())
+
+    def test_docfragments_build_doc_singlestep(self):
+        str_fragment = textwrap.dedent('''\
+        .. test_step:: 1
+
+            List files in the volume: ``ls -a /mnt/helloworld``
+        ''')
+        self.fragments.add_fragment(str_fragment, lineno=11)
+        doc = self.fragments.build_doc()
+        self.assertFalse(doc.is_empty())
+        self.assertTrue(TestCaseDoc.STEPS in doc.sections)
+
+    def test_docfragments_build_doc_multiple(self):
+        fragment_one = textwrap.dedent('''\
+        .. test_step:: 1
+
+            List files in the volume: ``ls -a /mnt/helloworld``
+        ''')
+        fragment_two = textwrap.dedent('''\
+        Hello World Test Case
+        *********************
+
+        .. test_metadata:: author foo@example.com
+        .. test_metadata:: date 2015-11-06
+
+        Description
+        ===========
+
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam
+        lectus.  Sed sit amet ipsum mauris. Maecenas congue ligula ac quam
+
+        Teardown
+        ========
+
+        #. Lorem ipsum dolor sit amet: ``rm -rf /mnt/helloworld``.
+        ''')
+        self.fragments.add_fragment(fragment_one, lineno=11)
+        self.fragments.add_fragment(fragment_two, lineno=131)
+        doc = self.fragments.build_doc()
+        self.assertFalse(doc.is_empty())
+        self.assertTrue(TestCaseDoc._HEAD in doc.sections)
+        self.assertTrue(TestCaseDoc.DESCR in doc.sections)
+        self.assertTrue(TestCaseDoc.STEPS in doc.sections)
+        self.assertTrue(TestCaseDoc.TEARD in doc.sections)
 
 
 class TestExtractDocumentFragments(unittest.TestCase):
