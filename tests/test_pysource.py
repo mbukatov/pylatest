@@ -332,9 +332,6 @@ class TestExtractDocumentFragments(unittest.TestCase):
             self.assertEqual(len(doc_fragments.default), 2)
 
 
-# TODO: extraction from python source is being hacked on, so just make it clear
-
-
 class TestPylatestDocumentExtractionOneCaseOneFile(unittest.TestCase):
     """
     Test extraction of entire pylatest document from single python source file.
@@ -352,27 +349,36 @@ class TestPylatestDocumentExtractionOneCaseOneFile(unittest.TestCase):
     def _test_extract_document_noerrors(self, testname):
         source = read_file("onecaseperfile", testname)
         expected_result = read_file("onecaseperfile", "rst")
-        doc_dict = pysource.extract_documents(source)
-        self.assertEqual(len(doc_dict), 1)
-        doc = doc_dict[None]
-        self.assertEqual(list(doc.errors()), [])
-        self.assertEqual(doc.recreate(), expected_result)
-        self.assertEqual(list(doc.errors_lastrecreate()), [])
-        self.assertFalse(doc.has_errors())
+        # extract TestCaseDocFragments from the python source file
+        docfr_dict = pysource.extract_doc_fragments(source)
+        # there should be just one test case document
+        self.assertEqual(len(docfr_dict), 1)
+        # this document is without pylatest id
+        doc_fr = docfr_dict[None]
+        # then build RstTestCaseDoc from TestCaseDocFragments
+        doc = doc_fr.build_doc()
+        # and finally build the rst source version
+        self.assertEqual(doc.build_rst(), expected_result)
 
     def _test_extract_document_mangled(self, testname, resultname):
         source = read_file("onecaseperfile", testname)
         expected_result = read_file("onecaseperfile", resultname)
-        doc_dict = pysource.extract_documents(source)
-        self.assertEqual(len(doc_dict), 1)
-        doc = doc_dict[None]
-        self.assertEqual(doc.recreate(), expected_result)
-        self.assertTrue(doc.has_errors())
+        # extract TestCaseDocFragments from the python source file
+        docfr_dict = pysource.extract_doc_fragments(source)
+        # there should be just one test case document
+        self.assertEqual(len(docfr_dict), 1)
+        # this document is without pylatest id
+        doc_fr = docfr_dict[None]
+        # TODO: needs update to work with new error handling (not yet done)
+        # then build RstTestCaseDoc from TestCaseDocFragments
+        doc = doc_fr.build_doc()
+        # and finally build the rst source version
+        self.assertEqual(doc.build_rst(), expected_result)
 
     def test_extract_document_null(self):
         source = read_file("onecaseperfile", "null.py")
-        doc_dict = pysource.extract_documents(source)
-        self.assertEqual(doc_dict, {})
+        docfr_dict = pysource.extract_doc_fragments(source)
+        self.assertEqual(docfr_dict, {})
 
     def test_extract_document_single(self):
         self._test_extract_document_noerrors("single.py")
@@ -435,18 +441,19 @@ class TestPylatestDocumentsExtractionMultipleCasesPerFile(unittest.TestCase):
         pylatest.xdocutils.client.register_plain()
 
     def _test_extract_documents_noerrors(self, doc_num, testname):
+        # TODO: needs update to work with new error handling (not yet done)
         source = read_file("multiplecasesperfile", testname)
-        doc_dict = pysource.extract_documents(source)
-        self.assertEqual(len(doc_dict), doc_num)
-        for doc_id, doc in doc_dict.items():
+        # extract TestCaseDocFragments from the python source file
+        docfr_dict = pysource.extract_doc_fragments(source)
+        self.assertEqual(len(docfr_dict), doc_num)
+        for doc_id, doc_fr in docfr_dict.items():
             if doc_id is None:
                 doc_id = "none"
             filename = "{}.rst".format(doc_id)
             expected_result = read_file("multiplecasesperfile", filename)
-            self.assertEqual(list(doc.errors()), [])
-            self.assertEqual(doc.recreate(), expected_result)
-            self.assertEqual(list(doc.errors_lastrecreate()), [])
-            self.assertFalse(doc.has_errors())
+            # build RstTestCaseDoc from TestCaseDocFragments
+            doc = doc_fr.build_doc()
+            self.assertEqual(doc.build_rst(), expected_result)
 
     def test_extract_documents_splitted_nested(self):
         self._test_extract_documents_noerrors(2, "splitted-nested.py")

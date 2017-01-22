@@ -164,9 +164,11 @@ class TestCaseDocFragments(object):
         for lineno, doc_str in self.docstrings.items():
             doc_str_lines = doc_str.splitlines()
             for rst_act in find_actions(doc_str):
+                content = "\n".join(
+                    doc_str_lines[rst_act.start_line-1:rst_act.end_line])
                 doc.add_test_action(
                     rst_act.action_name,
-                    doc_str_lines[rst_act.start_line-1:rst_act.end_line],
+                    content,
                     rst_act.action_id,
                     lineno)
             for rst_sct in find_sections(doc_str):
@@ -174,10 +176,9 @@ class TestCaseDocFragments(object):
                     section = TestCaseDoc._HEAD
                 else:
                     section = Section(rst_sct.title)
-                doc.add_section(
-                    section,
-                    doc_str_lines[rst_sct.start_line-1:rst_sct.end_line],
-                    lineno)
+                content = "\n".join(
+                    doc_str_lines[rst_sct.start_line-1:rst_sct.end_line])
+                doc.add_section(section, content, lineno)
         return doc
 
 
