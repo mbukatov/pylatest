@@ -111,6 +111,14 @@ def extract_doc_fragments(source):
     return docfr_dict
 
 
+def extract_content(str_lines, start, end):
+    """
+    Extract content on given lines (start, end) from str_lines list and return
+    it as a single string.
+    """
+    return "\n".join(str_lines[start-1:end]) + '\n'
+
+
 class TestCaseDocFragments(object):
     """
     Pylatest strings of with a test case description extracted from python
@@ -148,7 +156,6 @@ class TestCaseDocFragments(object):
         # TODO: also, why do I store the lineno like this?
         self.docstrings[lineno] = docstring
 
-    # TODO: next time start here
     def build_doc(self):
         """
         Build RstTestCaseDoc object based on pylatest string literals (aka
@@ -164,8 +171,8 @@ class TestCaseDocFragments(object):
         for lineno, doc_str in self.docstrings.items():
             doc_str_lines = doc_str.splitlines()
             for rst_act in find_actions(doc_str):
-                content = "\n".join(
-                    doc_str_lines[rst_act.start_line-1:rst_act.end_line])
+                content = extract_content(
+                    doc_str_lines, rst_act.start_line, rst_act.end_line)
                 doc.add_test_action(
                     rst_act.action_name,
                     content,
@@ -176,8 +183,8 @@ class TestCaseDocFragments(object):
                     section = TestCaseDoc._HEAD
                 else:
                     section = Section(rst_sct.title)
-                content = "\n".join(
-                    doc_str_lines[rst_sct.start_line-1:rst_sct.end_line])
+                content = extract_content(
+                    doc_str_lines, rst_sct.start_line, rst_sct.end_line)
                 doc.add_section(section, content, lineno)
         return doc
 
