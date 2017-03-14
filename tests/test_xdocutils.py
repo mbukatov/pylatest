@@ -77,7 +77,7 @@ class TestDocutilsPlain(TestBasePlain):
         ''')
         exp_result = textwrap.dedent('''\
         <div class="document">
-        <div class="container">
+        <div class="docutils container">
         Ceterum censeo Carthaginem esse delendam.</div>
         </div>
         ''')
