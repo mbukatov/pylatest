@@ -48,8 +48,13 @@ class TestFindSections(unittest.TestCase):
         ***********
 
         There are no sections, just a document title.
+        But in this case, it's evaluated as a section, so that
+        we are able to detect section fragments.
         ''')
-        self.assertEqual(rstsource.find_sections(src), [])
+        exp_sections = [
+            rstsource.RstSection("Hello World", 1, 6),
+            ]
+        self.assertEqual(rstsource.find_sections(src), exp_sections)
 
     def test_find_sections_docwithoutsections_two(self):
         src = textwrap.dedent('''\

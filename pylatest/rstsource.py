@@ -100,6 +100,10 @@ def find_sections(rst_source):
     """
     # parse rst_source string to get rst node tree
     nodetree = publish_doctree(source=rst_source)
+    # shortcut: immediatelly return for empty doc (so that we can assume
+    # nonempty nodetree later)
+    if len(rst_source) == 0 or len(nodetree) == 0:
+        return []
     # look for rst sections
     sections = []
     prev_section = None
@@ -131,6 +135,17 @@ def find_sections(rst_source):
         else:
             section = RstSection(None, 1, sections[0].start_line - 2)
             sections.append(section)
+    # a special case: this is necessary to be able to find sections fragments
+    # (rst source which contains just title and some content) - as long as rst
+    # parser is concerned, it's a rst document, but wrt pylatest test case
+    # document, it represent a mere fragment, particular section from a test
+    # case
+    if len(sections) == 0 and \
+       nodetree[0].tagname == "title" and \
+       rst_source[0].isalpha():
+        title = nodetree[0].astext()
+        section = RstSection(title, 1, get_last_line_num(rst_source))
+        sections.append(section)
     return sections
 
 
