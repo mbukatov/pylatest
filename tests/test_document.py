@@ -401,6 +401,36 @@ class TestRstTestCaseDocBuild(unittest.TestCase):
         tc.add_test_action("test_step", step_1, 1)
         self.assertEqual(tc.build_rst(), expected_rst)
 
+    def test_rsttestcasedoc_build_rst_single_action_single_section(self):
+        tc = RstTestCaseDoc()
+        step_1 = textwrap.dedent('''\
+        .. test_step:: 1
+
+            List files in the volume: ``ls -a /mnt/helloworld``
+        ''')
+        description = textwrap.dedent('''\
+        Description
+        ===========
+
+        There is no Description.
+        ''')
+        expected_rst = textwrap.dedent('''\
+        Description
+        ===========
+
+        There is no Description.
+
+        Test Steps
+        ==========
+
+        .. test_step:: 1
+
+            List files in the volume: ``ls -a /mnt/helloworld``
+        ''')
+        tc.add_test_action("test_step", step_1, 1)
+        tc.add_section(TestCaseDoc.DESCR, description)
+        self.assertEqual(tc.build_rst(), expected_rst)
+
     def test_rsttestcasedoc_build_rst_multiple_actions(self):
         tc = RstTestCaseDoc()
         step_1 = textwrap.dedent('''\
