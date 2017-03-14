@@ -492,6 +492,10 @@ class TestRstTestCaseDocBuild(unittest.TestCase):
         self.assertEqual(tc.build_rst(), expected_rst)
 
     def test_rsttestcasedoc_build_rst_multiple_actions_with_section(self):
+        """
+        Note that when some test action directives are present, the actual
+        content of test steps section is ignored (no matter what is there).
+        """
         tc = RstTestCaseDoc()
         section_content = textwrap.dedent('''\
         Test Steps
@@ -526,14 +530,6 @@ class TestRstTestCaseDocBuild(unittest.TestCase):
         expected_rst = textwrap.dedent('''\
         Test Steps
         ==========
-
-        .. test_step:: 1
-
-            Here is the first step.
-
-        .. test_result:: 1
-
-            And the 2nd result.
 
         .. test_step:: 2
 

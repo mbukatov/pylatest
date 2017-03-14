@@ -319,12 +319,18 @@ class RstTestCaseDoc(TestCaseDoc):
             content = self._section_dict.get(section)
             # section "Test steps" requires special care
             if section == TestCaseDoc.STEPS:
-                if content is not None:
-                    result_list.append(content)
-                elif len(self._test_actions) > 0:
+                # we regenerate Test Steps section based on just test
+                # actions ignoring any already existing content of the section
+                # (if exists).
+                if len(self._test_actions) > 0:
                     result_list.append(section.get_rst_header())
-                # put together test steps
-                for content in self._test_actions.iter_content():
+                    # put together test steps
+                    for content in self._test_actions.iter_content():
+                        result_list.append(content)
+                # only when there are no test actions, we use content of
+                # the test step section as it is - unless there is no such
+                # content obviously ...
+                elif content is not None:
                     result_list.append(content)
             # while all other sections are included as they are
             elif content is not None:
