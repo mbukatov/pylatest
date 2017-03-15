@@ -248,6 +248,40 @@ class TestTestCaseDocFragments(unittest.TestCase):
         self.assertTrue(TestCaseDoc.STEPS in doc.sections)
         self.assertTrue(TestCaseDoc.TEARD in doc.sections)
 
+    def test_docfragments_build_doc_multiple_buildmany(self):
+        fragment_one = textwrap.dedent('''\
+        .. test_step:: 1
+
+            List files in the volume: ``ls -a /mnt/helloworld``
+        ''')
+        fragment_two = textwrap.dedent('''\
+        Hello World Test Case
+        *********************
+
+        .. test_metadata:: author foo@example.com
+        .. test_metadata:: date 2015-11-06
+
+        Description
+        ===========
+
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam
+        lectus.  Sed sit amet ipsum mauris. Maecenas congue ligula ac quam
+
+        Teardown
+        ========
+
+        #. Lorem ipsum dolor sit amet: ``rm -rf /mnt/helloworld``.
+        ''')
+        self.fragments.add_fragment(fragment_one, lineno=11)
+        self.fragments.add_fragment(fragment_two, lineno=131)
+        # buil few docs from the fragments
+        doc1 = self.fragments.build_doc()
+        doc2 = self.fragments.build_doc()
+        doc3 = self.fragments.build_doc()
+        # every build should be independent and lead the the same result
+        self.assertEqual(doc1, doc2)
+        self.assertEqual(doc2, doc3)
+
     def test_docfragments_build_doc_multiple_fragmented(self):
         rst_fragments = [
             textwrap.dedent("""\

@@ -226,6 +226,15 @@ class TestRstTestCaseDoc(unittest.TestCase):
         self.assertEqual(tc.sections, [])
         self.assertEqual(tc.missing_sections, TestCaseDoc.SECTIONS_ALL)
 
+    def test_rsttestcasedoc_eq_self_empty(self):
+        tc = RstTestCaseDoc()
+        self.assertEqual(tc, tc)
+
+    def test_rsttestcasedoc_eq_empty(self):
+        tc1 = RstTestCaseDoc()
+        tc2 = RstTestCaseDoc()
+        self.assertEqual(tc1, tc2)
+
     def test_rsttestcasedoc_add_section_simple(self):
         tc = RstTestCaseDoc()
         tc.add_section(TestCaseDoc.DESCR, "string content", lineno=42)
@@ -316,6 +325,28 @@ class TestRstTestCaseDoc(unittest.TestCase):
         self.assertEqual(
             sorted(tc.missing_sections + tc.sections),
             sorted(TestCaseDoc.SECTIONS_ALL))
+
+    def test_rsttestcasedoc_eq_self_nonempty(self):
+        tc = RstTestCaseDoc()
+        tc.add_section(TestCaseDoc._HEAD, "header", lineno=10)
+        tc.add_section(TestCaseDoc.DESCR, "description", lineno=55)
+        tc.add_test_action("test_step", "test step", 1)
+        tc.add_test_action("test_result", "test result", 1)
+        tc.add_test_action("test_step", "another test step", 2)
+        self.assertEqual(tc, tc)
+        self.assertFalse(tc.is_empty())
+
+    def test_rsttestcasedoc_eq_nonempty(self):
+        tc1 = RstTestCaseDoc()
+        tc2 = RstTestCaseDoc()
+        for tc in (tc1, tc2):
+            tc.add_section(TestCaseDoc._HEAD, "header", lineno=10)
+            tc.add_section(TestCaseDoc.DESCR, "description", lineno=55)
+            tc.add_test_action("test_step", "test step", 1)
+            tc.add_test_action("test_result", "test result", 1)
+            tc.add_test_action("test_step", "another test step", 2)
+        self.assertEqual(tc1, tc2)
+        self.assertEqual(tc1.is_empty(), tc2.is_empty())
 
 
 class TestRstTestCaseDocBuild(unittest.TestCase):

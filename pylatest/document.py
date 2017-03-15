@@ -259,6 +259,10 @@ class RstTestCaseDoc(TestCaseDoc):
         # TODO: set a proper value (lineno values are specified wrt this file)
         self._source_file = None
 
+    def __eq__(self, other):
+        return self._section_dict == other._section_dict and \
+               self._test_actions == other._test_actions
+
     def add_section(self, section, content, lineno=None):
         """
         Add string fragment which contains given sections.
