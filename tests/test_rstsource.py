@@ -56,6 +56,29 @@ class TestFindSections(unittest.TestCase):
             ]
         self.assertEqual(rstsource.find_sections(src), exp_sections)
 
+    def test_find_sections_docwithoutsections_one_another(self):
+        """
+        The same case as test_find_sections_docwithoutsections_one.
+        """
+        src = textwrap.dedent('''\
+        Description
+        ===========
+
+        This is just demonstration of usage of pylatest rst directives and
+        expected structure of rst document.
+
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam
+        lectus.  Sed sit amet ipsum mauris. Maecenas congue ligula ac quam
+        viverra nec consectetur ante hendrerit. Donec et mollis dolor. Praesent
+        et diam eget libero egestas mattis sit amet vitae augue.
+
+        See :BZ:`439858` for more details.
+        ''')
+        exp_sections = [
+            rstsource.RstSection(TestCaseDoc.DESCR.title, 1, 12),
+            ]
+        self.assertEqual(rstsource.find_sections(src), exp_sections)
+
     def test_find_sections_docwithoutsections_two(self):
         src = textwrap.dedent('''\
         =============
@@ -660,223 +683,3 @@ class TestFindActions(unittest.TestCase):
             rstsource.RstTestAction(5, "test_step", 37, 41),
             ]
         self.assertEqual(rstsource.find_actions(src), exp_actions)
-
-
-class TestPylatestDocstringProcessing(unittest.TestCase):
-    """
-    Test processing of pylatest docstrings.
-    """
-
-    def setUp(self):
-        # commons steps required for all test cases
-        pylatest.xdocutils.client.register_plain()
-
-    def test_detect_docstring_sections_empty(self):
-        self.assertEqual(rstsource.detect_docstring_sections(""), ([], 0))
-
-    def test_detect_docstring_sections_nocontent(self):
-        src = textwrap.dedent('''\
-        Hello World Test Case
-        *********************
-
-        There are no pylatest data in this string.
-
-        Test Stuff
-        ==========
-
-        Really, Hic sunt leones ...
-        ''')
-        self.assertEqual(rstsource.detect_docstring_sections(src), ([], 0))
-
-    def test_detect_docstring_sections_header(self):
-        src = textwrap.dedent('''\
-        Hello World Test Case
-        *********************
-
-        .. test_metadata:: author foo@example.com
-        .. test_metadata:: date 2015-11-06
-        .. test_metadata:: comment Hello world.
-        ''')
-        expected_result = ([TestCaseDoc._HEAD], 0)
-        actual_result = rstsource.detect_docstring_sections(src)
-        self.assertEqual(actual_result, expected_result)
-
-    def test_detect_docstring_sections_description(self):
-        src = textwrap.dedent('''\
-        Description
-        ===========
-
-        This is just demonstration of usage of pylatest rst directives and
-        expected structure of rst document.
-
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam
-        lectus.  Sed sit amet ipsum mauris. Maecenas congue ligula ac quam
-        viverra nec consectetur ante hendrerit. Donec et mollis dolor. Praesent
-        et diam eget libero egestas mattis sit amet vitae augue.
-
-        See :BZ:`439858` for more details.
-        ''')
-        expected_result = ([TestCaseDoc.DESCR], 0)
-        actual_result = rstsource.detect_docstring_sections(src)
-        self.assertEqual(actual_result, expected_result)
-
-    def test_detect_docstring_sections_setup(self):
-        src = textwrap.dedent('''\
-        Setup
-        =====
-
-        #. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a
-           diam lectus. Sed sit amet ipsum mauris.
-
-        #. Use lvm disk paritioning and Leave 10G free space in volume
-           called ``lv_helloword``.
-
-        #. When the system is installed, format ``lv_helloword`` volume with
-           brtfs using ``--super --special --options``.
-
-        #. Mount it on a client::
-
-            # mount -t btrfs /dev/mapper/vg_fedora/lv_helloword /mnt/helloworld
-
-        #. Ceterum censeo, lorem ipsum::
-
-            # dnf install foobar
-            # systemctl enable foobard
-        ''')
-        expected_result = ([TestCaseDoc.SETUP], 0)
-        actual_result = rstsource.detect_docstring_sections(src)
-        self.assertEqual(actual_result, expected_result)
-
-    def test_detect_docstring_sections_teardown(self):
-        src = textwrap.dedent('''\
-        Teardown
-        ========
-
-        #. Lorem ipsum dolor sit amet: ``rm -rf /mnt/helloworld``.
-
-        #. Umount and remove ``lv_helloword`` volume.
-
-        #. The end.
-        ''')
-        expected_result = ([TestCaseDoc.TEARD], 0)
-        actual_result = rstsource.detect_docstring_sections(src)
-        self.assertEqual(actual_result, expected_result)
-
-    def test_detect_docstring_sections_teststep_single(self):
-        src = textwrap.dedent('''\
-        .. test_step:: 1
-
-            List files in the volume: ``ls -a /mnt/helloworld``
-        ''')
-        expected_result = ([], 1)
-        actual_result = rstsource.detect_docstring_sections(src)
-        self.assertEqual(actual_result, expected_result)
-
-    def test_detect_docstring_sections_teststep_many(self):
-        src = textwrap.dedent('''\
-        .. test_step:: 1
-
-            List files in the volume: ``ls -a /mnt/helloworld``
-
-        .. test_result:: 1
-
-            There are no files, output should be empty.
-
-        .. test_step:: 2
-
-            Donec et mollis dolor::
-
-                $ foo --extra sth
-                $ bar -vvv
-
-        .. test_result:: 2
-
-            Maecenas congue ligula ac quam viverra nec
-            consectetur ante hendrerit.
-
-        .. test_step:: 3
-
-            This one has no matching test result.
-
-        .. test_result:: 4
-
-            And this result has no test step.
-
-        .. test_step:: 5
-
-            List files in the volume: ``ls -a /mnt/helloworld``
-        ''')
-        expected_result = ([], 7)
-        actual_result = rstsource.detect_docstring_sections(src)
-        self.assertEqual(actual_result, expected_result)
-
-    def test_detect_docstring_sections_teststeps(self):
-        src = textwrap.dedent('''\
-        Test Steps
-        ==========
-
-        .. test_step:: 1
-
-            List files in the volume: ``ls -a /mnt/helloworld``
-
-        .. test_result:: 1
-
-            There are no files, output should be empty.
-        ''')
-        expected_result = ([TestCaseDoc.STEPS], 2)
-        actual_result = rstsource.detect_docstring_sections(src)
-        self.assertEqual(actual_result, expected_result)
-
-    def test_detect_docstring_sections_multi_header_teststeps(self):
-        src = textwrap.dedent('''\
-        Hello World Test Case
-        *********************
-
-        .. test_metadata:: author foo@example.com
-        .. test_metadata:: date 2015-11-06
-
-        Test Steps
-        ==========
-
-        .. test_step:: 1
-
-            List files in the volume: ``ls -a /mnt/helloworld``
-
-        .. test_result:: 1
-
-            There are no files, output should be empty.
-        ''')
-        # note that order of sections is not defined
-        expected_result = (sorted([TestCaseDoc._HEAD, TestCaseDoc.STEPS]), 2)
-        actual_result = rstsource.detect_docstring_sections(src)
-        actual_result = (sorted(actual_result[0]), actual_result[1])
-        self.assertEqual(actual_result, expected_result)
-
-    def test_detect_docstring_sections_multi_header_emptysteps_teardown(self):
-        src = textwrap.dedent('''\
-        Hello World Test Case
-        *********************
-
-        .. test_metadata:: author foo@example.com
-        .. test_metadata:: date 2015-11-06
-
-        Test Steps
-        ==========
-
-        There are no test steps!
-
-        Teardown
-        ========
-
-        #. Lorem ipsum dolor sit amet: ``rm -rf /mnt/helloworld``.
-
-        #. Umount and remove ``lv_helloword`` volume.
-
-        #. The end.
-        ''')
-        # note that order of sections is not defined
-        expected_sections = [TestCaseDoc._HEAD, TestCaseDoc.STEPS, TestCaseDoc.TEARD]
-        expected_result = (sorted(expected_sections), 0)
-        actual_result = rstsource.detect_docstring_sections(src)
-        actual_result = (sorted(actual_result[0]), actual_result[1])
-        self.assertEqual(actual_result, expected_result)
