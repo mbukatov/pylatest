@@ -497,6 +497,8 @@ class TestPylatestDocumentExtractionOneCaseOneFile(unittest.TestCase):
         doc = doc_fr.build_doc()
         # and finally build the rst source version
         self.assertEqual(doc.build_rst(), expected_result)
+        # every build should be the same
+        self.assertEqual(doc.build_rst(), expected_result)
 
     def _test_extract_document_mangled(self, testname, resultname):
         source = read_file("onecaseperfile", testname)
@@ -511,6 +513,8 @@ class TestPylatestDocumentExtractionOneCaseOneFile(unittest.TestCase):
         # then build RstTestCaseDoc from TestCaseDocFragments
         doc = doc_fr.build_doc()
         # and finally build the rst source version
+        self.assertEqual(doc.build_rst(), expected_result)
+        # every build should be the same
         self.assertEqual(doc.build_rst(), expected_result)
 
     def test_extract_document_null(self):
@@ -591,6 +595,8 @@ class TestPylatestDocumentsExtractionMultipleCasesPerFile(unittest.TestCase):
             expected_result = read_file("multiplecasesperfile", filename)
             # build RstTestCaseDoc from TestCaseDocFragments
             doc = doc_fr.build_doc()
+            self.assertEqual(doc.build_rst(), expected_result)
+            # every build should be the same
             self.assertEqual(doc.build_rst(), expected_result)
 
     def test_extract_documents_splitted_nested(self):
