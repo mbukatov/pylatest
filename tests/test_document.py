@@ -250,8 +250,8 @@ class TestRstTestCaseDoc(unittest.TestCase):
     def test_rsttestcasedoc_add_section_multiple_duplicit(self):
         tc = RstTestCaseDoc()
         tc.add_section(TestCaseDoc.DESCR, "descr. one", lineno=42)
-        with self.assertRaises(pylatest.document.PylatestDocumentError):
-            tc.add_section(TestCaseDoc.DESCR, "descr. two", lineno=94)
+        # 2nd value overrrides the original one
+        tc.add_section(TestCaseDoc.DESCR, "descr. two", lineno=94)
         self.assertFalse(tc.is_empty())
         self.assertEqual(sorted(tc.sections), sorted([TestCaseDoc.DESCR]))
         self.assertEqual(

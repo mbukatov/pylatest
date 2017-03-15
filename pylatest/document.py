@@ -263,9 +263,6 @@ class RstTestCaseDoc(TestCaseDoc):
         """
         Add string fragment which contains given sections.
         """
-        if self._section_dict.get(section) is not None:
-            msg = "section {} is aready present in this document"
-            raise PylatestDocumentError(msg.format(section))
         self._section_dict[section] = content
         # TODO: process lineno
 
