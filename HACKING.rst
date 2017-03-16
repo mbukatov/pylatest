@@ -8,17 +8,22 @@ Unit tests are located in ``tests/`` directory and are written using plain
 ``unittest`` module from python standard library. There are no custom test
 runners or test suites.
 
-To execute all unit tests, run::
+To execute all unit tests use predefined tox configuration::
 
-    python setup.py test
+    $ tox
 
-To run particular suite, eg. for ``tests/test_document.py``, use::
+The default list of test enviroments executed this way is preconfigured in
+``envlist`` option of ``tox.ini`` file.
 
-    python setup.py test -s tests.test_document
+To use only particular tox test enviroment, for example to
+run tests on python3 only, use::
 
-Note that's possible to go one step further and specify a class name::
+    $ tox -e py35
 
-    python setup.py test -s tests.test_document.TestSectionTuples
+To use use system installed python packages in tox created virtualenvs, use
+sitepackages option (works with both unit tests and flake8 check)::
+
+    $ tox --sitepackages
 
 Installation into virtualenv
 ============================
