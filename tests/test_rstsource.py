@@ -99,7 +99,7 @@ class TestFindSections(unittest.TestCase):
         ''')
         self.assertEqual(rstsource.find_sections(src), [])
 
-    def test_find_sections_metadata_simple(self):
+    def test_find_sections_metadata_simple_one(self):
         src = textwrap.dedent('''\
         Hello World Test Case
         *********************
@@ -115,7 +115,43 @@ class TestFindSections(unittest.TestCase):
             ]
         self.assertEqual(rstsource.find_sections(src), exp_sections)
 
-    def test_find_sections_metadata_with_other_sections(self):
+    def test_find_sections_metadata_simple_two(self):
+        src = textwrap.dedent('''\
+        Just Another Test Case
+        **********************
+
+        .. test_metadata:: author foo.bar@example.com
+        ''')
+        exp_sections = [
+            rstsource.RstSection(None, 1, 4),
+            ]
+        self.assertEqual(rstsource.find_sections(src), exp_sections)
+
+    # TODO: this test case fails, fix this!
+    # root cause is that test_metadata processing hack causes description header
+    # to be recognized as subtitle, so that whole description section seems to be
+    # just part of the header, the issue is reported as:
+    # https://gitlab.com/mbukatov/pylatest/issues/27
+    def test_find_sections_metadata_with_other_sections_one(self):
+        src = textwrap.dedent('''\
+        Just Another Test Case
+        **********************
+
+        .. test_metadata:: author foo.bar@example.com
+
+        Description
+        ===========
+
+        Vivamus fermentum semper porta. Nunc diam velit, adipiscing ut tristique
+        vitae, sagittis vel odio. Maecenas convallis ullamcorper ultricies.
+        ''')
+        exp_sections = [
+            rstsource.RstSection('Description', 6, 10),
+            rstsource.RstSection(None, 1, 4),
+            ]
+        self.assertEqual(rstsource.find_sections(src), exp_sections)
+
+    def test_find_sections_metadata_with_other_sections_two(self):
         src = textwrap.dedent('''\
         Hello World Test Case
         *********************

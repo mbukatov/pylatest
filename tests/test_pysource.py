@@ -248,6 +248,107 @@ class TestTestCaseDocFragments(unittest.TestCase):
         self.assertTrue(TestCaseDoc.STEPS in doc.sections)
         self.assertTrue(TestCaseDoc.TEARD in doc.sections)
 
+    def test_docfragments_build_doc_section_header(self):
+        fragment = textwrap.dedent('''\
+        Just Another Test Case
+        **********************
+
+        .. test_metadata:: author foo.bar@example.com
+
+        Description
+        ===========
+
+        Vivamus fermentum semper porta. Nunc diam velit, adipiscing ut tristique
+        vitae, sagittis vel odio. Maecenas convallis ullamcorper ultricies.
+        ''')
+        expected_head = textwrap.dedent('''\
+        Just Another Test Case
+        **********************
+
+        .. test_metadata:: author foo.bar@example.com
+        ''')
+        expected_desc = textwrap.dedent('''\
+        Description
+        ===========
+
+        Vivamus fermentum semper porta. Nunc diam velit, adipiscing ut tristique
+        vitae, sagittis vel odio. Maecenas convallis ullamcorper ultricies.
+        ''')
+        self.fragments.add_fragment(fragment, lineno=133)
+        doc = self.fragments.build_doc()
+        self.assertFalse(doc.is_empty())
+        self.assertTrue(TestCaseDoc._HEAD in doc.sections)
+        self.assertTrue(TestCaseDoc.DESCR in doc.sections)
+        self.assertTrue(doc2.get_section(TestCaseDoc._HEAD), expected_head_one)
+        self.assertTrue(doc2.get_section(TestCaseDoc.DESCR), expected_desc_one)
+
+    def test_docfragments_build_doc_section_override(self):
+        # 1st fragment
+        fragment_one = textwrap.dedent('''\
+        Just Another Test Case
+        **********************
+
+        .. test_metadata:: author foo.bar@example.com
+
+        Description
+        ===========
+
+        Vivamus fermentum semper porta. Nunc diam velit, adipiscing ut tristique
+        vitae, sagittis vel odio. Maecenas convallis ullamcorper ultricies.
+        Curabitur ornare, ligula semper consectetur sagittis, nisi diam iaculis
+        velit, id fringilla sem nunc vel mi. Nam dictum, odio nec pretium volutpat,
+        arcu ante placerat erat, non tristique elit urna et turpis.
+        ''')
+        # header from 1st fragment
+        expected_head_one = textwrap.dedent('''\
+        Just Another Test Case
+        **********************
+
+        .. test_metadata:: author foo.bar@example.com
+        ''')
+        # description section from 1st fragment
+        expected_desc_one = textwrap.dedent('''\
+        Description
+        ===========
+
+        Vivamus fermentum semper porta. Nunc diam velit, adipiscing ut tristique
+        vitae, sagittis vel odio. Maecenas convallis ullamcorper ultricies.
+        Curabitur ornare, ligula semper consectetur sagittis, nisi diam iaculis
+        velit, id fringilla sem nunc vel mi. Nam dictum, odio nec pretium volutpat,
+        arcu ante placerat erat, non tristique elit urna et turpis.
+        ''')
+        # 2nd fragment and expected description section after update
+        fragment_two = textwrap.dedent('''\
+        Description
+        ===========
+
+        This is just demonstration of usage of pylatest rst directives and expected
+        structure of rst document.
+
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus.
+        Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec
+        consectetur ante hendrerit. Donec et mollis dolor. Praesent et diam eget libero
+        egestas mattis sit amet vitae augue.
+
+        See :BZ:`439858` for more details.
+        ''')
+        # process 1st fragment first
+        self.fragments.add_fragment(fragment_two, lineno=131)
+        doc1 = self.fragments.build_doc()
+        self.assertFalse(doc1.is_empty())
+        self.assertTrue(TestCaseDoc._HEAD in doc1.sections)
+        self.assertTrue(TestCaseDoc.DESCR in doc1.sections)
+        self.assertTrue(doc2.get_section(TestCaseDoc._HEAD), expected_head_one)
+        self.assertTrue(doc2.get_section(TestCaseDoc.DESCR), expected_desc_one)
+        # update: add 2nd fragment and retry
+        self.fragments.add_fragment(fragment_one, lineno=11)
+        doc2 = self.fragments.build_doc()
+        self.assertFalse(doc2.is_empty())
+        self.assertTrue(TestCaseDoc._HEAD in doc2.sections)
+        self.assertTrue(TestCaseDoc.DESCR in doc2.sections)
+        self.assertTrue(doc2.get_section(TestCaseDoc._HEAD), expected_head_one)
+        self.assertTrue(doc2.get_section(TestCaseDoc.DESCR), fragment_two)
+
     def test_docfragments_build_doc_multiple_buildmany(self):
         fragment_one = textwrap.dedent('''\
         .. test_step:: 1
