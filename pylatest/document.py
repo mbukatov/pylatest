@@ -270,6 +270,21 @@ class RstTestCaseDoc(TestCaseDoc):
         self._section_dict[section] = content
         # TODO: process lineno
 
+    def get_section(self, section):
+        """
+        Return content of given section.
+
+        Raises PylatestDocumentError when such section doesn't exist.
+
+        This method was added for to simplify unit testing. It's not
+        necessary for actual functionality.
+        """
+        content = self._section_dict.get(section)
+        if content is None:
+            msg = "section '{}' is not included in this document"
+            raise PylatestDocumentError(msg.format(section))
+        return content
+
     def add_test_action(self, action_name, content, action_id, lineno=None):
         """
         Add docstring which contains some test step or result directives.

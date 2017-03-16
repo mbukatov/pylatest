@@ -256,6 +256,18 @@ class TestRstTestCaseDoc(unittest.TestCase):
             sorted(tc.missing_sections + tc.sections),
             sorted(TestCaseDoc.SECTIONS_ALL))
 
+    def test_rsttestcasedoc_get_section_one(self):
+        tc = RstTestCaseDoc()
+        content = "some content of header section"
+        tc.add_section(TestCaseDoc._HEAD, content, lineno=42)
+        self.assertEqual(tc.get_section(TestCaseDoc._HEAD), content)
+
+    def test_rsttestcasedoc_get_section_one_missing(self):
+        tc = RstTestCaseDoc()
+        tc.add_section(TestCaseDoc._HEAD, "some content", lineno=42)
+        with self.assertRaises(pylatest.document.PylatestDocumentError):
+            tc.get_section(TestCaseDoc.DESCR)
+
     def test_rsttestcasedoc_add_section_multiple_duplicit(self):
         tc = RstTestCaseDoc()
         tc.add_section(TestCaseDoc.DESCR, "descr. one", lineno=42)
