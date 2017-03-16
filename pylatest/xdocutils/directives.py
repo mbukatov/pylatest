@@ -28,13 +28,46 @@ from docutils import nodes
 from docutils.parsers import rst
 
 from pylatest.xdocutils.transforms import TestStepsTableTransform
-from pylatest.xdocutils.transforms import TestStepsPlainTransform
 from pylatest.xdocutils.transforms import TestMetadataTableTransform
 from pylatest.xdocutils.transforms import TestMetadataPlainTransform
 import pylatest.xdocutils.nodes
 
 
-class TestStepsDirective(rst.Directive):
+def arguments2action_id(arguments):
+    """
+    Converts agruments of Rst Directive into action id.
+
+    Note that *action* is couple of test step and result with the same
+    ``action_id``.
+    """
+    if len(arguments) == 0:
+        action_id = None
+    else:
+        action_id = int(arguments[0])
+    return action_id
+
+
+def parse_content(state, content, content_offset, options):
+    """
+    Parse content of a directive (via state.nexted_parse) into new anonymous
+    node element.
+    """
+    # first of all, parse text content of this directive
+    # into anonymous node element (can't be used directly in the tree)
+    content_node = nodes.Element()
+    if 'include' in options:
+        # include HACK: link to the referred test case
+        # TODO: use a proper referece (nested parse?)
+        # TODO: the final solutions is a working include though
+        ref_tc, ref_action = str(options['include']).split(":", 2)
+        text_content = "See {0}, action {1}".format(ref_tc, ref_action)
+        content_node += nodes.paragraph(text=text_content)
+    else:
+        state.nested_parse(content, content_offset, content_node)
+    return content_node
+
+
+class TestActionDirective(rst.Directive):
     """
     Base class with implementation of ``test_step`` and ``test_result`` rst
     directives.
@@ -64,26 +97,20 @@ class TestStepsDirective(rst.Directive):
         # with action_id == 1
         # note:
         # action is couple of test step and result with the same action_id
-        action_id = int(self.arguments[0])
+        action_id = arguments2action_id(self.arguments)
+
         # first of all, parse text content of this directive
         # into anonymous node element (can't be used directly in the tree)
-        node = nodes.Element()
-        # include HACK: link to the referred test case
-        # TODO: use a proper referece (nested parse?)
-        # TODO: the final solutions is a working include though
-        if 'include' in self.options:
-            ref_tc, ref_action = str(self.options['include']).split(":", 2)
-            text_content = "See {0}, action {1}".format(ref_tc, ref_action)
-            node += nodes.paragraph(text=text_content)
-        else:
-            self.state.nested_parse(self.content, self.content_offset, node)
+        content_node = parse_content(
+            self.state, self.content, self.content_offset, self.options)
+
         # create new pending node, which:
         #  - holds actual data (parsed content of the directive)
         #  - references transform class which is concerned with this node.
         #  - name of the directive (test_step or test_result)
         pending = nodes.pending(self.transform_class)
         # add content into pending node
-        pending.details['nodes'] = node
+        pending.details['nodes'] = content_node
         pending.details['action_id'] = action_id
         pending.details['action_name'] = self.name
         # since pylatest transformation will process all pylatest pending nodes
@@ -93,11 +120,12 @@ class TestStepsDirective(rst.Directive):
         if action_id == 1 and self.name == "test_step":
             # without this, transformer wouldn't know about this pending node
             self.state_machine.document.note_pending(pending)
+
         # and finally return the pending node as the only result
         return [pending]
 
 
-class TestStepsTableDirective(TestStepsDirective):
+class TestActionTableDirective(TestActionDirective):
     """
     Implementation of ``test_step`` and ``test_result`` directives for
     direct consumption (transformation will generate proper table from
@@ -107,13 +135,60 @@ class TestStepsTableDirective(TestStepsDirective):
     transform_class = TestStepsTableTransform
 
 
-class TestStepsPlainDirective(TestStepsDirective):
+class TestActionTableDirectiveAutoId(TestActionTableDirective):
+    """
+    Implementation of ``test_step`` and ``test_result`` directives for
+    direct consumption, with optional argument for action id.
+    """
+
+    required_arguments = 0
+    optional_arguments = 1
+
+
+class TestActionPlainDirective(rst.Directive):
     """
     Implementation of ``test_step`` and ``test_result`` directives for
     further processing, eg. checking particular part of resulting document.
     """
 
-    transform_class = TestStepsPlainTransform
+    required_arguments = 1
+    optional_arguments = 0
+    final_argument_whitespace = False
+    has_content = True
+    option_spec = {
+        'include': str,
+        }
+
+    def run(self):
+        action_id = arguments2action_id(self.arguments)
+
+        # parse text content of this directive into anonymous node element
+        # (can't be used directly in the tree)
+        content_node = parse_content(
+            self.state, self.content, self.content_offset, self.options)
+
+        # create new action node (either ``test_steprgr_node`` or
+        # ``test_result_node``)
+        node_name = "{}_node".format(self.name)
+        action_node = getattr(pylatest.xdocutils.nodes, node_name)()
+
+        # add all content nodes into the new action node
+        for content in content_node:
+            action_node += content
+        action_node.attributes['action_id'] = action_id
+
+        # and finally return the action node as the only result
+        return [action_node]
+
+
+class TestActionPlainDirectiveAutoId(TestActionPlainDirective):
+    """
+    Implementation of ``test_step`` and ``test_result`` directives for
+    direct consumption, with optional argument for action id.
+    """
+
+    required_arguments = 0
+    optional_arguments = 1
 
 
 class TestMetadataDirective(rst.Directive):

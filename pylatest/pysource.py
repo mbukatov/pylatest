@@ -27,12 +27,9 @@ import inspect
 import os
 import sys
 
-from docutils.core import publish_doctree
-from docutils import nodes
-
-from pylatest.document import SECTIONS, HEADER, SECTIONS_ALL
+from pylatest.document import TestCaseDoc, RstTestCaseDoc, Section
+from pylatest.rstsource import find_actions, find_sections
 import pylatest.xdocutils.client
-import pylatest.xdocutils.nodes
 
 
 def get_string_literals(content):
@@ -79,20 +76,20 @@ def classify_docstring(docstring):
     else:
         return (False, [], docstring)
 
-def extract_documents(source):
+def extract_doc_fragments(source):
     """
-    Try to extract pylatest docstrings from given string (content of
-    a python source file) and generate PylatestDocument(s) from it.
+    Try to extract pylatest document fragments from given string (content of
+    a python source file) and generate TestCaseDocFragments objects from it.
 
     Args:
         source(string): content of a python source file
 
     Returns:
-        list of PylatestDocument items generated from given python source
+        dict of TestCaseDocFragments items generated from given python source
     """
-    # doc_id (aka testcase id) -> pylatest document object (aka test case doc)
-    doc_dict = {}
-    default_doc = PylatestDocument()
+    # doc_id (aka testcase id) -> pylatest document fragments object
+    docfr_dict = {}
+    default_docfr = TestCaseDocFragments()
     for docstring, lineno in get_string_literals(source):
         is_pylatest_str, doc_id_list, content = classify_docstring(docstring)
         if is_pylatest_str:
@@ -100,286 +97,94 @@ def extract_documents(source):
                 # when no id is detected, create special document without id
                 doc_id_list = [None]
             elif "default" in doc_id_list:
-                status = default_doc.add_docstring(content, lineno)
+                default_docfr.add_fragment(content, lineno)
                 continue
             for doc_id in doc_id_list:
-                doc = doc_dict.setdefault(doc_id, PylatestDocument())
-                status = doc.add_docstring(content, lineno)
-                # TODO: do some debug output
-                # (status is True for a valid pylatest data)
-                assert status is True
+                docfr = docfr_dict.setdefault(doc_id, TestCaseDocFragments())
+                docfr.add_fragment(content, lineno)
     # allow all document objects to find defaults if needed
-    if not default_doc.is_empty:
-        for doc in doc_dict.values():
-            doc.default_doc = default_doc
-    return doc_dict
+    if len(default_docfr) > 0:
+        for docfr in docfr_dict.values():
+            docfr.default = default_docfr
+    return docfr_dict
 
-# TODO: this doesn't work because node tree still contains pending elements
-# instead of test step nodes - with single exception: the very first test
-# step - WTF? all metadata nodes are generated just fine ...
-def _teststeps_condition(node):
+
+def extract_content(str_lines, start, end):
     """
-    Traverse condition for filtering nodes of test steps directives.
+    Extract content on given lines (start, end) from str_lines list and return
+    it as a single string.
     """
-    test_steps_directives = ("test_step_node", "test_result_node")
-    for pylatest_node in test_steps_directives:
-        node_class = getattr(pylatest.xdocutils.nodes, pylatest_node)
-        if isinstance(node, node_class):
-            return True
-    return False
+    return "\n".join(str_lines[start - 1:end]) + '\n'
 
-def _teststeps_condition_hack(node):
+
+class TestCaseDocFragments(object):
     """
-    Traverse condition for filtering nodes of test steps directives.
-
-    This is a quick hack to overcome issue with ``_teststeps_condition()``.
-    """
-    # TODO: proper check (of at least transformation class) goes here
-    if isinstance(node, nodes.pending):
-        return True
-    return False
-
-def detect_docstring_sections(docstring):
-    """
-    Parse given docstring and try to detect which sections of pylatest
-    document for test case are present.
-
-    Args:
-        content(string): content of an pylatest docstring
-
-    Returns:
-        tuple: (list of detected sections, number of test action directives)
-    """
-    # parse docstring to get rst node tree
-    nodetree = publish_doctree(source=docstring)
-
-    # TODO: search for this kind of elements in the tree:
-    # <system_message level="3" line="4" source="<string>" type="ERROR">
-    # and report rst parsing errors in a useful way immediately
-    # Also note that publish_doctree() reports the errors to stderr, which
-    # is not that great here - TODO: reconfigure (logging involved?)
-
-    # try to find any pylatest section
-    detected_sections = []
-    title_condition = lambda node: \
-        isinstance(node, nodes.title) or isinstance(node, nodes.subtitle)
-    for node in nodetree.traverse(title_condition):
-        if node.astext() in SECTIONS:
-            detected_sections.append(node.astext())
-
-    # try to count all pylatest step/result directives
-    test_directive_count = 0
-    for node in nodetree.traverse(_teststeps_condition):
-        test_directive_count += 1
-    for node in nodetree.traverse(_teststeps_condition_hack):
-        test_directive_count += 1
-
-    # try to detect header pseudo section (contains name and metadata)
-    meta_directive_count = 0
-    nodes_title_count = 0
-    for node in nodetree.traverse(pylatest.xdocutils.nodes.test_metadata_node):
-        meta_directive_count += 1
-    for node in nodetree.traverse(nodes.title):
-        nodes_title_count += 1
-    if meta_directive_count > 0 and nodes_title_count > 0:
-        # here we expect that:
-        # 1) header pseudosection starts with the title,
-        #    which would make it the very first element in the nodetree
-        # 2) this title contains name of the test case,
-        #    so that title text doesn't match predefined set of sections
-        title_index = nodetree.first_child_matching_class(nodes.title)
-        if title_index == 0 and nodetree[title_index].astext() not in SECTIONS:
-            detected_sections.insert(1, HEADER)
-
-    return detected_sections, test_directive_count
-
-
-class PylatestDocument(object):
-    """
-    Pylatest rst document (test case description) extracted from python
+    Pylatest strings of with a test case description extracted from python
     source code (implementing the test case).
     """
 
     def __init__(self):
-        # content
-        self._docstrings = []
+        # TODO: rename
+        self.docstrings = {}
         """
-        list of docstrings with at least one section
+        List of docstrings with at least one section, line number -> string
         """
-        self._section_dict = {}
-        """
-        section name -> list of docstrings
-        """
-        self._test_actions = []
-        """
-        dosctrings with test step/result directives only
-        """
-        self.default_doc = None
-        """
-        document object with default content
-        """
-        # errors
-        self._err_dict = {}
-        """
-        lineno -> list of err msg
-        """
-        self._run_errs = []
-        """
-        runtile error list (after reading docstrings)
-        """
-        # state
-        self.is_empty = True
 
-    def _add_error(self, msg, lineno=None):
+        self.default = None
         """
-        Add error into error list.
+        Document Fragments object with default content
         """
-        if lineno is None:
-            self._run_errs.append(msg)
-        else:
-            self._err_dict.setdefault(lineno, []).append(msg)
 
-    def has_errors(self):
+        # TODO: set to a proper value
+        self.source_file = ""
         """
-        Return true if errors were logged during parsing and generation.
+        Name of the source file from which this string literal (doc fragment)
+        has been extracted.
         """
-        return len(self._err_dict) > 0 or len(self._run_errs) > 0
 
-    def errors(self):
-        """
-        Return error iterator (sorted by line number).
-        """
-        for lineno, err_list in sorted(self._err_dict.items()):
-            for err in err_list:
-                yield lineno, err
+    def __len__(self):
+        return len(self.docstrings)
 
-    def errors_lastrecreate(self):
+    def add_fragment(self, docstring, lineno):
         """
-        Return iterator for error found during last ``recreate()`` run.
-        """
-        return iter(self._run_errs)
-
-    def _add_section(self, docstring, lineno, sections):
-        """
-        Add docstring which contains given sections.
-        """
-        self._docstrings.append(docstring)
-        for section in sections:
-            self._section_dict.setdefault(section, []).append(docstring)
-
-    def _add_test_actions(self, docstring, lineno):
-        """
-        Add docstring which contains some test step or result directives.
-        """
-        self._test_actions.append(docstring)
-
-    def add_docstring(self, docstring, lineno):
-        """
-        Look for some part of pylatest test description data in given string,
-        and add it into this pylatest document if such data are found.
-
         Args:
             docstring (str): content of single docstring expression
-
-        Returns:
-            True if given docstring contains pylatest data and were added,
-            Fase otherwise.
+            lineno (int): line number of the docstring
         """
-        sections, test_directive_count = detect_docstring_sections(docstring)
+        # TODO: also, why do I store the lineno like this?
+        self.docstrings[lineno] = docstring
 
-        if len(sections) == 0 and test_directive_count == 0:
-            status_success = False
-        elif len(sections) == 0 and test_directive_count > 0:
-            self._add_test_actions(docstring, lineno)
-            status_success = True
-        elif len(sections) > 0 and test_directive_count == 0:
-            if "Test Steps" in sections:
-                # we have Test Steps section without test step directives
-                msg = "found 'Test Steps' section without test step direcives"
-                self._add_error(msg, lineno)
-            self._add_section(docstring, lineno, sections)
-            status_success = True
-        elif len(sections) > 0 and test_directive_count > 0:
-            if "Test Steps" not in sections:
-                msg = ("docstring with multiple sections contains test step"
-                      " directives, but no 'Test Steps' section was found")
-                self._add_error(msg, lineno)
-            self._add_section(docstring, lineno, sections)
-            status_success = True
-
-        if status_success:
-            self.is_empty = False
-        return status_success
-
-    @property
-    def sections(self):
+    def build_doc(self):
         """
-        Get list of sections this document contains so far.
+        Build RstTestCaseDoc object based on pylatest string literals (aka
+        document fragments) stored in this object.
         """
-        return self._section_dict.keys()
-
-    def recreate(self):
-        """
-        Recreate pylatest test case description from docstring fragments.
-        """
-        # reset err list
-        self._run_errs = []
-
-        # nothing has been found
-        if len(self._docstrings) == 0:
-            return ""
-
-        # import default sections
-        if self.default_doc is not None:
-            for section in ("Description", "Setup", "Teardown"):
-                if section not in self.sections \
-                    and section in self.default_doc.sections:
-                    # TODO: log this event (info or debug)
-                    # TODO: improve error checks (we assume few things here)
-                    def_section = self.default_doc._section_dict[section][0]
-                    self.add_docstring(def_section, 1)
-
-        # report missing sections
-        for section in SECTIONS_ALL:
-            if section not in self._section_dict:
-                if section == "Test Steps" and len(self._docstrings) > 1:
-                    # test steps may be in standalone directives
-                    continue
-                msg = "{0:s} section is missing.".format(section)
-                self._add_error(msg)
-
-        # when everything is just in a single string
-        if len(self._docstrings) == 1:
-            content_string = self._docstrings[0]
-            return content_string + '\n'
-
-        # document is splitted across multiple docstrings
-        rst_list = []
-        docstrings_used = set()
-        for section in SECTIONS_ALL:
-            docstrings = self._section_dict.get(section)
-            if docstrings is None and section == "Test Steps":
-                # put together test steps
-                if len(self._test_actions) > 0:
-                    rst_list.append("Test Steps\n==========")
-                    teststeps = "\n\n".join(self._test_actions)
-                    rst_list.append(teststeps)
+        if self.default is None:
+            doc = RstTestCaseDoc()
+        else:
+            # TODO: this builds the default doc every time, cache the build
+            # (if nothing changed - for merging def doc.)
+            doc = self.default.build_doc()
+        # find pylatest document sections/directives in every fragment
+        for lineno, doc_str in self.docstrings.items():
+            doc_str_lines = doc_str.splitlines()
+            for rst_act in find_actions(doc_str):
+                content = extract_content(
+                    doc_str_lines, rst_act.start_line, rst_act.end_line)
+                doc.add_test_action(
+                    rst_act.action_name,
+                    content,
+                    rst_act.action_id,
+                    lineno)
+            for rst_sct in find_sections(doc_str):
+                if rst_sct.title is None:
+                    section = TestCaseDoc._HEAD
                 else:
-                    msg = "test steps/actions directives are missing"
-                    self._add_error(msg)
-            if docstrings is None:
-                continue
-            if len(docstrings) > 1:
-                msg = "multiple docstrings with {0:s} section found"
-                self._add_error(msg.format(section))
-            # case with multiple docstrings for one section is invalid,
-            # but add them all anyway to make debugging easier
-            for docstring in docstrings:
-                if docstring not in docstrings_used:
-                    rst_list.append(docstring)
-                    docstrings_used.add(docstring)
-
-        return "\n\n".join(rst_list) + '\n'
+                    section = Section(rst_sct.title)
+                content = extract_content(
+                    doc_str_lines, rst_sct.start_line, rst_sct.end_line)
+                doc.add_section(section, content, lineno)
+        return doc
 
 
 def main():
@@ -424,33 +229,33 @@ def main():
 
     with open(args.filepath, 'r') as python_file:
         source_content = python_file.read()
-        doc_dict = extract_documents(source_content)
+        docfr_dict = extract_doc_fragments(source_content)
 
     retcode = 0
 
-    for doc_id, doc in doc_dict.items():
+    for doc_id, doc_fr in docfr_dict.items():
         if args.list:
-            # try to use default filename when no testcase/doc id is used
+            # here we list test case names wihtout doing anything else
+            # try to use default filename as a testcase name (aka doc id)
+            # when doc id is not specified
             if doc_id is None and args.default_filename is not None:
                 doc_id = args.default_filename
             print("{0}".format(doc_id))
             continue
-        # report all errors found so far
-        for lineno, error in doc.errors():
-            msg = "Error on line {0:d}: {1:s} (doc_id: {2:s})"
-            print(msg.format(lineno, error, doc_id), file=sys.stderr)
-        # TODO: try except
-        rst_document = doc.recreate()
-        # report all runtime errors
-        for error in doc.errors_lastrecreate():
-            msg = "Error: {0:s} (doc_id: {1:s})"
-            print(msg.format(error, doc_id), file=sys.stderr)
+
+        # TODO: add proper error checking
+        # build RstTestCaseDoc from TestCaseDocFragments
+        doc = doc_fr.build_doc()
+        # generate string with rst source for the test case document
+        rst_content = doc.build_rst()
+
         if args.enforce_id and doc_id is None:
             msg = "docstring without id found while id enforcing enabled"
             # TODO: report line numbers of such docstrings
             print("Error: {0:s}".format(msg), file=sys.stderr)
             retcode = 1
             break
+
         if args.create_files:
             # try to use default filename when no testcase/doc id is used
             if doc_id is None:
@@ -468,12 +273,10 @@ def main():
             else:
                 filepath = filename
             with open(filepath, 'w') as rst_file:
-                rst_file.write(rst_document)
+                rst_file.write(rst_content)
         else:
-            print(rst_document, end='')
-            if len(doc_dict) > 1:
+            print(rst_content, end='')
+            if len(docfr_dict) > 1:
                 print()
-        if doc.has_errors():
-            retcode = 1
 
     return retcode

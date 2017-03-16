@@ -22,9 +22,9 @@ import os
 import sys
 import codecs
 
-import pylatest.xdocutils.client
-import pylatest.document
+from pylatest.document import TestCaseDoc
 import pylatest.pysource as pysource
+import pylatest.xdocutils.client
 
 
 HERE = os.path.abspath(os.path.dirname(__file__))
@@ -182,224 +182,403 @@ class TestStringExtraction(unittest.TestCase):
         self.assertEqual(content, "        Bicycle Repair Man.\n        ")
 
 
-class TestPylatestDocstringProcessing(unittest.TestCase):
+class TestTestCaseDocFragments(unittest.TestCase):
     """
-    Test processing of pylatest docstrings.
+    Tests of pylatest.pysource.TestCaseDocFragments class.
     """
 
     def setUp(self):
-        # commons steps required for all test cases
         pylatest.xdocutils.client.register_plain()
+        self.fragments = pysource.TestCaseDocFragments()
 
-    def test_detect_docstring_sections_empty(self):
-        self.assertEqual(pysource.detect_docstring_sections(""), ([], 0))
+    def test_docfragments_null(self):
+        self.assertEqual(len(self.fragments), 0)
+        self.assertIsNone(self.fragments.default)
 
-    def test_detect_docstring_sections_nocontent(self):
-        src = textwrap.dedent('''\
-        Hello World Test Case
-        *********************
+    def test_docfragments_add_one(self):
+        self.fragments.add_fragment("foo bar baz", 11)
+        self.assertEqual(len(self.fragments), 1)
+        self.assertIsNone(self.fragments.default)
+        self.assertEqual(self.fragments.docstrings.get(11), "foo bar baz")
 
-        There are no pylatest data in this string.
+    def test_docfragments_add_few(self):
+        self.fragments.add_fragment("foo", 1)
+        self.assertEqual(len(self.fragments), 1)
+        self.assertIsNone(self.fragments.default)
+        for i in range(10):
+            self.fragments.add_fragment("just another_one", i + 10)
+        self.assertEqual(len(self.fragments), 11)
+        self.assertIsNone(self.fragments.default)
 
-        Test Stuff
-        ==========
+    def test_docfragments_build_doc_empty(self):
+        doc = self.fragments.build_doc()
+        self.assertTrue(doc.is_empty())
 
-        Really, Hic sunt leones ...
+    def test_docfragments_build_doc_singlestep(self):
+        str_fragment = textwrap.dedent('''\
+        .. test_step:: 1
+
+            List files in the volume: ``ls -a /mnt/helloworld``
         ''')
-        self.assertEqual(pysource.detect_docstring_sections(src), ([], 0))
+        self.fragments.add_fragment(str_fragment, lineno=11)
+        doc = self.fragments.build_doc()
+        self.assertFalse(doc.is_empty())
+        self.assertTrue(TestCaseDoc.STEPS in doc.sections)
 
-    def test_detect_docstring_sections_header(self):
-        src = textwrap.dedent('''\
+    def test_docfragments_build_doc_multiple(self):
+        fragment_one = textwrap.dedent('''\
+        .. test_step:: 1
+
+            List files in the volume: ``ls -a /mnt/helloworld``
+        ''')
+        fragment_two = textwrap.dedent('''\
         Hello World Test Case
         *********************
 
         .. test_metadata:: author foo@example.com
         .. test_metadata:: date 2015-11-06
-        .. test_metadata:: comment Hello world.
-        ''')
-        expected_result = ([pylatest.document.HEADER], 0)
-        actual_result = pysource.detect_docstring_sections(src)
-        self.assertEqual(actual_result, expected_result)
 
-    def test_detect_docstring_sections_description(self):
-        src = textwrap.dedent('''\
         Description
         ===========
 
-        This is just demonstration of usage of pylatest rst directives and
-        expected structure of rst document.
-
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam
         lectus.  Sed sit amet ipsum mauris. Maecenas congue ligula ac quam
-        viverra nec consectetur ante hendrerit. Donec et mollis dolor. Praesent
-        et diam eget libero egestas mattis sit amet vitae augue.
+
+        Teardown
+        ========
+
+        #. Lorem ipsum dolor sit amet: ``rm -rf /mnt/helloworld``.
+        ''')
+        self.fragments.add_fragment(fragment_one, lineno=11)
+        self.fragments.add_fragment(fragment_two, lineno=131)
+        doc = self.fragments.build_doc()
+        self.assertFalse(doc.is_empty())
+        self.assertTrue(TestCaseDoc._HEAD in doc.sections)
+        self.assertTrue(TestCaseDoc.DESCR in doc.sections)
+        self.assertTrue(TestCaseDoc.STEPS in doc.sections)
+        self.assertTrue(TestCaseDoc.TEARD in doc.sections)
+
+    def test_docfragments_build_doc_section_header(self):
+        fragment = textwrap.dedent('''\
+        Just Another Test Case
+        **********************
+
+        .. test_metadata:: author foo.bar@example.com
+
+        Description
+        ===========
+
+        Vivamus fermentum semper porta. Nunc diam velit, adipiscing ut tristique
+        vitae, sagittis vel odio. Maecenas convallis ullamcorper ultricies.
+        ''')
+        expected_head = textwrap.dedent('''\
+        Just Another Test Case
+        **********************
+
+        .. test_metadata:: author foo.bar@example.com
+        ''')
+        expected_desc = textwrap.dedent('''\
+        Description
+        ===========
+
+        Vivamus fermentum semper porta. Nunc diam velit, adipiscing ut tristique
+        vitae, sagittis vel odio. Maecenas convallis ullamcorper ultricies.
+        ''')
+        self.fragments.add_fragment(fragment, lineno=133)
+        doc = self.fragments.build_doc()
+        self.assertFalse(doc.is_empty())
+        self.assertTrue(TestCaseDoc._HEAD in doc.sections)
+        self.assertTrue(TestCaseDoc.DESCR in doc.sections)
+        self.assertTrue(doc2.get_section(TestCaseDoc._HEAD), expected_head_one)
+        self.assertTrue(doc2.get_section(TestCaseDoc.DESCR), expected_desc_one)
+
+    def test_docfragments_build_doc_section_override(self):
+        # 1st fragment
+        fragment_one = textwrap.dedent('''\
+        Just Another Test Case
+        **********************
+
+        .. test_metadata:: author foo.bar@example.com
+
+        Description
+        ===========
+
+        Vivamus fermentum semper porta. Nunc diam velit, adipiscing ut tristique
+        vitae, sagittis vel odio. Maecenas convallis ullamcorper ultricies.
+        Curabitur ornare, ligula semper consectetur sagittis, nisi diam iaculis
+        velit, id fringilla sem nunc vel mi. Nam dictum, odio nec pretium volutpat,
+        arcu ante placerat erat, non tristique elit urna et turpis.
+        ''')
+        # header from 1st fragment
+        expected_head_one = textwrap.dedent('''\
+        Just Another Test Case
+        **********************
+
+        .. test_metadata:: author foo.bar@example.com
+        ''')
+        # description section from 1st fragment
+        expected_desc_one = textwrap.dedent('''\
+        Description
+        ===========
+
+        Vivamus fermentum semper porta. Nunc diam velit, adipiscing ut tristique
+        vitae, sagittis vel odio. Maecenas convallis ullamcorper ultricies.
+        Curabitur ornare, ligula semper consectetur sagittis, nisi diam iaculis
+        velit, id fringilla sem nunc vel mi. Nam dictum, odio nec pretium volutpat,
+        arcu ante placerat erat, non tristique elit urna et turpis.
+        ''')
+        # 2nd fragment and expected description section after update
+        fragment_two = textwrap.dedent('''\
+        Description
+        ===========
+
+        This is just demonstration of usage of pylatest rst directives and expected
+        structure of rst document.
+
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus.
+        Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec
+        consectetur ante hendrerit. Donec et mollis dolor. Praesent et diam eget libero
+        egestas mattis sit amet vitae augue.
 
         See :BZ:`439858` for more details.
         ''')
-        expected_result = (["Description"], 0)
-        actual_result = pysource.detect_docstring_sections(src)
-        self.assertEqual(actual_result, expected_result)
+        # process 1st fragment first
+        self.fragments.add_fragment(fragment_two, lineno=131)
+        doc1 = self.fragments.build_doc()
+        self.assertFalse(doc1.is_empty())
+        self.assertTrue(TestCaseDoc._HEAD in doc1.sections)
+        self.assertTrue(TestCaseDoc.DESCR in doc1.sections)
+        self.assertTrue(doc2.get_section(TestCaseDoc._HEAD), expected_head_one)
+        self.assertTrue(doc2.get_section(TestCaseDoc.DESCR), expected_desc_one)
+        # update: add 2nd fragment and retry
+        self.fragments.add_fragment(fragment_one, lineno=11)
+        doc2 = self.fragments.build_doc()
+        self.assertFalse(doc2.is_empty())
+        self.assertTrue(TestCaseDoc._HEAD in doc2.sections)
+        self.assertTrue(TestCaseDoc.DESCR in doc2.sections)
+        self.assertTrue(doc2.get_section(TestCaseDoc._HEAD), expected_head_one)
+        self.assertTrue(doc2.get_section(TestCaseDoc.DESCR), fragment_two)
 
-    def test_detect_docstring_sections_setup(self):
-        src = textwrap.dedent('''\
-        Setup
-        =====
-
-        #. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a
-           diam lectus. Sed sit amet ipsum mauris.
-
-        #. Use lvm disk paritioning and Leave 10G free space in volume
-           called ``lv_helloword``.
-
-        #. When the system is installed, format ``lv_helloword`` volume with
-           brtfs using ``--super --special --options``.
-
-        #. Mount it on a client::
-
-            # mount -t btrfs /dev/mapper/vg_fedora/lv_helloword /mnt/helloworld
-
-        #. Ceterum censeo, lorem ipsum::
-
-            # dnf install foobar
-            # systemctl enable foobard
-        ''')
-        expected_result = (["Setup"], 0)
-        actual_result = pysource.detect_docstring_sections(src)
-        self.assertEqual(actual_result, expected_result)
-
-    def test_detect_docstring_sections_teardown(self):
-        src = textwrap.dedent('''\
-        Teardown
-        ========
-
-        #. Lorem ipsum dolor sit amet: ``rm -rf /mnt/helloworld``.
-
-        #. Umount and remove ``lv_helloword`` volume.
-
-        #. The end.
-        ''')
-        expected_result = (["Teardown"], 0)
-        actual_result = pysource.detect_docstring_sections(src)
-        self.assertEqual(actual_result, expected_result)
-
-    def test_detect_docstring_sections_teststep_single(self):
-        src = textwrap.dedent('''\
+    def test_docfragments_build_doc_multiple_buildmany(self):
+        fragment_one = textwrap.dedent('''\
         .. test_step:: 1
 
             List files in the volume: ``ls -a /mnt/helloworld``
         ''')
-        expected_result = ([], 1)
-        actual_result = pysource.detect_docstring_sections(src)
-        self.assertEqual(actual_result, expected_result)
-
-    def test_detect_docstring_sections_teststep_many(self):
-        src = textwrap.dedent('''\
-        .. test_step:: 1
-
-            List files in the volume: ``ls -a /mnt/helloworld``
-
-        .. test_result:: 1
-
-            There are no files, output should be empty.
-
-        .. test_step:: 2
-
-            Donec et mollis dolor::
-
-                $ foo --extra sth
-                $ bar -vvv
-
-        .. test_result:: 2
-
-            Maecenas congue ligula ac quam viverra nec
-            consectetur ante hendrerit.
-
-        .. test_step:: 3
-
-            This one has no matching test result.
-
-        .. test_result:: 4
-
-            And this result has no test step.
-
-        .. test_step:: 5
-
-            List files in the volume: ``ls -a /mnt/helloworld``
-        ''')
-        expected_result = ([], 7)
-        actual_result = pysource.detect_docstring_sections(src)
-        self.assertEqual(actual_result, expected_result)
-
-    def test_detect_docstring_sections_teststeps(self):
-        src = textwrap.dedent('''\
-        Test Steps
-        ==========
-
-        .. test_step:: 1
-
-            List files in the volume: ``ls -a /mnt/helloworld``
-
-        .. test_result:: 1
-
-            There are no files, output should be empty.
-        ''')
-        expected_result = (["Test Steps"], 2)
-        actual_result = pysource.detect_docstring_sections(src)
-        self.assertEqual(actual_result, expected_result)
-
-    def test_detect_docstring_sections_multi_header_teststeps(self):
-        src = textwrap.dedent('''\
+        fragment_two = textwrap.dedent('''\
         Hello World Test Case
         *********************
 
         .. test_metadata:: author foo@example.com
         .. test_metadata:: date 2015-11-06
 
-        Test Steps
-        ==========
+        Description
+        ===========
 
-        .. test_step:: 1
-
-            List files in the volume: ``ls -a /mnt/helloworld``
-
-        .. test_result:: 1
-
-            There are no files, output should be empty.
-        ''')
-        # note that order of sections is not defined
-        expected_result = (sorted([pylatest.document.HEADER, "Test Steps"]), 2)
-        actual_result = pysource.detect_docstring_sections(src)
-        actual_result = (sorted(actual_result[0]), actual_result[1])
-        self.assertEqual(actual_result, expected_result)
-
-    def test_detect_docstring_sections_multi_header_emptysteps_teardown(self):
-        src = textwrap.dedent('''\
-        Hello World Test Case
-        *********************
-
-        .. test_metadata:: author foo@example.com
-        .. test_metadata:: date 2015-11-06
-
-        Test Steps
-        ==========
-
-        There are no test steps!
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam
+        lectus.  Sed sit amet ipsum mauris. Maecenas congue ligula ac quam
 
         Teardown
         ========
 
         #. Lorem ipsum dolor sit amet: ``rm -rf /mnt/helloworld``.
-
-        #. Umount and remove ``lv_helloword`` volume.
-
-        #. The end.
         ''')
-        # note that order of sections is not defined
-        expected_sections = [pylatest.document.HEADER, "Test Steps", "Teardown"]
-        expected_result = (sorted(expected_sections), 0)
-        actual_result = pysource.detect_docstring_sections(src)
-        actual_result = (sorted(actual_result[0]), actual_result[1])
-        self.assertEqual(actual_result, expected_result)
+        self.fragments.add_fragment(fragment_one, lineno=11)
+        self.fragments.add_fragment(fragment_two, lineno=131)
+        # buil few docs from the fragments
+        doc1 = self.fragments.build_doc()
+        doc2 = self.fragments.build_doc()
+        doc3 = self.fragments.build_doc()
+        # every build should be independent and lead the the same result
+        self.assertEqual(doc1, doc2)
+        self.assertEqual(doc2, doc3)
+
+    def test_docfragments_build_doc_multiple_fragmented(self):
+        rst_fragments = [
+            textwrap.dedent("""\
+            Hello World Test Case
+            *********************
+
+            .. test_metadata:: author foo@example.com
+            .. test_metadata:: date 2015-11-06
+            .. test_metadata:: comment This is here just to test metadata processing.
+            """),
+            textwrap.dedent("""\
+            Description
+            ===========
+
+            This is just demonstration of usage of pylatest rst directives and expected
+            structure of rst document.
+
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus.
+            Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec
+            consectetur ante hendrerit. Donec et mollis dolor. Praesent et diam eget libero
+            egestas mattis sit amet vitae augue.
+
+            See :BZ:`439858` for more details.
+            """),
+            textwrap.dedent("""\
+            .. test_step:: 1
+
+                List files in the volume: ``ls -a /mnt/helloworld``
+            """),
+            textwrap.dedent("""\
+            .. test_result:: 1
+
+                There are no files, output should be empty.
+            """),
+            textwrap.dedent("""\
+            .. test_step:: 2
+
+                Donec et mollis dolor::
+
+                    $ foo --extra sth
+                    $ bar -vvv
+            """),
+            textwrap.dedent("""\
+            .. test_result:: 2
+
+                Maecenas congue ligula ac quam viverra nec
+                consectetur ante hendrerit.
+            """),
+            textwrap.dedent("""\
+            .. test_step:: 3
+
+                This one has no matching test result.
+            """),
+            textwrap.dedent("""\
+            .. test_result:: 4
+
+                And this result has no test step.
+            """),
+            textwrap.dedent("""\
+            Setup
+            =====
+
+            #. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam
+               lectus. Sed sit amet ipsum mauris.
+
+            #. Use lvm disk paritioning and Leave 10G free space in volume
+               called ``lv_helloword``.
+
+            #. When the system is installed, format ``lv_helloword`` volume with
+               brtfs using ``--super --special --options``.
+
+            #. Mount it on a client::
+
+                # mount -t btrfs /dev/mapper/vg_fedora/lv_helloword /mnt/helloworld
+
+            #. Ceterum censeo, lorem ipsum::
+
+                # dnf install foobar
+                # systemctl enable foobard
+            """),
+            textwrap.dedent("""\
+            Teardown
+            ========
+
+            #. Lorem ipsum dolor sit amet: ``rm -rf /mnt/helloworld``.
+
+            #. Umount and remove ``lv_helloword`` volume.
+
+            #. The end.
+            """),
+            ]
+        for index, fragment in enumerate(rst_fragments):
+            # line number have to be unique
+            lineno = index*100 + 2
+            self.fragments.add_fragment(fragment, lineno=lineno)
+        self.assertEqual(len(self.fragments), len(rst_fragments))
+        doc = self.fragments.build_doc()
+        self.assertFalse(doc.is_empty())
+        self.assertTrue(TestCaseDoc.DESCR in doc.sections)
+        self.assertTrue(TestCaseDoc.SETUP in doc.sections)
+        self.assertTrue(TestCaseDoc.STEPS in doc.sections)
+        self.assertTrue(TestCaseDoc.TEARD in doc.sections)
+        self.assertTrue(TestCaseDoc._HEAD in doc.sections)
+
+
+class TestExtractDocumentFragments(unittest.TestCase):
+    """
+    Test extraction of pylatest document fragments (pylatest string literals)
+    from python source file - function ``pysource.extract_doc_fragments``
+
+    Input data (python source files) and expected output (pylatest rst file)
+    are stored in ``./pysource-onecaseperfile/`` directory.
+    """
+
+    def setUp(self):
+        # show full diff (note: python3 unittest diff is much better)
+        self.maxDiff = None
+        # commons steps required for all test cases
+        pylatest.xdocutils.client.register_plain()
+
+    def test_extract_doc_fragments_null_str(self):
+        doc_fragment_dict = pysource.extract_doc_fragments("")
+        self.assertEqual(len(doc_fragment_dict), 0)
+        self.assertEqual(doc_fragment_dict, {})
+
+    def test_extract_doc_fragments_null(self):
+        source = read_file("onecaseperfile", "null.py")
+        doc_fragment_dict = pysource.extract_doc_fragments(source)
+        self.assertEqual(len(doc_fragment_dict), 0)
+        self.assertEqual(doc_fragment_dict, {})
+
+    def test_extract_doc_fragments_onecaseperfile_single(self):
+        source = read_file("onecaseperfile", "single.py")
+        doc_fragment_dict = pysource.extract_doc_fragments(source)
+        self.assertEqual(len(doc_fragment_dict), 1)
+        doc_fragments = doc_fragment_dict[None]
+        self.assertEqual(len(doc_fragments), 1)
+        self.assertIsNone(doc_fragments.default)
+
+    def test_extract_doc_fragments_onecaseperfile_splitted_nested(self):
+        source = read_file("onecaseperfile", "splitted-nested.py")
+        doc_fragment_dict = pysource.extract_doc_fragments(source)
+        # there is just a single test case in the file
+        # (as 'onecaseperfile' directory name suggests)
+        self.assertEqual(len(doc_fragment_dict), 1)
+        # pylatest strings are without pylatest ids
+        doc_fragments = doc_fragment_dict[None]
+        # there are 9 pylatest strings in given file
+        self.assertEqual(len(doc_fragments), 9)
+        # the default doc feature is not used in given file
+        self.assertIsNone(doc_fragments.default)
+        # pylatest string literal which ends on line 95 in splitted-neste.py file
+        fragment_line95 = textwrap.dedent('''\
+        .. test_step:: 1
+
+            List files in the volume: ``ls -a /mnt/helloworld``''')
+        self.assertEqual(doc_fragments.docstrings[95], fragment_line95)
+
+    def test_extract_doc_fragments_multiplecasesperfile_splitted_nested(self):
+        source = read_file("multiplecasesperfile", "splitted-nested.py")
+        doc_fragment_dict = pysource.extract_doc_fragments(source)
+        self.assertEqual(len(doc_fragment_dict), 2)
+        # number of expected pylatest strings for each pylatest doc id
+        expected_fragments = {
+            'test01': 9,
+            'test02': 7,
+            }
+        for doc_id, doc_fragments in doc_fragment_dict.items():
+            # default doc feature is not used in the file
+            self.assertIsNone(doc_fragments.default)
+            # check expected number of pylatest strings
+            self.assertEqual(len(doc_fragments), expected_fragments[doc_id])
+        # check that some pylatest strings are the same in both doc fragments
+        for linenum in (77, 96):
+            self.assertEqual(
+                doc_fragment_dict['test01'].docstrings[linenum],
+                doc_fragment_dict['test02'].docstrings[linenum],)
+
+    def test_extract_documents_splitted_nested_withdefault(self):
+        source = read_file("multiplecasesperfile", "splitted-nested-default.py")
+        doc_fragment_dict = pysource.extract_doc_fragments(source)
+        self.assertEqual(len(doc_fragment_dict), 2)
+        for doc_id, doc_fragments in doc_fragment_dict.items():
+            # default doc is used in the file (for setup and teardown strings)
+            self.assertIsNotNone(doc_fragments.default)
+            self.assertEqual(len(doc_fragments.default), 2)
 
 
 class TestPylatestDocumentExtractionOneCaseOneFile(unittest.TestCase):
@@ -419,27 +598,40 @@ class TestPylatestDocumentExtractionOneCaseOneFile(unittest.TestCase):
     def _test_extract_document_noerrors(self, testname):
         source = read_file("onecaseperfile", testname)
         expected_result = read_file("onecaseperfile", "rst")
-        doc_dict = pysource.extract_documents(source)
-        self.assertEqual(len(doc_dict), 1)
-        doc = doc_dict[None]
-        self.assertEqual(list(doc.errors()), [])
-        self.assertEqual(doc.recreate(), expected_result)
-        self.assertEqual(list(doc.errors_lastrecreate()), [])
-        self.assertFalse(doc.has_errors())
+        # extract TestCaseDocFragments from the python source file
+        docfr_dict = pysource.extract_doc_fragments(source)
+        # there should be just one test case document
+        self.assertEqual(len(docfr_dict), 1)
+        # this document is without pylatest id
+        doc_fr = docfr_dict[None]
+        # then build RstTestCaseDoc from TestCaseDocFragments
+        doc = doc_fr.build_doc()
+        # and finally build the rst source version
+        self.assertEqual(doc.build_rst(), expected_result)
+        # every build should be the same
+        self.assertEqual(doc.build_rst(), expected_result)
 
     def _test_extract_document_mangled(self, testname, resultname):
         source = read_file("onecaseperfile", testname)
         expected_result = read_file("onecaseperfile", resultname)
-        doc_dict = pysource.extract_documents(source)
-        self.assertEqual(len(doc_dict), 1)
-        doc = doc_dict[None]
-        self.assertEqual(doc.recreate(), expected_result)
-        self.assertTrue(doc.has_errors())
+        # extract TestCaseDocFragments from the python source file
+        docfr_dict = pysource.extract_doc_fragments(source)
+        # there should be just one test case document
+        self.assertEqual(len(docfr_dict), 1)
+        # this document is without pylatest id
+        doc_fr = docfr_dict[None]
+        # TODO: needs update to work with new error handling (not yet done)
+        # then build RstTestCaseDoc from TestCaseDocFragments
+        doc = doc_fr.build_doc()
+        # and finally build the rst source version
+        self.assertEqual(doc.build_rst(), expected_result)
+        # every build should be the same
+        self.assertEqual(doc.build_rst(), expected_result)
 
     def test_extract_document_null(self):
         source = read_file("onecaseperfile", "null.py")
-        doc_dict = pysource.extract_documents(source)
-        self.assertEqual(doc_dict, {})
+        docfr_dict = pysource.extract_doc_fragments(source)
+        self.assertEqual(docfr_dict, {})
 
     def test_extract_document_single(self):
         self._test_extract_document_noerrors("single.py")
@@ -502,18 +694,21 @@ class TestPylatestDocumentsExtractionMultipleCasesPerFile(unittest.TestCase):
         pylatest.xdocutils.client.register_plain()
 
     def _test_extract_documents_noerrors(self, doc_num, testname):
+        # TODO: needs update to work with new error handling (not yet done)
         source = read_file("multiplecasesperfile", testname)
-        doc_dict = pysource.extract_documents(source)
-        self.assertEqual(len(doc_dict), doc_num)
-        for doc_id, doc in doc_dict.items():
+        # extract TestCaseDocFragments from the python source file
+        docfr_dict = pysource.extract_doc_fragments(source)
+        self.assertEqual(len(docfr_dict), doc_num)
+        for doc_id, doc_fr in docfr_dict.items():
             if doc_id is None:
                 doc_id = "none"
             filename = "{}.rst".format(doc_id)
             expected_result = read_file("multiplecasesperfile", filename)
-            self.assertEqual(list(doc.errors()), [])
-            self.assertEqual(doc.recreate(), expected_result)
-            self.assertEqual(list(doc.errors_lastrecreate()), [])
-            self.assertFalse(doc.has_errors())
+            # build RstTestCaseDoc from TestCaseDocFragments
+            doc = doc_fr.build_doc()
+            self.assertEqual(doc.build_rst(), expected_result)
+            # every build should be the same
+            self.assertEqual(doc.build_rst(), expected_result)
 
     def test_extract_documents_splitted_nested(self):
         self._test_extract_documents_noerrors(2, "splitted-nested.py")

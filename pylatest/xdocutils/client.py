@@ -37,8 +37,10 @@ from docutils.core import publish_parts
 from docutils import nodes
 from docutils.writers.html4css1 import HTMLTranslator
 
-from pylatest.xdocutils.directives import TestStepsTableDirective
-from pylatest.xdocutils.directives import TestStepsPlainDirective
+from pylatest.xdocutils.directives import TestActionTableDirective
+from pylatest.xdocutils.directives import TestActionPlainDirective
+from pylatest.xdocutils.directives import TestActionTableDirectiveAutoId
+from pylatest.xdocutils.directives import TestActionPlainDirectiveAutoId
 from pylatest.xdocutils.directives import TestMetadataTableDirective
 from pylatest.xdocutils.directives import TestMetadataPlainDirective
 from pylatest.xdocutils.directives import RequirementPlainDirective
@@ -81,25 +83,37 @@ def register_pylatest_roles():
     roles.register_local_role("bz", redhat_bugzilla_role)
     roles.register_local_role("pylaref", pylaref_html_role)
 
-def register_table():
+def register_table(auto_id=False):
     """
     Register table generating implementation of pylatest rst directives
     and roles.
     """
     directives.register_directive("test_metadata", TestMetadataTableDirective)
-    directives.register_directive("test_step", TestStepsTableDirective)
-    directives.register_directive("test_result", TestStepsTableDirective)
+    if auto_id:
+        directives.register_directive("test_step",
+            TestActionTableDirectiveAutoId)
+        directives.register_directive("test_result",
+            TestActionTableDirectiveAutoId)
+    else:
+        directives.register_directive("test_step", TestActionTableDirective)
+        directives.register_directive("test_result", TestActionTableDirective)
     directives.register_directive("requirement", RequirementSectionDirective)
     register_pylatest_roles()
 
-def register_plain():
+def register_plain(auto_id=False):
     """
     Register plain implementation of pylatest rst directives and roles.
     This is intended for further processing (HTML only).
     """
     directives.register_directive("test_metadata", TestMetadataPlainDirective)
-    directives.register_directive("test_step", TestStepsPlainDirective)
-    directives.register_directive("test_result", TestStepsPlainDirective)
+    if auto_id:
+        directives.register_directive("test_step",
+            TestActionPlainDirectiveAutoId)
+        directives.register_directive("test_result",
+            TestActionPlainDirectiveAutoId)
+    else:
+        directives.register_directive("test_step", TestActionPlainDirective)
+        directives.register_directive("test_result", TestActionPlainDirective)
     directives.register_directive("requirement", RequirementPlainDirective)
     register_pylatest_roles()
     register_pylatest_nodes()

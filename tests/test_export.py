@@ -21,7 +21,7 @@ import unittest
 
 from lxml import etree
 
-from pylatest.document import SECTIONS_PLAINHTML, ACTION_NAMES
+from pylatest.document import TestActions, TestCaseDoc
 from pylatest.xdocutils.client import register_plain
 import pylatest.export as export
 
@@ -67,7 +67,7 @@ def add_section_div(elem, section_id):
     """
     Adds a section div element (with a headline) with given into given element.
     """
-    # note: section_id comes from pylatest.document.SECTIONS_PLAINHTML
+    # note: section_id comes from pylatest.document.TestCaseDoc.SECTIONS_PLAINHTML
     div_attrs = {
         'id': str(section_id),
         'class': 'section'}
@@ -115,8 +115,8 @@ class TestRst2HtmlBodyTree(unittest.TestCase):
         # TODO: if the pylatest directive is unknown, error goes to stderr!
         html_body = export.rst2htmlbodytree(rst_content)
         # construct expected tree
-        html_body_expected, p_el = get_singleparagraph_body_tree()
-        div_el = add_action_div(p_el, '1', 'step')
+        html_body_expected = get_empty_body_tree()
+        div_el = add_action_div(html_body_expected, '1', 'step')
         div_el.text = '\nThis is just a test.\n'
         self.assertEqual(
             etree.tostring(html_body),
@@ -134,7 +134,7 @@ class TestGetStuffFromHtmlPlain(unittest.TestCase):
 
     def test_get_actions_empty(self):
         body_tree = get_empty_body_tree()
-        self.assertEqual(export.get_actions(body_tree), {})
+        self.assertEqual(export.get_actions(body_tree), TestActions())
 
     def test_get_actions_singleaction(self):
         # construct input
@@ -144,17 +144,17 @@ class TestGetStuffFromHtmlPlain(unittest.TestCase):
         result_div_el = add_action_div(p_el, '1', 'result')
         result_div_el.text = "This is the expected result."
         # construct expected output
-        exp_res = {1: {
-            'test_step': etree.tostring(step_div_el),
-            'test_result': etree.tostring(result_div_el)}, }
+        exp_res = TestActions()
+        exp_res.add_step(etree.tostring(step_div_el))
+        exp_res.add_result(etree.tostring(result_div_el))
         # run, run
-        action_dict = export.get_actions(body_tree)
+        actions = export.get_actions(body_tree)
         # checking
-        self.assertDictEqual(action_dict, exp_res)
+        self.assertEqual(actions, exp_res)
 
     def test_get_section_empty(self):
         body_tree = get_empty_body_tree()
-        for section in SECTIONS_PLAINHTML:
+        for section in TestCaseDoc.SECTIONS_PLAINHTML:
             self.assertIsNone(export.get_section(body_tree, section))
 
     def test_get_section_actually_nothing(self):
@@ -163,19 +163,19 @@ class TestGetStuffFromHtmlPlain(unittest.TestCase):
         add_section_div(body_tree, 'foo')
         add_section_div(body_tree, 'bar')
         # checking
-        for section in SECTIONS_PLAINHTML:
+        for section in TestCaseDoc.SECTIONS_PLAINHTML:
             self.assertIsNone(export.get_section(body_tree, section))
 
     def test_get_section_single(self):
         # construct input
         body_tree, p_el = get_singleparagraph_body_tree()
         add_section_div(body_tree, 'foo')
-        section_el = add_section_div(body_tree, SECTIONS_PLAINHTML[0])
+        section_el = add_section_div(body_tree, TestCaseDoc.SECTIONS_PLAINHTML[0])
         add_section_div(body_tree, 'bar')
         # run, run
-        result_el = export.get_section(body_tree, SECTIONS_PLAINHTML[0])
+        result_el = export.get_section(body_tree, TestCaseDoc.SECTIONS_PLAINHTML[0])
         # checking
         self.assertIsNotNone(result_el)
         self.assertEqual(result_el, section_el)
-        for section in SECTIONS_PLAINHTML[1:]:
+        for section in TestCaseDoc.SECTIONS_PLAINHTML[1:]:
             self.assertIsNone(export.get_section(body_tree, section))
