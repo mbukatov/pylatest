@@ -28,7 +28,7 @@ import pylatest.xdocutils.directives
 import pylatest.xdocutils.client
 
 
-def testparse(rst_str):
+def _testparse(rst_str):
     """
     Parse given string with rst parser, returns pformat string result.
     """
@@ -41,7 +41,7 @@ def testparse(rst_str):
     # setup: disable docutils error messages
     settings.report_level = 5
     settings.halt_level = 5
-    document = docutils.utils.new_document('testparse() method', settings)
+    document = docutils.utils.new_document('_testparse() method', settings)
     # parsing
     rst_parser.parse(rst_str, document)
     return document.pformat()
@@ -56,7 +56,7 @@ class TestBasePlain(unittest.TestCase):
         self.maxDiff = None
 
     def check_directive(self, rst_input, exp_result):
-        result = testparse(rst_input)
+        result = _testparse(rst_input)
         self.assertEqual(result, exp_result)
 
 
@@ -67,7 +67,7 @@ class TestDocutilsPlain(TestBasePlain):
 
     def test_docutils_works_fine_empty(self):
         rst_input = ""
-        exp_result = '<document source="testparse() method">\n'
+        exp_result = '<document source="_testparse() method">\n'
         self.check_directive(rst_input, exp_result)
 
     def test_docutils_works_fine_somedirective(self):
@@ -77,7 +77,7 @@ class TestDocutilsPlain(TestBasePlain):
             Lorem ipsum.
         ''')
         exp_result = textwrap.dedent('''\
-        <document source="testparse() method">
+        <document source="_testparse() method">
             <container>
                 <paragraph>
                     Lorem ipsum.
@@ -90,7 +90,7 @@ class TestTestActionsDirectivePlain(TestBasePlain):
     def test_teststep_empty(self):
         rst_input = '.. test_step:: 1'
         exp_result = textwrap.dedent('''\
-        <document source="testparse() method">
+        <document source="_testparse() method">
             <test_step_node action_id="1">
         ''')
         self.check_directive(rst_input, exp_result)
@@ -98,8 +98,8 @@ class TestTestActionsDirectivePlain(TestBasePlain):
     def test_teststep_empty_noid(self):
         rst_input = '.. test_step::'
         exp_result = textwrap.dedent('''\
-        <document source="testparse() method">
-            <system_message level="3" line="1" source="testparse() method" type="ERROR">
+        <document source="_testparse() method">
+            <system_message level="3" line="1" source="_testparse() method" type="ERROR">
                 <paragraph>
                     Error in "test_step" directive:
                     1 argument(s) required, 0 supplied.
@@ -111,7 +111,7 @@ class TestTestActionsDirectivePlain(TestBasePlain):
     def test_testresult_empty(self):
         rst_input = '.. test_result:: 1'
         exp_result = textwrap.dedent('''\
-        <document source="testparse() method">
+        <document source="_testparse() method">
             <test_result_node action_id="1">
         ''')
         self.check_directive(rst_input, exp_result)
@@ -123,7 +123,7 @@ class TestTestActionsDirectivePlain(TestBasePlain):
             Some content.
         ''')
         exp_result = textwrap.dedent('''\
-        <document source="testparse() method">
+        <document source="_testparse() method">
             <test_step_node action_id="7">
                 <paragraph>
                     Some content.
@@ -137,7 +137,7 @@ class TestTestActionsDirectivePlain(TestBasePlain):
             Some content.
         ''')
         exp_result = textwrap.dedent('''\
-        <document source="testparse() method">
+        <document source="_testparse() method">
             <test_result_node action_id="7">
                 <paragraph>
                     Some content.
@@ -150,8 +150,8 @@ class TestTestMetadataDirectivePlain(TestBasePlain):
     def test_testmetadata_empty(self):
         rst_input = '.. test_metadata:: author'
         exp_result = textwrap.dedent('''\
-        <document source="testparse() method">
-            <system_message level="3" line="1" source="testparse() method" type="ERROR">
+        <document source="_testparse() method">
+            <system_message level="3" line="1" source="_testparse() method" type="ERROR">
                 <paragraph>
                     Error in "test_metadata" directive:
                     2 argument(s) required, 1 supplied.
@@ -163,7 +163,7 @@ class TestTestMetadataDirectivePlain(TestBasePlain):
     def test_testmetadata_single(self):
         rst_input = '.. test_metadata:: author foo@example.com'
         exp_result = textwrap.dedent('''\
-        <document source="testparse() method">
+        <document source="_testparse() method">
             <pending>
                 .. internal attributes:
                      .transform: pylatest.xdocutils.transforms.TestMetadataPlainTransform
@@ -176,7 +176,7 @@ class TestTestMetadataDirectivePlain(TestBasePlain):
     def test_testmetadata_two_authors(self):
         rst_input = '.. test_metadata:: author foo@example.com bar@example.com'
         exp_result = textwrap.dedent('''\
-        <document source="testparse() method">
+        <document source="_testparse() method">
             <pending>
                 .. internal attributes:
                      .transform: pylatest.xdocutils.transforms.TestMetadataPlainTransform
@@ -193,7 +193,7 @@ class TestTestMetadataDirectivePlain(TestBasePlain):
         .. test_metadata:: comment This is here just to test arg processing.
         ''')
         exp_result = textwrap.dedent('''\
-        <document source="testparse() method">
+        <document source="_testparse() method">
             <pending>
                 .. internal attributes:
                      .transform: pylatest.xdocutils.transforms.TestMetadataPlainTransform
@@ -225,7 +225,7 @@ class TestRequirementDirectivePlain(TestBasePlain):
             Some content.
         ''')
         exp_result = textwrap.dedent('''\
-        <document source="testparse() method">
+        <document source="_testparse() method">
             <requirement_node req_id="SOME_ID">
                 <paragraph>
                     Some content.
@@ -242,7 +242,7 @@ class TestRequirementDirectivePlain(TestBasePlain):
             Expedita saepe architecto numquam accusamus.
         ''')
         exp_result = textwrap.dedent('''\
-        <document source="testparse() method">
+        <document source="_testparse() method">
             <requirement_node priority="high" req_id="FOO123">
                 <paragraph>
                     Natus illum repudiandae consequatur.
@@ -267,7 +267,7 @@ class TestRequirementDirectiveTable(TestBasePlain):
             Some content.
         ''')
         exp_result = textwrap.dedent('''\
-        <document source="testparse() method">
+        <document source="_testparse() method">
             <section ids="requirement-some-id" names="requirement\ some_id">
                 <title>
                     Requirement SOME_ID
@@ -286,7 +286,7 @@ class TestRequirementDirectiveTable(TestBasePlain):
             Expedita saepe architecto numquam accusamus.
         ''')
         exp_result = textwrap.dedent('''\
-        <document source="testparse() method">
+        <document source="_testparse() method">
             <section ids="requirement-foo123" names="requirement\ foo123">
                 <title>
                     Requirement FOO123

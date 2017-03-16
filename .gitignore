@@ -9,3 +9,4 @@ dist
 tmp
 examples/*.html
 .tox
+.cache
