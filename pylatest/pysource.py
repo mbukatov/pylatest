@@ -231,33 +231,33 @@ def main():
 
     with open(args.filepath, 'r') as python_file:
         source_content = python_file.read()
-        doc_fragments = extract_doc_fragments(source_content)
+        docfr_dict = extract_doc_fragments(source_content)
 
     retcode = 0
 
-    for doc_id, docfr in doc_fragments.items():
+    for doc_id, doc_fr in docfr_dict.items():
         if args.list:
-            # try to use default filename when no testcase/doc id is used
+            # here we list test case names wihtout doing anything else
+            # try to use default filename as a testcase name (aka doc id)
+            # when doc id is not specified
             if doc_id is None and args.default_filename is not None:
                 doc_id = args.default_filename
             print("{0}".format(doc_id))
             continue
-        # report all errors found so far
-        for lineno, error in doc.errors():
-            msg = "Error on line {0:d}: {1:s} (doc_id: {2:s})"
-            print(msg.format(lineno, error, doc_id), file=sys.stderr)
-        # TODO: try except
-        rst_document = doc.recreate()
-        # report all runtime errors
-        for error in doc.errors_lastrecreate():
-            msg = "Error: {0:s} (doc_id: {1:s})"
-            print(msg.format(error, doc_id), file=sys.stderr)
+
+        # TODO: add proper error checking
+        # build RstTestCaseDoc from TestCaseDocFragments
+        doc = doc_fr.build_doc()
+        # generate string with rst source for the test case document
+        rst_content = doc.build_rst()
+
         if args.enforce_id and doc_id is None:
             msg = "docstring without id found while id enforcing enabled"
             # TODO: report line numbers of such docstrings
             print("Error: {0:s}".format(msg), file=sys.stderr)
             retcode = 1
             break
+
         if args.create_files:
             # try to use default filename when no testcase/doc id is used
             if doc_id is None:
@@ -275,12 +275,10 @@ def main():
             else:
                 filepath = filename
             with open(filepath, 'w') as rst_file:
-                rst_file.write(rst_document)
+                rst_file.write(rst_content)
         else:
-            print(rst_document, end='')
-            if len(doc_dict) > 1:
+            print(rst_content, end='')
+            if len(docfr_dict) > 1:
                 print()
-        if doc.has_errors():
-            retcode = 1
 
     return retcode
