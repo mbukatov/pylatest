@@ -260,8 +260,8 @@ class RstTestCaseDoc(TestCaseDoc):
         self._source_file = None
 
     def __eq__(self, other):
-        return self._section_dict == other._section_dict and \
-               self._test_actions == other._test_actions
+        return (self._section_dict == other._section_dict and
+                self._test_actions == other._test_actions)
 
     def add_section(self, section, content, lineno=None):
         """

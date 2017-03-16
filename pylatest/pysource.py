@@ -27,8 +27,6 @@ import inspect
 import os
 import sys
 
-from docutils import nodes
-
 from pylatest.document import TestCaseDoc, RstTestCaseDoc, Section
 from pylatest.rstsource import find_actions, find_sections
 import pylatest.xdocutils.client
@@ -116,7 +114,7 @@ def extract_content(str_lines, start, end):
     Extract content on given lines (start, end) from str_lines list and return
     it as a single string.
     """
-    return "\n".join(str_lines[start-1:end]) + '\n'
+    return "\n".join(str_lines[start - 1:end]) + '\n'
 
 
 class TestCaseDocFragments(object):

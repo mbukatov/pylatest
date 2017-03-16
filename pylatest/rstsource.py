@@ -20,15 +20,9 @@ Helper functions for processing of rst source text strings.
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-import ast
-import inspect
-import os
-import sys
-
 from docutils.core import publish_doctree
 from docutils import nodes
 
-from pylatest.document import TestCaseDoc, Section
 import pylatest.xdocutils.nodes
 
 
@@ -49,9 +43,9 @@ class RstSection(object):
         self.end_line = end_line
 
     def __eq__(self, other):
-        return self.title == other.title \
-               and self.start_line == other.start_line \
-               and self.end_line == other.end_line
+        return (self.title == other.title and
+                self.start_line == other.start_line and
+                self.end_line == other.end_line)
 
     def __repr__(self):
         template = "RstSection('{}', {}, {})"
@@ -67,10 +61,10 @@ class RstTestAction(object):
         self.end_line = end_line
 
     def __eq__(self, other):
-        return self.action_id == other.action_id \
-               and self.action_name == other.action_name \
-               and self.start_line == other.start_line \
-               and self.end_line == other.end_line
+        return (self.action_id == other.action_id and
+                self.action_name == other.action_name and
+                self.start_line == other.start_line and
+                self.end_line == other.end_line)
 
     def __repr__(self):
         template = "RstTestAction({}, {}, {}, {})"
@@ -130,7 +124,7 @@ def find_sections(rst_source):
     if contains_meta and nodetree.children[0].tagname == "title":
         if len(sections) == 0:
             # rst_source contains just the meta data fragment
-            section = RstSection(None, 1,  get_last_line_num(rst_source))
+            section = RstSection(None, 1, get_last_line_num(rst_source))
             sections.append(section)
         else:
             section = RstSection(None, 1, sections[0].start_line - 2)
@@ -225,7 +219,7 @@ def find_actions(rst_source):
                 # ok, it seems this node is the last one in the rst source
                 end_line = get_last_line_num(rst_source)
         action_id = node.attributes['action_id']
-        action_name = node.tagname[:-5] # dropping '_node' suffix
+        action_name = node.tagname[:-5]  # dropping '_node' suffix
         action = RstTestAction(action_id, action_name, start_line, end_line)
         actions.append(action)
     return actions
