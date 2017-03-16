@@ -270,9 +270,15 @@ class TestRstTestCaseDoc(unittest.TestCase):
 
     def test_rsttestcasedoc_add_section_multiple_duplicit(self):
         tc = RstTestCaseDoc()
+        # set 1st value for DESCR section
         tc.add_section(TestCaseDoc.DESCR, "descr. one", lineno=42)
+        # check that the 1st value has been included
+        self.assertEqual(tc.get_section(TestCaseDoc.DESCR), "descr. one")
         # 2nd value overrrides the original one
         tc.add_section(TestCaseDoc.DESCR, "descr. two", lineno=94)
+        # check that the 2nd value has been included
+        self.assertEqual(tc.get_section(TestCaseDoc.DESCR), "descr. two")
+        # additional checks
         self.assertFalse(tc.is_empty())
         self.assertEqual(sorted(tc.sections), sorted([TestCaseDoc.DESCR]))
         self.assertEqual(
