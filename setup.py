@@ -64,5 +64,4 @@ setup(
             'pylatest2pseudoxml=pylatest.main:pylatest2pseudoxml',
         ],
     },
-    test_suite = 'tests',
     )
