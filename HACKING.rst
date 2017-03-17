@@ -25,6 +25,20 @@ sitepackages option (works with both unit tests and flake8 check)::
 
     $ tox --sitepackages
 
+You can even pass options for pytest from tox as shown in the following
+example, where we execute only particular test case in py35 test environment
+using system site packages::
+
+    $ tox --sitepackages -e py35 tests/test_xdocutils.py::TestTestActionsTableAutoId::test_teststep_simple
+
+Note that to pass command line options into pytest, one has to use ``--``::
+
+    $ tox -e py35 -- --durations=3 tests/test_rstsource.py::TestFindSections
+
+Very useful is to drop into pdb shell when a test case fails::
+
+    $ tox --sitepackages -e py35 -- --pdb tests/test_rstsource.py
+
 Installation into virtualenv
 ============================
 
