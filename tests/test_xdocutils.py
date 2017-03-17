@@ -26,6 +26,8 @@ rst source into html build and then checks the result.
 import textwrap
 import unittest
 
+import pytest
+
 import pylatest.xdocutils.client as xclient
 
 
@@ -199,6 +201,7 @@ class TestTestActionsPlainAutoId(TestTestActionsPlain):
         # show full diff (note: python3 unittest diff is much better)
         self.maxDiff = None
 
+    @pytest.mark.xfail(reason="https://gitlab.com/mbukatov/pylatest/issues/11")
     def test_test_action_simple_autoid(self):
         rst_input = textwrap.dedent('''\
         .. test_step:: 1
@@ -221,6 +224,7 @@ class TestTestActionsPlainAutoId(TestTestActionsPlain):
         ''')
         self.check_html_body(rst_input, exp_result)
 
+    @pytest.mark.xfail(reason="https://gitlab.com/mbukatov/pylatest/issues/11")
     def test_test_actions_two_autoid(self):
         rst_input = textwrap.dedent('''\
         .. test_step:: 1
