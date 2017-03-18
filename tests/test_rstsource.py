@@ -127,11 +127,6 @@ class TestFindSections(unittest.TestCase):
             ]
         self.assertEqual(rstsource.find_sections(src), exp_sections)
 
-    # TODO: this test case fails, fix this!
-    # root cause is that test_metadata processing hack causes description header
-    # to be recognized as subtitle, so that whole description section seems to be
-    # just part of the header, the issue is reported as:
-    # https://gitlab.com/mbukatov/pylatest/issues/27
     def test_find_sections_metadata_with_other_sections_one(self):
         src = textwrap.dedent('''\
         Just Another Test Case
