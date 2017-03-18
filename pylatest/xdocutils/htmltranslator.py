@@ -46,16 +46,6 @@ def visit_test_result_node(self, node):
 def depart_test_result_node(self, node):
     self.body.append('\n</div>\n')
 
-def visit_test_metadata_node(self, node):
-    attributes = {
-        'class': 'pylatest_metadata',
-        'name': node.attributes['name'],
-        }
-    self.body.append(self.starttag(node, 'span', **attributes))
-
-def depart_test_metadata_node(self, node):
-    self.body.append('</span>\n')
-
 def visit_requirement_node(self, node):
     attributes = {
         'class': 'pylatest_requirement',

@@ -41,8 +41,6 @@ from pylatest.xdocutils.directives import TestActionTableDirective
 from pylatest.xdocutils.directives import TestActionPlainDirective
 from pylatest.xdocutils.directives import TestActionTableDirectiveAutoId
 from pylatest.xdocutils.directives import TestActionPlainDirectiveAutoId
-from pylatest.xdocutils.directives import TestMetadataTableDirective
-from pylatest.xdocutils.directives import TestMetadataPlainDirective
 from pylatest.xdocutils.directives import RequirementPlainDirective
 from pylatest.xdocutils.directives import RequirementSectionDirective
 from pylatest.xdocutils.roles import redhat_bugzilla_role
@@ -88,7 +86,6 @@ def register_table(auto_id=False):
     Register table generating implementation of pylatest rst directives
     and roles.
     """
-    directives.register_directive("test_metadata", TestMetadataTableDirective)
     if auto_id:
         directives.register_directive("test_step",
             TestActionTableDirectiveAutoId)
@@ -105,7 +102,6 @@ def register_plain(auto_id=False):
     Register plain implementation of pylatest rst directives and roles.
     This is intended for further processing (HTML only).
     """
-    directives.register_directive("test_metadata", TestMetadataPlainDirective)
     if auto_id:
         directives.register_directive("test_step",
             TestActionPlainDirectiveAutoId)
