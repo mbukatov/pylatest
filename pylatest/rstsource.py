@@ -113,11 +113,7 @@ def find_sections(rst_source):
         prev_section.end_line = get_last_line_num(rst_source)
     # check if the node tree contains test metadata nodes
     contains_meta = False
-    for node in nodetree.traverse(lambda n:
-            isinstance(n, pylatest.xdocutils.nodes.test_metadata_node)):
-        # TODO: this completelly ignores location of such metadata nodes
-        # in the node tree, report True only when metadata node is not inside
-        # some section
+    for node in nodetree.traverse(lambda n: isinstance(n, nodes.docinfo)):
         contains_meta = True
         break
     # look for metadata fragment and report it "as a special section"

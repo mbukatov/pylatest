@@ -1,8 +1,8 @@
 Ahoj Světe Test Case
 ********************
 
-.. test_metadata:: author bar@example.com
-.. test_metadata:: date 2015-11-07
+:author: bar@example.com
+:date: 2015-11-07
 
 Description
 ===========

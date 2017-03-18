@@ -5,9 +5,9 @@
 Hello World Test Case
 *********************
 
-.. test_metadata:: author foo@example.com
-.. test_metadata:: date 2015-11-06
-.. test_metadata:: comment This is here just to test metadata processing.
+:author: foo@example.com
+:date: 2015-11-06
+:comment: This is here just to test metadata processing.
 """
 
 """@pylatest
@@ -146,8 +146,8 @@ def test02():
     Ahoj Světe Test Case
     ********************
 
-    .. test_metadata:: author bar@example.com
-    .. test_metadata:: date 2015-11-07
+    :author: bar@example.com
+    :date: 2015-11-07
 
     Description
     ===========
@@ -245,7 +245,7 @@ def main():
     Just Another Test Case
     **********************
 
-    .. test_metadata:: author foo.bar@example.com
+    :author: foo.bar@example.com
 
     Description
     ===========

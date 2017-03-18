@@ -93,9 +93,9 @@ class TestFindSections(unittest.TestCase):
         src = textwrap.dedent('''\
         There is no title or any sections. Just a paragraph and some metadata.
 
-        .. test_metadata:: author foo@example.com
-        .. test_metadata:: date 2015-11-06
-        .. test_metadata:: This is here just to test metadata processing.
+        :author: foo@example.com
+        :date: 2015-11-06
+        :comment: This is here just to test metadata processing.
         ''')
         self.assertEqual(rstsource.find_sections(src), [])
 
@@ -104,9 +104,9 @@ class TestFindSections(unittest.TestCase):
         Hello World Test Case
         *********************
 
-        .. test_metadata:: author foo@example.com
-        .. test_metadata:: date 2015-11-06
-        .. test_metadata:: This is here just to test metadata processing.
+        :author: foo@example.com
+        :date: 2015-11-06
+        :comment: This is here just to test metadata processing.
 
 
         ''')
@@ -120,24 +120,19 @@ class TestFindSections(unittest.TestCase):
         Just Another Test Case
         **********************
 
-        .. test_metadata:: author foo.bar@example.com
+        :author: foo.bar@example.com
         ''')
         exp_sections = [
             rstsource.RstSection(None, 1, 4),
             ]
         self.assertEqual(rstsource.find_sections(src), exp_sections)
 
-    # TODO: this test case fails, fix this!
-    # root cause is that test_metadata processing hack causes description header
-    # to be recognized as subtitle, so that whole description section seems to be
-    # just part of the header, the issue is reported as:
-    # https://gitlab.com/mbukatov/pylatest/issues/27
     def test_find_sections_metadata_with_other_sections_one(self):
         src = textwrap.dedent('''\
         Just Another Test Case
         **********************
 
-        .. test_metadata:: author foo.bar@example.com
+        :author: foo.bar@example.com
 
         Description
         ===========
@@ -156,9 +151,9 @@ class TestFindSections(unittest.TestCase):
         Hello World Test Case
         *********************
 
-        .. test_metadata:: author foo@example.com
-        .. test_metadata:: date 2015-11-06
-        .. test_metadata:: This is here just to test metadata processing.
+        :author: foo@example.com
+        :date: 2015-11-06
+        :comment: This is here just to test metadata processing.
 
         Section One
         ===========
@@ -182,9 +177,9 @@ class TestFindSections(unittest.TestCase):
         Hello World Test Case
         *********************
 
-        .. test_metadata:: author foo@example.com
-        .. test_metadata:: date 2015-11-06
-        .. test_metadata:: This is here just to test metadata processing.
+        :author: foo@example.com
+        :date: 2015-11-06
+        :comment: This is here just to test metadata processing.
 
         Section One
         ***********
@@ -266,8 +261,8 @@ class TestFindSections(unittest.TestCase):
          Test FooBar
         =============
 
-        .. test_metadata:: author foo@example.com
-        .. test_metadata:: date 2015-11-06
+        :author: foo@example.com
+        :date: 2015-11-06
 
         Header One
         ==========
@@ -394,8 +389,8 @@ class TestFindActions(unittest.TestCase):
          Test FooBar
         =============
 
-        .. test_metadata:: author foo@example.com
-        .. test_metadata:: date 2015-11-06
+        :author: foo@example.com
+        :date: 2015-11-06
 
         Header One
         ==========
@@ -554,8 +549,8 @@ class TestFindActions(unittest.TestCase):
          Test FooBar
         =============
 
-        .. test_metadata:: author foo@example.com
-        .. test_metadata:: date 2015-11-06
+        :author: foo@example.com
+        :date: 2015-11-06
 
         Header One
         ==========

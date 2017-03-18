@@ -235,8 +235,8 @@ class TestTestCaseDocFragments(unittest.TestCase):
         Hello World Test Case
         *********************
 
-        .. test_metadata:: author foo@example.com
-        .. test_metadata:: date 2015-11-06
+        :author: foo@example.com
+        :date: 2015-11-06
 
         Description
         ===========
@@ -263,7 +263,7 @@ class TestTestCaseDocFragments(unittest.TestCase):
         Just Another Test Case
         **********************
 
-        .. test_metadata:: author foo.bar@example.com
+        :author: foo.bar@example.com
 
         Description
         ===========
@@ -275,7 +275,7 @@ class TestTestCaseDocFragments(unittest.TestCase):
         Just Another Test Case
         **********************
 
-        .. test_metadata:: author foo.bar@example.com
+        :author: foo.bar@example.com
         ''')
         expected_desc = textwrap.dedent('''\
         Description
@@ -289,8 +289,8 @@ class TestTestCaseDocFragments(unittest.TestCase):
         self.assertFalse(doc.is_empty())
         self.assertTrue(TestCaseDoc._HEAD in doc.sections)
         self.assertTrue(TestCaseDoc.DESCR in doc.sections)
-        self.assertTrue(doc2.get_section(TestCaseDoc._HEAD), expected_head_one)
-        self.assertTrue(doc2.get_section(TestCaseDoc.DESCR), expected_desc_one)
+        self.assertTrue(doc.get_section(TestCaseDoc._HEAD), expected_head)
+        self.assertTrue(doc.get_section(TestCaseDoc.DESCR), expected_desc)
 
     def test_docfragments_build_doc_section_override(self):
         # 1st fragment
@@ -298,7 +298,7 @@ class TestTestCaseDocFragments(unittest.TestCase):
         Just Another Test Case
         **********************
 
-        .. test_metadata:: author foo.bar@example.com
+        :author: foo.bar@example.com
 
         Description
         ===========
@@ -314,7 +314,7 @@ class TestTestCaseDocFragments(unittest.TestCase):
         Just Another Test Case
         **********************
 
-        .. test_metadata:: author foo.bar@example.com
+        :author: foo.bar@example.com
         ''')
         # description section from 1st fragment
         expected_desc_one = textwrap.dedent('''\
@@ -343,15 +343,15 @@ class TestTestCaseDocFragments(unittest.TestCase):
         See :BZ:`439858` for more details.
         ''')
         # process 1st fragment first
-        self.fragments.add_fragment(fragment_two, lineno=131)
+        self.fragments.add_fragment(fragment_one, lineno=131)
         doc1 = self.fragments.build_doc()
         self.assertFalse(doc1.is_empty())
         self.assertTrue(TestCaseDoc._HEAD in doc1.sections)
         self.assertTrue(TestCaseDoc.DESCR in doc1.sections)
-        self.assertTrue(doc2.get_section(TestCaseDoc._HEAD), expected_head_one)
-        self.assertTrue(doc2.get_section(TestCaseDoc.DESCR), expected_desc_one)
+        self.assertTrue(doc1.get_section(TestCaseDoc._HEAD), expected_head_one)
+        self.assertTrue(doc1.get_section(TestCaseDoc.DESCR), expected_desc_one)
         # update: add 2nd fragment and retry
-        self.fragments.add_fragment(fragment_one, lineno=11)
+        self.fragments.add_fragment(fragment_two, lineno=11)
         doc2 = self.fragments.build_doc()
         self.assertFalse(doc2.is_empty())
         self.assertTrue(TestCaseDoc._HEAD in doc2.sections)
@@ -369,8 +369,8 @@ class TestTestCaseDocFragments(unittest.TestCase):
         Hello World Test Case
         *********************
 
-        .. test_metadata:: author foo@example.com
-        .. test_metadata:: date 2015-11-06
+        :author: foo@example.com
+        :date: 2015-11-06
 
         Description
         ===========
@@ -399,9 +399,9 @@ class TestTestCaseDocFragments(unittest.TestCase):
             Hello World Test Case
             *********************
 
-            .. test_metadata:: author foo@example.com
-            .. test_metadata:: date 2015-11-06
-            .. test_metadata:: comment This is here just to test metadata processing.
+            :author: foo@example.com
+            :date: 2015-11-06
+            :comment: This is here just to test metadata processing.
             """),
             textwrap.dedent("""\
             Description
