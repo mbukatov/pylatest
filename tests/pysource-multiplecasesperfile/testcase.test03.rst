@@ -1,7 +1,7 @@
 Just Another Test Case
 **********************
 
-.. test_metadata:: author foo.bar@example.com
+:author: foo.bar@example.com
 
 Description
 ===========

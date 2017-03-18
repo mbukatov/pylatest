@@ -1,7 +1,7 @@
 TODO: name of the testcase
 **************************
 
-.. test_metadata:: author ${tc_metadata_author}
+:author: ${tc_metadata_author}
 
 Description
 ===========

@@ -235,8 +235,8 @@ class TestTestCaseDocFragments(unittest.TestCase):
         Hello World Test Case
         *********************
 
-        .. test_metadata:: author foo@example.com
-        .. test_metadata:: date 2015-11-06
+        :author: foo@example.com
+        :date: 2015-11-06
 
         Description
         ===========
@@ -263,7 +263,7 @@ class TestTestCaseDocFragments(unittest.TestCase):
         Just Another Test Case
         **********************
 
-        .. test_metadata:: author foo.bar@example.com
+        :author: foo.bar@example.com
 
         Description
         ===========
@@ -275,7 +275,7 @@ class TestTestCaseDocFragments(unittest.TestCase):
         Just Another Test Case
         **********************
 
-        .. test_metadata:: author foo.bar@example.com
+        :author: foo.bar@example.com
         ''')
         expected_desc = textwrap.dedent('''\
         Description
@@ -298,7 +298,7 @@ class TestTestCaseDocFragments(unittest.TestCase):
         Just Another Test Case
         **********************
 
-        .. test_metadata:: author foo.bar@example.com
+        :author: foo.bar@example.com
 
         Description
         ===========
@@ -314,7 +314,7 @@ class TestTestCaseDocFragments(unittest.TestCase):
         Just Another Test Case
         **********************
 
-        .. test_metadata:: author foo.bar@example.com
+        :author: foo.bar@example.com
         ''')
         # description section from 1st fragment
         expected_desc_one = textwrap.dedent('''\
@@ -369,8 +369,8 @@ class TestTestCaseDocFragments(unittest.TestCase):
         Hello World Test Case
         *********************
 
-        .. test_metadata:: author foo@example.com
-        .. test_metadata:: date 2015-11-06
+        :author: foo@example.com
+        :date: 2015-11-06
 
         Description
         ===========
@@ -399,9 +399,9 @@ class TestTestCaseDocFragments(unittest.TestCase):
             Hello World Test Case
             *********************
 
-            .. test_metadata:: author foo@example.com
-            .. test_metadata:: date 2015-11-06
-            .. test_metadata:: comment This is here just to test metadata processing.
+            :author: foo@example.com
+            :date: 2015-11-06
+            :comment: This is here just to test metadata processing.
             """),
             textwrap.dedent("""\
             Description

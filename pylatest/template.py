@@ -10,7 +10,7 @@ Example of usage, following command::
     $ ls
     foobarcase.rst
     $ grep '^.. test_metadata::' foobarcase.rst
-    .. test_metadata:: author john@example.com
+    :author: john@example.com
 
 where ``pylatest-template`` is command line tool which uses ``main()``
 function from this module.

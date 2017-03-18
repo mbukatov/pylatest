@@ -161,7 +161,7 @@ class TestTestMetadataDirectivePlain(TestBasePlain):
         self.check_directive(rst_input, exp_result)
 
     def test_testmetadata_single(self):
-        rst_input = '.. test_metadata:: author foo@example.com'
+        rst_input = ':author: foo@example.com'
         exp_result = textwrap.dedent('''\
         <document source="_testparse() method">
             <pending>
@@ -174,7 +174,7 @@ class TestTestMetadataDirectivePlain(TestBasePlain):
         self.check_directive(rst_input, exp_result)
 
     def test_testmetadata_two_authors(self):
-        rst_input = '.. test_metadata:: author foo@example.com bar@example.com'
+        rst_input = ':author: foo@example.com bar@example.com'
         exp_result = textwrap.dedent('''\
         <document source="_testparse() method">
             <pending>
@@ -188,9 +188,9 @@ class TestTestMetadataDirectivePlain(TestBasePlain):
 
     def test_testmetadata_multiple(self):
         rst_input = textwrap.dedent('''\
-        .. test_metadata:: author foo@example.com
-        .. test_metadata:: date 2015-11-06
-        .. test_metadata:: comment This is here just to test arg processing.
+        :author: foo@example.com
+        :date: 2015-11-06
+        :comment: This is here just to test arg processing.
         ''')
         exp_result = textwrap.dedent('''\
         <document source="_testparse() method">
