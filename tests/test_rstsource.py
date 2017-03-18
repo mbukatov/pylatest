@@ -95,7 +95,7 @@ class TestFindSections(unittest.TestCase):
 
         :author: foo@example.com
         :date: 2015-11-06
-        .. test_metadata:: This is here just to test metadata processing.
+        :comment: This is here just to test metadata processing.
         ''')
         self.assertEqual(rstsource.find_sections(src), [])
 
@@ -106,7 +106,7 @@ class TestFindSections(unittest.TestCase):
 
         :author: foo@example.com
         :date: 2015-11-06
-        .. test_metadata:: This is here just to test metadata processing.
+        :comment: This is here just to test metadata processing.
 
 
         ''')
@@ -158,7 +158,7 @@ class TestFindSections(unittest.TestCase):
 
         :author: foo@example.com
         :date: 2015-11-06
-        .. test_metadata:: This is here just to test metadata processing.
+        :comment: This is here just to test metadata processing.
 
         Section One
         ===========
@@ -184,7 +184,7 @@ class TestFindSections(unittest.TestCase):
 
         :author: foo@example.com
         :date: 2015-11-06
-        .. test_metadata:: This is here just to test metadata processing.
+        :comment: This is here just to test metadata processing.
 
         Section One
         ***********

@@ -9,7 +9,7 @@ Example of usage, following command::
     $ pylatest-template --author john@example.com foobarcase
     $ ls
     foobarcase.rst
-    $ grep '^.. test_metadata::' foobarcase.rst
+    $ grep '^:author:' foobarcase.rst
     :author: john@example.com
 
 where ``pylatest-template`` is command line tool which uses ``main()``
