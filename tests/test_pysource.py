@@ -289,8 +289,8 @@ class TestTestCaseDocFragments(unittest.TestCase):
         self.assertFalse(doc.is_empty())
         self.assertTrue(TestCaseDoc._HEAD in doc.sections)
         self.assertTrue(TestCaseDoc.DESCR in doc.sections)
-        self.assertTrue(doc2.get_section(TestCaseDoc._HEAD), expected_head_one)
-        self.assertTrue(doc2.get_section(TestCaseDoc.DESCR), expected_desc_one)
+        self.assertTrue(doc.get_section(TestCaseDoc._HEAD), expected_head)
+        self.assertTrue(doc.get_section(TestCaseDoc.DESCR), expected_desc)
 
     def test_docfragments_build_doc_section_override(self):
         # 1st fragment
