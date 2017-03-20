@@ -20,6 +20,8 @@ import unittest
 import textwrap
 import os
 
+import pytest
+
 from pylatest.document import Section, TestCaseDoc, RstTestCaseDoc
 import pylatest.document
 
@@ -48,7 +50,7 @@ class TestTestActions(unittest.TestCase):
         assert list(self.actions) == [(1, '1.step', '1.result')]
 
     def test_actions_add_error(self):
-        with self.assertRaises(pylatest.document.PylatestActionsError):
+        with pytest.raises(pylatest.document.PylatestActionsError):
             self.actions.add("test_foobar", "1.foobar", 1)
         assert len(self.actions) == 0
 
@@ -90,7 +92,7 @@ class TestTestActions(unittest.TestCase):
         self.actions.add("test_step", "1.step", 1)
         self.actions.add("test_result", "1.result", 1)
         assert len(self.actions) == 1
-        with self.assertRaises(pylatest.document.PylatestActionsError):
+        with pytest.raises(pylatest.document.PylatestActionsError):
             self.actions.add("test_step", "1.step-clash", 1)
         assert len(self.actions) == 1
         assert list(self.actions.iter_content()) == ["1.step", "1.result"]
@@ -234,7 +236,7 @@ class TestRstTestCaseDoc(unittest.TestCase):
     def test_rsttestcasedoc_get_section_one_missing(self):
         tc = RstTestCaseDoc()
         tc.add_section(TestCaseDoc._HEAD, "some content", lineno=42)
-        with self.assertRaises(pylatest.document.PylatestDocumentError):
+        with pytest.raises(pylatest.document.PylatestDocumentError):
             tc.get_section(TestCaseDoc.DESCR)
 
     def test_rsttestcasedoc_add_section_multiple_duplicit(self):
@@ -271,7 +273,7 @@ class TestRstTestCaseDoc(unittest.TestCase):
 
     def test_rsttestcasedoc_add_testaction_wrong(self):
         tc = RstTestCaseDoc()
-        with self.assertRaises(pylatest.document.PylatestActionsError):
+        with pytest.raises(pylatest.document.PylatestActionsError):
             tc.add_test_action("test_foobarbaz", "content", 1)
         assert tc.is_empty()
         assert tc.sections == []
@@ -300,7 +302,7 @@ class TestRstTestCaseDoc(unittest.TestCase):
     def test_rsttestcasedoc_add_testaction_multiple_duplicit(self):
         tc = RstTestCaseDoc()
         tc.add_test_action("test_step", "test step", 1)
-        with self.assertRaises(pylatest.document.PylatestActionsError):
+        with pytest.raises(pylatest.document.PylatestActionsError):
             tc.add_test_action("test_step", "another test step", 1)
         assert not tc.is_empty()
         assert tc.sections == [TestCaseDoc.STEPS]
