@@ -184,17 +184,17 @@ class TestTestCaseDoc(unittest.TestCase):
             self.assertIn(section, TestCaseDoc.SECTIONS_ALL)
 
     def test_has_section(self):
-        self.assertTrue(TestCaseDoc.has_section(title="Description"))
-        self.assertTrue(TestCaseDoc.has_section("Test Steps"))
-        self.assertFalse(TestCaseDoc.has_section(title="Requirements"))
-        self.assertFalse(TestCaseDoc.has_section("Foo Bar"))
+        assert TestCaseDoc.has_section(title="Description")
+        assert TestCaseDoc.has_section("Test Steps")
+        assert not TestCaseDoc.has_section(title="Requirements")
+        assert not TestCaseDoc.has_section("Foo Bar")
 
 
 class TestRstTestCaseDoc(unittest.TestCase):
 
     def test_rsttestcasedoc_empty(self):
         tc = RstTestCaseDoc()
-        self.assertTrue(tc.is_empty())
+        assert tc.is_empty()
         assert tc.sections == []
         assert tc.missing_sections == TestCaseDoc.SECTIONS_ALL
 
@@ -210,7 +210,7 @@ class TestRstTestCaseDoc(unittest.TestCase):
     def test_rsttestcasedoc_add_section_simple(self):
         tc = RstTestCaseDoc()
         tc.add_section(TestCaseDoc.DESCR, "string content", lineno=42)
-        self.assertFalse(tc.is_empty())
+        assert not tc.is_empty()
         assert tc.sections == [TestCaseDoc.DESCR]
         assert sorted(tc.missing_sections + tc.sections) == \
                sorted(TestCaseDoc.SECTIONS_ALL)
@@ -219,7 +219,7 @@ class TestRstTestCaseDoc(unittest.TestCase):
         tc = RstTestCaseDoc()
         tc.add_section(TestCaseDoc._HEAD, "header", lineno=42)
         tc.add_section(TestCaseDoc.DESCR, "description", lineno=83)
-        self.assertFalse(tc.is_empty())
+        assert not tc.is_empty()
         assert sorted(tc.sections) == \
                sorted([TestCaseDoc._HEAD, TestCaseDoc.DESCR])
         assert sorted(tc.missing_sections + tc.sections) == \
@@ -248,7 +248,7 @@ class TestRstTestCaseDoc(unittest.TestCase):
         # check that the 2nd value has been included
         assert tc.get_section(TestCaseDoc.DESCR) == "descr. two"
         # additional checks
-        self.assertFalse(tc.is_empty())
+        assert not tc.is_empty()
         assert sorted(tc.sections) == sorted([TestCaseDoc.DESCR])
         assert sorted(tc.missing_sections + tc.sections) == \
                sorted(TestCaseDoc.SECTIONS_ALL)
@@ -259,7 +259,7 @@ class TestRstTestCaseDoc(unittest.TestCase):
         tc.add_section(TestCaseDoc.DESCR, "description", lineno=55)
         tc.add_section(TestCaseDoc.SETUP, "setup", lineno=98)
         tc.add_section(TestCaseDoc.TEARD, "teardown", lineno=150)
-        self.assertFalse(tc.is_empty())
+        assert not tc.is_empty()
         assert sorted(tc.sections) == sorted([
             TestCaseDoc._HEAD,
             TestCaseDoc.DESCR,
@@ -273,7 +273,7 @@ class TestRstTestCaseDoc(unittest.TestCase):
         tc = RstTestCaseDoc()
         with self.assertRaises(pylatest.document.PylatestActionsError):
             tc.add_test_action("test_foobarbaz", "content", 1)
-        self.assertTrue(tc.is_empty())
+        assert tc.is_empty()
         assert tc.sections == []
         assert tc.missing_sections == TestCaseDoc.SECTIONS_ALL
         assert sorted(tc.missing_sections + tc.sections) == \
@@ -282,7 +282,7 @@ class TestRstTestCaseDoc(unittest.TestCase):
     def test_rsttestcasedoc_add_testaction_simple(self):
         tc = RstTestCaseDoc()
         tc.add_test_action("test_step", "content", 1)
-        self.assertFalse(tc.is_empty())
+        assert not tc.is_empty()
         assert tc.sections == [TestCaseDoc.STEPS]
         assert sorted(tc.missing_sections + tc.sections) == \
                sorted(TestCaseDoc.SECTIONS_ALL)
@@ -292,7 +292,7 @@ class TestRstTestCaseDoc(unittest.TestCase):
         tc.add_test_action("test_step", "test step", 1)
         tc.add_test_action("test_result", "test result", 1)
         tc.add_test_action("test_step", "another test step", 2)
-        self.assertFalse(tc.is_empty())
+        assert not tc.is_empty()
         assert tc.sections == [TestCaseDoc.STEPS]
         assert sorted(tc.missing_sections + tc.sections) == \
                sorted(TestCaseDoc.SECTIONS_ALL)
@@ -302,7 +302,7 @@ class TestRstTestCaseDoc(unittest.TestCase):
         tc.add_test_action("test_step", "test step", 1)
         with self.assertRaises(pylatest.document.PylatestActionsError):
             tc.add_test_action("test_step", "another test step", 1)
-        self.assertFalse(tc.is_empty())
+        assert not tc.is_empty()
         assert tc.sections == [TestCaseDoc.STEPS]
         assert sorted(tc.missing_sections + tc.sections) == \
                sorted(TestCaseDoc.SECTIONS_ALL)
@@ -315,7 +315,7 @@ class TestRstTestCaseDoc(unittest.TestCase):
         tc.add_test_action("test_result", "test result", 1)
         tc.add_test_action("test_step", "another test step", 2)
         assert tc == tc
-        self.assertFalse(tc.is_empty())
+        assert not tc.is_empty()
 
     def test_rsttestcasedoc_eq_nonempty(self):
         tc1 = RstTestCaseDoc()

@@ -108,14 +108,14 @@ class TestStringExtraction(unittest.TestCase):
         And now something completelly different.
         """
         is_pylatest_str, _, _ = pysource.classify_docstring(docstring)
-        self.assertTrue(is_pylatest_str)
+        assert is_pylatest_str
 
     def test_is_pylatest_docstring_verysimple_withidlist(self):
         docstring = """@pylatest foobar 123
         And now something completelly different.
         """
         is_pylatest_str, _, _ = pysource.classify_docstring(docstring)
-        self.assertTrue(is_pylatest_str)
+        assert is_pylatest_str
 
     def test_is_pylatest_docstring_teardownsection(self):
         docstring = """@pylatest
@@ -129,7 +129,7 @@ class TestStringExtraction(unittest.TestCase):
         #. The end.
         """
         is_pylatest_str, _, _ = pysource.classify_docstring(docstring)
-        self.assertTrue(is_pylatest_str)
+        assert is_pylatest_str
 
     def test_is_pylatest_docstring_falsepositive(self):
         docstring1 = "This is just a string "
@@ -155,14 +155,14 @@ class TestStringExtraction(unittest.TestCase):
         examples = [docstring1, docstring2, docstring3]
         for docstring in examples:
             is_pylatest_str, _, _ = pysource.classify_docstring(docstring)
-            self.assertFalse(is_pylatest_str)
+            assert not is_pylatest_str
 
     def test_get_doc_id_list_noid(self):
         docstring = """@pylatest  
         And now something completelly different.
         """
         is_pylatest_str, doc_id_list, _ = pysource.classify_docstring(docstring)
-        self.assertTrue(is_pylatest_str)
+        assert is_pylatest_str
         assert doc_id_list == []
 
     def test_get_doc_id_list_someids(self):
@@ -170,7 +170,7 @@ class TestStringExtraction(unittest.TestCase):
         And now something completelly different.
         """
         is_pylatest_str, doc_id_list, _ = pysource.classify_docstring(docstring)
-        self.assertTrue(is_pylatest_str)
+        assert is_pylatest_str
         assert doc_id_list == ['foo', 'bar', '1234']
 
     def test_get_docstring_content(self):
@@ -178,7 +178,7 @@ class TestStringExtraction(unittest.TestCase):
         Bicycle Repair Man.
         """
         is_pylatest_str, _, content = pysource.classify_docstring(docstring)
-        self.assertTrue(is_pylatest_str)
+        assert is_pylatest_str
         assert content == "        Bicycle Repair Man.\n        "
 
 
@@ -212,7 +212,7 @@ class TestTestCaseDocFragments(unittest.TestCase):
 
     def test_docfragments_build_doc_empty(self):
         doc = self.fragments.build_doc()
-        self.assertTrue(doc.is_empty())
+        assert doc.is_empty()
 
     def test_docfragments_build_doc_singlestep(self):
         str_fragment = textwrap.dedent('''\
@@ -222,8 +222,8 @@ class TestTestCaseDocFragments(unittest.TestCase):
         ''')
         self.fragments.add_fragment(str_fragment, lineno=11)
         doc = self.fragments.build_doc()
-        self.assertFalse(doc.is_empty())
-        self.assertTrue(TestCaseDoc.STEPS in doc.sections)
+        assert not doc.is_empty()
+        assert TestCaseDoc.STEPS in doc.sections
 
     def test_docfragments_build_doc_multiple(self):
         fragment_one = textwrap.dedent('''\
@@ -252,11 +252,11 @@ class TestTestCaseDocFragments(unittest.TestCase):
         self.fragments.add_fragment(fragment_one, lineno=11)
         self.fragments.add_fragment(fragment_two, lineno=131)
         doc = self.fragments.build_doc()
-        self.assertFalse(doc.is_empty())
-        self.assertTrue(TestCaseDoc._HEAD in doc.sections)
-        self.assertTrue(TestCaseDoc.DESCR in doc.sections)
-        self.assertTrue(TestCaseDoc.STEPS in doc.sections)
-        self.assertTrue(TestCaseDoc.TEARD in doc.sections)
+        assert not doc.is_empty()
+        assert TestCaseDoc._HEAD in doc.sections
+        assert TestCaseDoc.DESCR in doc.sections
+        assert TestCaseDoc.STEPS in doc.sections
+        assert TestCaseDoc.TEARD in doc.sections
 
     def test_docfragments_build_doc_section_header(self):
         fragment = textwrap.dedent('''\
@@ -286,11 +286,11 @@ class TestTestCaseDocFragments(unittest.TestCase):
         ''')
         self.fragments.add_fragment(fragment, lineno=133)
         doc = self.fragments.build_doc()
-        self.assertFalse(doc.is_empty())
-        self.assertTrue(TestCaseDoc._HEAD in doc.sections)
-        self.assertTrue(TestCaseDoc.DESCR in doc.sections)
-        self.assertTrue(doc.get_section(TestCaseDoc._HEAD), expected_head)
-        self.assertTrue(doc.get_section(TestCaseDoc.DESCR), expected_desc)
+        assert not doc.is_empty()
+        assert TestCaseDoc._HEAD in doc.sections
+        assert TestCaseDoc.DESCR in doc.sections
+        assert doc.get_section(TestCaseDoc._HEAD), expected_head
+        assert doc.get_section(TestCaseDoc.DESCR), expected_desc
 
     def test_docfragments_build_doc_section_override(self):
         # 1st fragment
@@ -345,19 +345,19 @@ class TestTestCaseDocFragments(unittest.TestCase):
         # process 1st fragment first
         self.fragments.add_fragment(fragment_one, lineno=131)
         doc1 = self.fragments.build_doc()
-        self.assertFalse(doc1.is_empty())
-        self.assertTrue(TestCaseDoc._HEAD in doc1.sections)
-        self.assertTrue(TestCaseDoc.DESCR in doc1.sections)
-        self.assertTrue(doc1.get_section(TestCaseDoc._HEAD), expected_head_one)
-        self.assertTrue(doc1.get_section(TestCaseDoc.DESCR), expected_desc_one)
+        assert not doc1.is_empty()
+        assert TestCaseDoc._HEAD in doc1.sections
+        assert TestCaseDoc.DESCR in doc1.sections
+        assert doc1.get_section(TestCaseDoc._HEAD), expected_head_one
+        assert doc1.get_section(TestCaseDoc.DESCR), expected_desc_one
         # update: add 2nd fragment and retry
         self.fragments.add_fragment(fragment_two, lineno=11)
         doc2 = self.fragments.build_doc()
-        self.assertFalse(doc2.is_empty())
-        self.assertTrue(TestCaseDoc._HEAD in doc2.sections)
-        self.assertTrue(TestCaseDoc.DESCR in doc2.sections)
-        self.assertTrue(doc2.get_section(TestCaseDoc._HEAD), expected_head_one)
-        self.assertTrue(doc2.get_section(TestCaseDoc.DESCR), fragment_two)
+        assert not doc2.is_empty()
+        assert TestCaseDoc._HEAD in doc2.sections
+        assert TestCaseDoc.DESCR in doc2.sections
+        assert doc2.get_section(TestCaseDoc._HEAD), expected_head_one
+        assert doc2.get_section(TestCaseDoc.DESCR), fragment_two
 
     def test_docfragments_build_doc_multiple_buildmany(self):
         fragment_one = textwrap.dedent('''\
@@ -490,12 +490,12 @@ class TestTestCaseDocFragments(unittest.TestCase):
             self.fragments.add_fragment(fragment, lineno=lineno)
         assert len(self.fragments) == len(rst_fragments)
         doc = self.fragments.build_doc()
-        self.assertFalse(doc.is_empty())
-        self.assertTrue(TestCaseDoc.DESCR in doc.sections)
-        self.assertTrue(TestCaseDoc.SETUP in doc.sections)
-        self.assertTrue(TestCaseDoc.STEPS in doc.sections)
-        self.assertTrue(TestCaseDoc.TEARD in doc.sections)
-        self.assertTrue(TestCaseDoc._HEAD in doc.sections)
+        assert not doc.is_empty()
+        assert TestCaseDoc.DESCR in doc.sections
+        assert TestCaseDoc.SETUP in doc.sections
+        assert TestCaseDoc.STEPS in doc.sections
+        assert TestCaseDoc.TEARD in doc.sections
+        assert TestCaseDoc._HEAD in doc.sections
 
 
 class TestExtractDocumentFragments(unittest.TestCase):
