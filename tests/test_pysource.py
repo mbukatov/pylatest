@@ -351,8 +351,11 @@ class TestTestCaseDocFragments(unittest.TestCase):
         assert doc1.get_section(TestCaseDoc._HEAD) == expected_head_one
         assert doc1.get_section(TestCaseDoc.DESCR) == expected_desc_one
         # update: add 2nd fragment and retry
-        self.fragments.add_fragment(fragment_two, lineno=11)
-        doc2 = self.fragments.build_doc()
+        # note: override feature works only wrt default document
+        fragments2 = pysource.TestCaseDocFragments()
+        fragments2.default = self.fragments
+        fragments2.add_fragment(fragment_two, lineno=11)
+        doc2 = fragments2.build_doc()
         assert not doc2.is_empty()
         assert TestCaseDoc._HEAD in doc2.sections
         assert TestCaseDoc.DESCR in doc2.sections
