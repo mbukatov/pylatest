@@ -289,8 +289,8 @@ class TestTestCaseDocFragments(unittest.TestCase):
         assert not doc.is_empty()
         assert TestCaseDoc._HEAD in doc.sections
         assert TestCaseDoc.DESCR in doc.sections
-        assert doc.get_section(TestCaseDoc._HEAD), expected_head
-        assert doc.get_section(TestCaseDoc.DESCR), expected_desc
+        assert doc.get_section(TestCaseDoc._HEAD) == expected_head
+        assert doc.get_section(TestCaseDoc.DESCR) == expected_desc
 
     def test_docfragments_build_doc_section_override(self):
         # 1st fragment
@@ -348,16 +348,16 @@ class TestTestCaseDocFragments(unittest.TestCase):
         assert not doc1.is_empty()
         assert TestCaseDoc._HEAD in doc1.sections
         assert TestCaseDoc.DESCR in doc1.sections
-        assert doc1.get_section(TestCaseDoc._HEAD), expected_head_one
-        assert doc1.get_section(TestCaseDoc.DESCR), expected_desc_one
+        assert doc1.get_section(TestCaseDoc._HEAD) == expected_head_one
+        assert doc1.get_section(TestCaseDoc.DESCR) == expected_desc_one
         # update: add 2nd fragment and retry
         self.fragments.add_fragment(fragment_two, lineno=11)
         doc2 = self.fragments.build_doc()
         assert not doc2.is_empty()
         assert TestCaseDoc._HEAD in doc2.sections
         assert TestCaseDoc.DESCR in doc2.sections
-        assert doc2.get_section(TestCaseDoc._HEAD), expected_head_one
-        assert doc2.get_section(TestCaseDoc.DESCR), fragment_two
+        assert doc2.get_section(TestCaseDoc._HEAD) == expected_head_one
+        assert doc2.get_section(TestCaseDoc.DESCR) == fragment_two
 
     def test_docfragments_build_doc_multiple_buildmany(self):
         fragment_one = textwrap.dedent('''\
