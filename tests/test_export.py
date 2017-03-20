@@ -150,7 +150,7 @@ class TestGetStuffFromHtmlPlain(unittest.TestCase):
     def test_get_section_empty(self):
         body_tree = get_empty_body_tree()
         for section in TestCaseDoc.SECTIONS_PLAINHTML:
-            self.assertIsNone(export.get_section(body_tree, section))
+            assert export.get_section(body_tree, section) is None
 
     def test_get_section_actually_nothing(self):
         # construct input
@@ -159,7 +159,7 @@ class TestGetStuffFromHtmlPlain(unittest.TestCase):
         add_section_div(body_tree, 'bar')
         # checking
         for section in TestCaseDoc.SECTIONS_PLAINHTML:
-            self.assertIsNone(export.get_section(body_tree, section))
+            assert export.get_section(body_tree, section) is None
 
     def test_get_section_single(self):
         # construct input
@@ -170,7 +170,7 @@ class TestGetStuffFromHtmlPlain(unittest.TestCase):
         # run, run
         result_el = export.get_section(body_tree, TestCaseDoc.SECTIONS_PLAINHTML[0])
         # checking
-        self.assertIsNotNone(result_el)
+        assert result_el is not None
         assert result_el == section_el
         for section in TestCaseDoc.SECTIONS_PLAINHTML[1:]:
-            self.assertIsNone(export.get_section(body_tree, section))
+            assert export.get_section(body_tree, section) is None

@@ -193,22 +193,22 @@ class TestTestCaseDocFragments(unittest.TestCase):
 
     def test_docfragments_null(self):
         assert len(self.fragments) == 0
-        self.assertIsNone(self.fragments.default)
+        assert self.fragments.default is None
 
     def test_docfragments_add_one(self):
         self.fragments.add_fragment("foo bar baz", 11)
         assert len(self.fragments) == 1
-        self.assertIsNone(self.fragments.default)
+        assert self.fragments.default is None
         assert self.fragments.docstrings.get(11) == "foo bar baz"
 
     def test_docfragments_add_few(self):
         self.fragments.add_fragment("foo", 1)
         assert len(self.fragments) == 1
-        self.assertIsNone(self.fragments.default)
+        assert self.fragments.default is None
         for i in range(10):
             self.fragments.add_fragment("just another_one", i + 10)
         assert len(self.fragments) == 11
-        self.assertIsNone(self.fragments.default)
+        assert self.fragments.default is None
 
     def test_docfragments_build_doc_empty(self):
         doc = self.fragments.build_doc()
@@ -533,7 +533,7 @@ class TestExtractDocumentFragments(unittest.TestCase):
         assert len(doc_fragment_dict) == 1
         doc_fragments = doc_fragment_dict[None]
         assert len(doc_fragments) == 1
-        self.assertIsNone(doc_fragments.default)
+        assert doc_fragments.default is None
 
     def test_extract_doc_fragments_onecaseperfile_splitted_nested(self):
         source = read_file("onecaseperfile", "splitted-nested.py")
@@ -546,7 +546,7 @@ class TestExtractDocumentFragments(unittest.TestCase):
         # there are 9 pylatest strings in given file
         assert len(doc_fragments) == 9
         # the default doc feature is not used in given file
-        self.assertIsNone(doc_fragments.default)
+        assert doc_fragments.default is None
         # pylatest string literal which ends on line 95 in splitted-neste.py file
         fragment_line95 = textwrap.dedent('''\
         .. test_step:: 1
@@ -565,7 +565,7 @@ class TestExtractDocumentFragments(unittest.TestCase):
             }
         for doc_id, doc_fragments in doc_fragment_dict.items():
             # default doc feature is not used in the file
-            self.assertIsNone(doc_fragments.default)
+            assert doc_fragments.default is None
             # check expected number of pylatest strings
             assert len(doc_fragments) == expected_fragments[doc_id]
         # check that some pylatest strings are the same in both doc fragments
@@ -579,7 +579,7 @@ class TestExtractDocumentFragments(unittest.TestCase):
         assert len(doc_fragment_dict) == 2
         for doc_id, doc_fragments in doc_fragment_dict.items():
             # default doc is used in the file (for setup and teardown strings)
-            self.assertIsNotNone(doc_fragments.default)
+            assert doc_fragments.default is not None
             assert len(doc_fragments.default) == 2
 
 
