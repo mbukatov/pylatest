@@ -52,7 +52,7 @@ class TestStringExtraction(unittest.TestCase):
     """
 
     def test_get_string_literals_emptysource(self):
-        self.assertEqual(pysource.get_string_literals(""), [])
+        assert pysource.get_string_literals("") == []
 
     def test_get_string_literals_nostrings(self):
         source = textwrap.dedent('''\
@@ -75,7 +75,7 @@ class TestStringExtraction(unittest.TestCase):
             foobar = "this is not an anynymous string literal"
             print("hello world!")
         ''')
-        self.assertEqual(pysource.get_string_literals(source), [])
+        assert pysource.get_string_literals(source) == []
 
     def test_get_string_literals_singlestring(self):
         source = textwrap.dedent('''\
@@ -99,9 +99,9 @@ class TestStringExtraction(unittest.TestCase):
             args = parser.parse_args()
         ''')
         result = pysource.get_string_literals(source)
-        self.assertEqual(len(result), 1)
+        assert len(result) == 1
         docstring_item = ("Main function of py2pylatest cli tool.", 12)
-        self.assertEqual(result, [docstring_item])
+        assert result == [docstring_item]
 
     def test_is_pylatest_docstring_verysimple(self):
         docstring = """@pylatest
@@ -163,7 +163,7 @@ class TestStringExtraction(unittest.TestCase):
         """
         is_pylatest_str, doc_id_list, _ = pysource.classify_docstring(docstring)
         self.assertTrue(is_pylatest_str)
-        self.assertEqual(doc_id_list, [])
+        assert doc_id_list == []
 
     def test_get_doc_id_list_someids(self):
         docstring = """@pylatest foo bar 1234
@@ -171,7 +171,7 @@ class TestStringExtraction(unittest.TestCase):
         """
         is_pylatest_str, doc_id_list, _ = pysource.classify_docstring(docstring)
         self.assertTrue(is_pylatest_str)
-        self.assertEqual(doc_id_list, ['foo', 'bar', '1234'])
+        assert doc_id_list, ['foo', 'bar' == '1234']
 
     def test_get_docstring_content(self):
         docstring = """@pylatest foo bar 1234
@@ -179,7 +179,7 @@ class TestStringExtraction(unittest.TestCase):
         """
         is_pylatest_str, _, content = pysource.classify_docstring(docstring)
         self.assertTrue(is_pylatest_str)
-        self.assertEqual(content, "        Bicycle Repair Man.\n        ")
+        assert content == "        Bicycle Repair Man.\n        "
 
 
 class TestTestCaseDocFragments(unittest.TestCase):
@@ -192,22 +192,22 @@ class TestTestCaseDocFragments(unittest.TestCase):
         self.fragments = pysource.TestCaseDocFragments()
 
     def test_docfragments_null(self):
-        self.assertEqual(len(self.fragments), 0)
+        assert len(self.fragments) == 0
         self.assertIsNone(self.fragments.default)
 
     def test_docfragments_add_one(self):
         self.fragments.add_fragment("foo bar baz", 11)
-        self.assertEqual(len(self.fragments), 1)
+        assert len(self.fragments) == 1
         self.assertIsNone(self.fragments.default)
-        self.assertEqual(self.fragments.docstrings.get(11), "foo bar baz")
+        assert self.fragments.docstrings.get(11) == "foo bar baz"
 
     def test_docfragments_add_few(self):
         self.fragments.add_fragment("foo", 1)
-        self.assertEqual(len(self.fragments), 1)
+        assert len(self.fragments) == 1
         self.assertIsNone(self.fragments.default)
         for i in range(10):
             self.fragments.add_fragment("just another_one", i + 10)
-        self.assertEqual(len(self.fragments), 11)
+        assert len(self.fragments) == 11
         self.assertIsNone(self.fragments.default)
 
     def test_docfragments_build_doc_empty(self):
@@ -390,8 +390,8 @@ class TestTestCaseDocFragments(unittest.TestCase):
         doc2 = self.fragments.build_doc()
         doc3 = self.fragments.build_doc()
         # every build should be independent and lead the the same result
-        self.assertEqual(doc1, doc2)
-        self.assertEqual(doc2, doc3)
+        assert doc1 == doc2
+        assert doc2 == doc3
 
     def test_docfragments_build_doc_multiple_fragmented(self):
         rst_fragments = [
@@ -488,7 +488,7 @@ class TestTestCaseDocFragments(unittest.TestCase):
             # line number have to be unique
             lineno = index*100 + 2
             self.fragments.add_fragment(fragment, lineno=lineno)
-        self.assertEqual(len(self.fragments), len(rst_fragments))
+        assert len(self.fragments) == len(rst_fragments)
         doc = self.fragments.build_doc()
         self.assertFalse(doc.is_empty())
         self.assertTrue(TestCaseDoc.DESCR in doc.sections)
@@ -515,21 +515,21 @@ class TestExtractDocumentFragments(unittest.TestCase):
 
     def test_extract_doc_fragments_null_str(self):
         doc_fragment_dict = pysource.extract_doc_fragments("")
-        self.assertEqual(len(doc_fragment_dict), 0)
-        self.assertEqual(doc_fragment_dict, {})
+        assert len(doc_fragment_dict) == 0
+        assert doc_fragment_dict == {}
 
     def test_extract_doc_fragments_null(self):
         source = read_file("onecaseperfile", "null.py")
         doc_fragment_dict = pysource.extract_doc_fragments(source)
-        self.assertEqual(len(doc_fragment_dict), 0)
-        self.assertEqual(doc_fragment_dict, {})
+        assert len(doc_fragment_dict) == 0
+        assert doc_fragment_dict == {}
 
     def test_extract_doc_fragments_onecaseperfile_single(self):
         source = read_file("onecaseperfile", "single.py")
         doc_fragment_dict = pysource.extract_doc_fragments(source)
-        self.assertEqual(len(doc_fragment_dict), 1)
+        assert len(doc_fragment_dict) == 1
         doc_fragments = doc_fragment_dict[None]
-        self.assertEqual(len(doc_fragments), 1)
+        assert len(doc_fragments) == 1
         self.assertIsNone(doc_fragments.default)
 
     def test_extract_doc_fragments_onecaseperfile_splitted_nested(self):
@@ -537,11 +537,11 @@ class TestExtractDocumentFragments(unittest.TestCase):
         doc_fragment_dict = pysource.extract_doc_fragments(source)
         # there is just a single test case in the file
         # (as 'onecaseperfile' directory name suggests)
-        self.assertEqual(len(doc_fragment_dict), 1)
+        assert len(doc_fragment_dict) == 1
         # pylatest strings are without pylatest ids
         doc_fragments = doc_fragment_dict[None]
         # there are 9 pylatest strings in given file
-        self.assertEqual(len(doc_fragments), 9)
+        assert len(doc_fragments) == 9
         # the default doc feature is not used in given file
         self.assertIsNone(doc_fragments.default)
         # pylatest string literal which ends on line 95 in splitted-neste.py file
@@ -549,12 +549,12 @@ class TestExtractDocumentFragments(unittest.TestCase):
         .. test_step:: 1
 
             List files in the volume: ``ls -a /mnt/helloworld``''')
-        self.assertEqual(doc_fragments.docstrings[95], fragment_line95)
+        assert doc_fragments.docstrings[95] == fragment_line95
 
     def test_extract_doc_fragments_multiplecasesperfile_splitted_nested(self):
         source = read_file("multiplecasesperfile", "splitted-nested.py")
         doc_fragment_dict = pysource.extract_doc_fragments(source)
-        self.assertEqual(len(doc_fragment_dict), 2)
+        assert len(doc_fragment_dict) == 2
         # number of expected pylatest strings for each pylatest doc id
         expected_fragments = {
             'test01': 9,
@@ -564,7 +564,7 @@ class TestExtractDocumentFragments(unittest.TestCase):
             # default doc feature is not used in the file
             self.assertIsNone(doc_fragments.default)
             # check expected number of pylatest strings
-            self.assertEqual(len(doc_fragments), expected_fragments[doc_id])
+            assert len(doc_fragments) == expected_fragments[doc_id]
         # check that some pylatest strings are the same in both doc fragments
         for linenum in (77, 96):
             self.assertEqual(
@@ -574,11 +574,11 @@ class TestExtractDocumentFragments(unittest.TestCase):
     def test_extract_documents_splitted_nested_withdefault(self):
         source = read_file("multiplecasesperfile", "splitted-nested-default.py")
         doc_fragment_dict = pysource.extract_doc_fragments(source)
-        self.assertEqual(len(doc_fragment_dict), 2)
+        assert len(doc_fragment_dict) == 2
         for doc_id, doc_fragments in doc_fragment_dict.items():
             # default doc is used in the file (for setup and teardown strings)
             self.assertIsNotNone(doc_fragments.default)
-            self.assertEqual(len(doc_fragments.default), 2)
+            assert len(doc_fragments.default) == 2
 
 
 class TestPylatestDocumentExtractionOneCaseOneFile(unittest.TestCase):
@@ -601,15 +601,15 @@ class TestPylatestDocumentExtractionOneCaseOneFile(unittest.TestCase):
         # extract TestCaseDocFragments from the python source file
         docfr_dict = pysource.extract_doc_fragments(source)
         # there should be just one test case document
-        self.assertEqual(len(docfr_dict), 1)
+        assert len(docfr_dict) == 1
         # this document is without pylatest id
         doc_fr = docfr_dict[None]
         # then build RstTestCaseDoc from TestCaseDocFragments
         doc = doc_fr.build_doc()
         # and finally build the rst source version
-        self.assertEqual(doc.build_rst(), expected_result)
+        assert doc.build_rst() == expected_result
         # every build should be the same
-        self.assertEqual(doc.build_rst(), expected_result)
+        assert doc.build_rst() == expected_result
 
     def _test_extract_document_mangled(self, testname, resultname):
         source = read_file("onecaseperfile", testname)
@@ -617,21 +617,21 @@ class TestPylatestDocumentExtractionOneCaseOneFile(unittest.TestCase):
         # extract TestCaseDocFragments from the python source file
         docfr_dict = pysource.extract_doc_fragments(source)
         # there should be just one test case document
-        self.assertEqual(len(docfr_dict), 1)
+        assert len(docfr_dict) == 1
         # this document is without pylatest id
         doc_fr = docfr_dict[None]
         # TODO: needs update to work with new error handling (not yet done)
         # then build RstTestCaseDoc from TestCaseDocFragments
         doc = doc_fr.build_doc()
         # and finally build the rst source version
-        self.assertEqual(doc.build_rst(), expected_result)
+        assert doc.build_rst() == expected_result
         # every build should be the same
-        self.assertEqual(doc.build_rst(), expected_result)
+        assert doc.build_rst() == expected_result
 
     def test_extract_document_null(self):
         source = read_file("onecaseperfile", "null.py")
         docfr_dict = pysource.extract_doc_fragments(source)
-        self.assertEqual(docfr_dict, {})
+        assert docfr_dict == {}
 
     def test_extract_document_single(self):
         self._test_extract_document_noerrors("single.py")
@@ -698,7 +698,7 @@ class TestPylatestDocumentsExtractionMultipleCasesPerFile(unittest.TestCase):
         source = read_file("multiplecasesperfile", testname)
         # extract TestCaseDocFragments from the python source file
         docfr_dict = pysource.extract_doc_fragments(source)
-        self.assertEqual(len(docfr_dict), doc_num)
+        assert len(docfr_dict) == doc_num
         for doc_id, doc_fr in docfr_dict.items():
             if doc_id is None:
                 doc_id = "none"
@@ -706,9 +706,9 @@ class TestPylatestDocumentsExtractionMultipleCasesPerFile(unittest.TestCase):
             expected_result = read_file("multiplecasesperfile", filename)
             # build RstTestCaseDoc from TestCaseDocFragments
             doc = doc_fr.build_doc()
-            self.assertEqual(doc.build_rst(), expected_result)
+            assert doc.build_rst() == expected_result
             # every build should be the same
-            self.assertEqual(doc.build_rst(), expected_result)
+            assert doc.build_rst() == expected_result
 
     def test_extract_documents_splitted_nested(self):
         self._test_extract_documents_noerrors(2, "splitted-nested.py")

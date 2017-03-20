@@ -57,7 +57,7 @@ class TestBasePlain(unittest.TestCase):
 
     def check_directive(self, rst_input, exp_result):
         result = _testparse(rst_input)
-        self.assertEqual(result, exp_result)
+        assert result == exp_result
 
 
 class TestDocutilsPlain(TestBasePlain):

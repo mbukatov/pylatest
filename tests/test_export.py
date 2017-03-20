@@ -134,7 +134,7 @@ class TestGetStuffFromHtmlPlain(unittest.TestCase):
 
     def test_get_actions_empty(self):
         body_tree = get_empty_body_tree()
-        self.assertEqual(export.get_actions(body_tree), TestActions())
+        assert export.get_actions(body_tree) == TestActions()
 
     def test_get_actions_singleaction(self):
         # construct input
@@ -150,7 +150,7 @@ class TestGetStuffFromHtmlPlain(unittest.TestCase):
         # run, run
         actions = export.get_actions(body_tree)
         # checking
-        self.assertEqual(actions, exp_res)
+        assert actions == exp_res
 
     def test_get_section_empty(self):
         body_tree = get_empty_body_tree()
@@ -176,6 +176,6 @@ class TestGetStuffFromHtmlPlain(unittest.TestCase):
         result_el = export.get_section(body_tree, TestCaseDoc.SECTIONS_PLAINHTML[0])
         # checking
         self.assertIsNotNone(result_el)
-        self.assertEqual(result_el, section_el)
+        assert result_el == section_el
         for section in TestCaseDoc.SECTIONS_PLAINHTML[1:]:
             self.assertIsNone(export.get_section(body_tree, section))

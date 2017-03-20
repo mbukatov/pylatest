@@ -32,7 +32,7 @@ class TestFindSections(unittest.TestCase):
         pylatest.xdocutils.client.register_plain()
 
     def test_find_sections_emptydoc(self):
-        self.assertEqual(rstsource.find_sections(""), [])
+        assert rstsource.find_sections("") == []
 
     def test_find_sections_doc_without_title(self):
         src = textwrap.dedent('''\
@@ -40,7 +40,7 @@ class TestFindSections(unittest.TestCase):
 
         Or two.
         ''')
-        self.assertEqual(rstsource.find_sections(src), [])
+        assert rstsource.find_sections(src) == []
 
     def test_find_sections_docwithoutsections_one(self):
         src = textwrap.dedent('''\
@@ -54,7 +54,7 @@ class TestFindSections(unittest.TestCase):
         exp_sections = [
             rstsource.RstSection("Hello World", 1, 6),
             ]
-        self.assertEqual(rstsource.find_sections(src), exp_sections)
+        assert rstsource.find_sections(src) == exp_sections
 
     def test_find_sections_docwithoutsections_one_another(self):
         """
@@ -77,7 +77,7 @@ class TestFindSections(unittest.TestCase):
         exp_sections = [
             rstsource.RstSection(TestCaseDoc.DESCR.title, 1, 12),
             ]
-        self.assertEqual(rstsource.find_sections(src), exp_sections)
+        assert rstsource.find_sections(src) == exp_sections
 
     def test_find_sections_docwithoutsections_two(self):
         src = textwrap.dedent('''\
@@ -87,7 +87,7 @@ class TestFindSections(unittest.TestCase):
 
         Again, there are no sections, just a document title.
         ''')
-        self.assertEqual(rstsource.find_sections(src), [])
+        assert rstsource.find_sections(src) == []
 
     def test_find_sections_metadata_doc_without_title(self):
         src = textwrap.dedent('''\
@@ -97,7 +97,7 @@ class TestFindSections(unittest.TestCase):
         :date: 2015-11-06
         :comment: This is here just to test metadata processing.
         ''')
-        self.assertEqual(rstsource.find_sections(src), [])
+        assert rstsource.find_sections(src) == []
 
     def test_find_sections_metadata_simple_one(self):
         src = textwrap.dedent('''\
@@ -113,7 +113,7 @@ class TestFindSections(unittest.TestCase):
         exp_sections = [
             rstsource.RstSection(None, 1, 8),
             ]
-        self.assertEqual(rstsource.find_sections(src), exp_sections)
+        assert rstsource.find_sections(src) == exp_sections
 
     def test_find_sections_metadata_simple_two(self):
         src = textwrap.dedent('''\
@@ -125,7 +125,7 @@ class TestFindSections(unittest.TestCase):
         exp_sections = [
             rstsource.RstSection(None, 1, 4),
             ]
-        self.assertEqual(rstsource.find_sections(src), exp_sections)
+        assert rstsource.find_sections(src) == exp_sections
 
     def test_find_sections_metadata_with_other_sections_one(self):
         src = textwrap.dedent('''\
@@ -144,7 +144,7 @@ class TestFindSections(unittest.TestCase):
             rstsource.RstSection('Description', 6, 10),
             rstsource.RstSection(None, 1, 4),
             ]
-        self.assertEqual(rstsource.find_sections(src), exp_sections)
+        assert rstsource.find_sections(src) == exp_sections
 
     def test_find_sections_metadata_with_other_sections_two(self):
         src = textwrap.dedent('''\
@@ -170,7 +170,7 @@ class TestFindSections(unittest.TestCase):
             rstsource.RstSection('Section Two', 13, 16),
             rstsource.RstSection(None, 1, 6),
             ]
-        self.assertEqual(rstsource.find_sections(src), exp_sections)
+        assert rstsource.find_sections(src) == exp_sections
 
     def test_find_sections_metadata_simple_wrong(self):
         src = textwrap.dedent('''\
@@ -196,7 +196,7 @@ class TestFindSections(unittest.TestCase):
             rstsource.RstSection('Section One', 8, 11),
             rstsource.RstSection('Section Two', 13, 16),
             ]
-        self.assertEqual(rstsource.find_sections(src), exp_sections)
+        assert rstsource.find_sections(src) == exp_sections
 
     def test_find_sections_simpledoc(self):
         src = textwrap.dedent('''\
@@ -214,7 +214,7 @@ class TestFindSections(unittest.TestCase):
             rstsource.RstSection("Section One", 1, 4),
             rstsource.RstSection("Section Two", 6, 9),
             ]
-        self.assertEqual(rstsource.find_sections(src), exp_sections)
+        assert rstsource.find_sections(src) == exp_sections
 
 
     def test_find_sections_multilevel(self):
@@ -253,7 +253,7 @@ class TestFindSections(unittest.TestCase):
             rstsource.RstSection("Header Two", 22, 25),
             rstsource.RstSection("Header Three", 27, 28),
             ]
-        self.assertEqual(rstsource.find_sections(src), exp_sections)
+        assert rstsource.find_sections(src) == exp_sections
 
     def test_find_sections_multilevel_with_testmetadata(self):
         src = textwrap.dedent('''\
@@ -293,7 +293,7 @@ class TestFindSections(unittest.TestCase):
             rstsource.RstSection("Header Three", 28, 29),
             rstsource.RstSection(None, 1, 6),
             ]
-        self.assertEqual(rstsource.find_sections(src), exp_sections)
+        assert rstsource.find_sections(src) == exp_sections
 
     def test_find_sections_multilevel_startswithline(self):
         src = textwrap.dedent('''\
@@ -329,23 +329,23 @@ class TestFindSections(unittest.TestCase):
         exp_sections = [
             rstsource.RstSection("Status Report", 5, 28),
             ]
-        self.assertEqual(rstsource.find_sections(src), exp_sections)
+        assert rstsource.find_sections(src) == exp_sections
 
 
 class TestGetLastLine(unittest.TestCase):
 
     def test_get_last_line_num_null(self):
-        self.assertEqual(rstsource.get_last_line_num(""), 1)
+        assert rstsource.get_last_line_num("") == 1
 
     def test_get_last_line_num_one(self):
         src = textwrap.dedent('''\
         1
         ''')
-        self.assertEqual(rstsource.get_last_line_num(src), 1)
+        assert rstsource.get_last_line_num(src) == 1
 
     def test_get_last_line_num_one_nonewline(self):
         src = "1"
-        self.assertEqual(rstsource.get_last_line_num(src), 1)
+        assert rstsource.get_last_line_num(src) == 1
 
     def test_get_last_line_num_four(self):
         src = textwrap.dedent('''\
@@ -354,7 +354,7 @@ class TestGetLastLine(unittest.TestCase):
         3
         4
         ''')
-        self.assertEqual(rstsource.get_last_line_num(src), 4)
+        assert rstsource.get_last_line_num(src) == 4
 
     def test_get_last_line_num_four_nonewline(self):
         src = textwrap.dedent('''\
@@ -362,7 +362,7 @@ class TestGetLastLine(unittest.TestCase):
         2
         3
         4''')
-        self.assertEqual(rstsource.get_last_line_num(src), 4)
+        assert rstsource.get_last_line_num(src) == 4
 
 
 class TestFindActions(unittest.TestCase):
@@ -372,7 +372,7 @@ class TestFindActions(unittest.TestCase):
         pylatest.xdocutils.client.register_plain()
 
     def test_find_actions_null(self):
-        self.assertEqual(rstsource.find_actions(""), [])
+        assert rstsource.find_actions("") == []
 
     def test_find_actions_emptydoc(self):
         src = textwrap.dedent('''\
@@ -381,7 +381,7 @@ class TestFindActions(unittest.TestCase):
 
         There are no rst directives.
         ''')
-        self.assertEqual(rstsource.find_actions(src), [])
+        assert rstsource.find_actions(src) == []
 
     def test_find_actions_somedoc_noaction(self):
         src = textwrap.dedent('''\
@@ -412,7 +412,7 @@ class TestFindActions(unittest.TestCase):
 
         There are no rst directives in this section.
         ''')
-        self.assertEqual(rstsource.find_actions(src), [])
+        assert rstsource.find_actions(src) == []
 
     def test_find_actions_minimal_single_action(self):
         src = textwrap.dedent('''\
@@ -426,7 +426,7 @@ class TestFindActions(unittest.TestCase):
         exp_actions = [
             rstsource.RstTestAction(1, "test_step", 1, 6),
             ]
-        self.assertEqual(rstsource.find_actions(src), exp_actions)
+        assert rstsource.find_actions(src) == exp_actions
 
     def test_find_actions_minimal_single_action_highid(self):
         src = textwrap.dedent('''\
@@ -440,7 +440,7 @@ class TestFindActions(unittest.TestCase):
         exp_actions = [
             rstsource.RstTestAction(3, "test_step", 1, 6),
             ]
-        self.assertEqual(rstsource.find_actions(src), exp_actions)
+        assert rstsource.find_actions(src) == exp_actions
 
     def test_find_actions_minimal_two_actions(self):
         src = textwrap.dedent('''\
@@ -460,7 +460,7 @@ class TestFindActions(unittest.TestCase):
             rstsource.RstTestAction(1, "test_step", 1, 6),
             rstsource.RstTestAction(2, "test_step", 8, 11),
             ]
-        self.assertEqual(rstsource.find_actions(src), exp_actions)
+        assert rstsource.find_actions(src) == exp_actions
 
     def test_find_actions_simpledoc_endline_theend(self):
         src = textwrap.dedent('''\
@@ -477,7 +477,7 @@ class TestFindActions(unittest.TestCase):
         exp_actions = [
             rstsource.RstTestAction(10, "test_step", 4, 9),
             ]
-        self.assertEqual(rstsource.find_actions(src), exp_actions)
+        assert rstsource.find_actions(src) == exp_actions
 
     def test_find_actions_simpledoc_endline_paragraph(self):
         src = textwrap.dedent('''\
@@ -496,7 +496,7 @@ class TestFindActions(unittest.TestCase):
         exp_actions = [
             rstsource.RstTestAction(5, "test_step", 4, 9),
             ]
-        self.assertEqual(rstsource.find_actions(src), exp_actions)
+        assert rstsource.find_actions(src) == exp_actions
 
     def test_find_actions_simpledoc_endline_section(self):
         src = textwrap.dedent('''\
@@ -518,7 +518,7 @@ class TestFindActions(unittest.TestCase):
         exp_actions = [
             rstsource.RstTestAction(1, "test_step", 4, 9),
             ]
-        self.assertEqual(rstsource.find_actions(src), exp_actions)
+        assert rstsource.find_actions(src) == exp_actions
 
     def test_find_actions_simpledoc_endline_anotherdirective(self):
         src = textwrap.dedent('''\
@@ -541,7 +541,7 @@ class TestFindActions(unittest.TestCase):
             rstsource.RstTestAction(1, "test_step", 4, 9),
             rstsource.RstTestAction(2, "test_step", 11, 14),
             ]
-        self.assertEqual(rstsource.find_actions(src), exp_actions)
+        assert rstsource.find_actions(src) == exp_actions
 
     def test_find_actions_somedoc_oneaction(self):
         src = textwrap.dedent('''\
@@ -580,7 +580,7 @@ class TestFindActions(unittest.TestCase):
         exp_actions = [
             rstsource.RstTestAction(1, "test_step", 18, 21),
             ]
-        self.assertEqual(rstsource.find_actions(src), exp_actions)
+        assert rstsource.find_actions(src) == exp_actions
 
     # note: there is no way checking of mixed content like that would work
     # this is because of pylatest tranformations, which translates pending
@@ -658,7 +658,7 @@ class TestFindActions(unittest.TestCase):
             rstsource.RstTestAction(4, "test_result", 41, 48),
             rstsource.RstTestAction(5, "test_step", 55, 59),
             ]
-        self.assertEqual(rstsource.find_actions(src), exp_actions)
+        assert rstsource.find_actions(src) == exp_actions
 
     def test_find_actions_real_looking_test_steps_section(self):
         src = textwrap.dedent('''\
@@ -713,4 +713,4 @@ class TestFindActions(unittest.TestCase):
             rstsource.RstTestAction(4, "test_result", 28, 35),
             rstsource.RstTestAction(5, "test_step", 37, 41),
             ]
-        self.assertEqual(rstsource.find_actions(src), exp_actions)
+        assert rstsource.find_actions(src) == exp_actions

@@ -45,7 +45,7 @@ class TestBasePlain(unittest.TestCase):
 
     def check_html_body(self, rst_input, exp_result):
         htmlbody_str = xclient.publish_parts_wrapper(rst_input)['html_body']
-        self.assertEqual(htmlbody_str, exp_result)
+        assert htmlbody_str == exp_result
 
 
 class TestDocutilsPlain(TestBasePlain):
