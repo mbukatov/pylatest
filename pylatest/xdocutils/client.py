@@ -78,7 +78,7 @@ def register_pylatest_roles():
     """
     Register custom pylatest roles.
     """
-    roles.register_local_role("bz", redhat_bugzilla_role)
+    roles.register_local_role("rhbz", redhat_bugzilla_role)
     roles.register_local_role("pylaref", pylaref_html_role)
 
 def register_table(auto_id=False):

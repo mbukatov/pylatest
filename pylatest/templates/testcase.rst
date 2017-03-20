@@ -16,7 +16,7 @@ check:
 * http://sphinx-doc.org/rest.html
 
 In addition to that, you can use the following syntax to reference redhat
-bugzilla: see :BZ:`439858` (it will create proper link).
+bugzilla: see :RHBZ:`439858` (it will create proper link).
 
 Setup
 =====

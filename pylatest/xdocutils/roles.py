@@ -36,7 +36,7 @@ def redhat_bugzilla_role(role, rawtext, text, lineno, inliner,
 
     Usage::
 
-        See :BZ:`439858` for more information.
+        See :RHBZ:`439858` for more information.
     """
     try:
         bznum = int(text)

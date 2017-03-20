@@ -72,7 +72,7 @@ class TestFindSections(unittest.TestCase):
         viverra nec consectetur ante hendrerit. Donec et mollis dolor. Praesent
         et diam eget libero egestas mattis sit amet vitae augue.
 
-        See :BZ:`439858` for more details.
+        See :RHBZ:`439858` for more details.
         ''')
         exp_sections = [
             rstsource.RstSection(TestCaseDoc.DESCR.title, 1, 12),

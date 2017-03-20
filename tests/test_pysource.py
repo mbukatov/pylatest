@@ -340,7 +340,7 @@ class TestTestCaseDocFragments(unittest.TestCase):
         consectetur ante hendrerit. Donec et mollis dolor. Praesent et diam eget libero
         egestas mattis sit amet vitae augue.
 
-        See :BZ:`439858` for more details.
+        See :RHBZ:`439858` for more details.
         ''')
         # process 1st fragment first
         self.fragments.add_fragment(fragment_one, lineno=131)
@@ -415,7 +415,7 @@ class TestTestCaseDocFragments(unittest.TestCase):
             consectetur ante hendrerit. Donec et mollis dolor. Praesent et diam eget libero
             egestas mattis sit amet vitae augue.
 
-            See :BZ:`439858` for more details.
+            See :RHBZ:`439858` for more details.
             """),
             textwrap.dedent("""\
             .. test_step:: 1
