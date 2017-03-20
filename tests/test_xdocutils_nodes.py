@@ -17,17 +17,18 @@
 
 
 import textwrap
-import unittest
 import xml.etree.ElementTree as ET
 
 from docutils import nodes
 from docutils.core import publish_from_doctree, publish_doctree
+import pytest
 
 import pylatest.xdocutils.client
 import pylatest.xdocutils.nodes
 
 
-def get_empty_doctree():
+@pytest.fixture
+def empty_doctree():
     """
     Produce empty rst document tree.
     """
@@ -37,6 +38,15 @@ def get_empty_doctree():
         parser_name='restructuredtext',)
     return doctree
 
+
+@pytest.fixture
+def register_nodes(scope="module"):
+    """
+    Register custom pylatest nodes with html translator.
+    """
+    pylatest.xdocutils.client.register_pylatest_nodes()
+
+
 def publish_pseudoxml(doctree):
     """
     Returns string with pseudo xml rendering of ``doctree``.
@@ -45,6 +55,7 @@ def publish_pseudoxml(doctree):
         doctree,
         settings_overrides={'output_encoding': 'unicode'},)
     return output
+
 
 def publish_html(doctree):
     """
@@ -60,58 +71,51 @@ def publish_html(doctree):
     return output
 
 
-class TestCustomNodes(unittest.TestCase):
-    """
-    Test custom pylatest nodes.
-    """
+def test_pylatest_doesnt_break_docutils(empty_doctree):
+    output = publish_pseudoxml(empty_doctree)
+    assert output.strip() == '<document source="<string>">'
 
-    def setUp(self):
-        # register custom pylatest nodes with html translator
-        pylatest.xdocutils.client.register_pylatest_nodes()
-        # produce empty document tree
-        self.doctree = get_empty_doctree()
 
-    def test_pylatest_doesnt_break_docutils(self):
-        output = publish_pseudoxml(self.doctree)
-        self.assertEqual(output.strip(), '<document source="<string>">')
+@pytest.mark.parametrize("node_name", pylatest.xdocutils.nodes.node_class_names)
+def test_all_custom_nodes(empty_doctree, node_name):
+    doctree = empty_doctree
+    # create test step without any content
+    node_class = getattr(pylatest.xdocutils.nodes, node_name)
+    node = node_class()
+    # add this node into doctree
+    doctree += node
+    # generate html into string
+    output = publish_pseudoxml(doctree)
+    # check the result
+    exp_result = textwrap.dedent('''\
+    <document source="<string>">
+        <{0:s}>
+    '''.format(node_name))
+    assert output == exp_result
 
-    def test_all_custom_nodes(self):
-        for node_name in pylatest.xdocutils.nodes.node_class_names:
-            # produce empty document tree
-            self.doctree = get_empty_doctree()
-            # create test step without any content
-            node_class = getattr(pylatest.xdocutils.nodes, node_name)
-            node = node_class()
-            # add this node into doctree
-            self.doctree += node
-            # generate html into string
-            output = publish_pseudoxml(self.doctree)
-            # check the result
-            exp_result = textwrap.dedent('''\
-            <document source="<string>">
-                <{0:s}>
-            '''.format(node_name))
-            self.assertEqual(output, exp_result)
 
-    def test_test_step_node_with_content_html(self):
-        # create test step node with some content
-        node = pylatest.xdocutils.nodes.test_step_node()
-        node.attributes["action_id"] = 7
-        node += nodes.paragraph(text="Just do it!")
-        # add this node into doctree
-        self.doctree += node
-        # generate html into string
-        output = publish_html(self.doctree)
-        # this test step node should be rendered as a div element
-        # so search for pylatest action div elements in the output string
-        output_tree = ET.fromstring(output)
-        xml_ns = 'http://www.w3.org/1999/xhtml'
-        node_xpath = ".//{%s}div[@class='pylatest_action']" % xml_ns
-        node_list = output_tree.findall(node_xpath)
-        # check that there is only one such node
-        self.assertEqual(len(node_list), 1)
-        # examine the div element
-        node_el = node_list[0]
-        self.assertEqual(node_el.text.strip(), "Just do it!")
-        self.assertEqual(node_el.get("action_id"), "7")
-        self.assertEqual(node_el.get("action_name"), "step")
+@pytest.mark.parametrize("node_name", ["test_step_node", "test_result_node"])
+def test_action_node_with_content_html(empty_doctree, node_name, register_nodes):
+    doctree = empty_doctree
+    # create test step node with some content
+    node_class = getattr(pylatest.xdocutils.nodes, node_name)
+    node = node_class()
+    node.attributes["action_id"] = 7
+    node += nodes.paragraph(text="Just do it!")
+    # add this node into doctree
+    doctree += node
+    # generate html into string
+    output = publish_html(doctree)
+    # this test step node should be rendered as a div element
+    # so search for pylatest action div elements in the output string
+    output_tree = ET.fromstring(output)
+    xml_ns = 'http://www.w3.org/1999/xhtml'
+    node_xpath = ".//{%s}div[@class='pylatest_action']" % xml_ns
+    node_list = output_tree.findall(node_xpath)
+    # check that there is only one such node
+    assert len(node_list) == 1
+    # examine the div element
+    node_el = node_list[0]
+    assert node_el.text.strip() == "Just do it!"
+    assert node_el.get("action_id") == "7"
+    assert node_el.get("action_name") == node_name.split("_")[1]
