@@ -176,12 +176,12 @@ class TestTestCaseDoc(unittest.TestCase):
         assert len(TestCaseDoc.SECTIONS) + 1 == len(TestCaseDoc.SECTIONS_ALL)
 
     def test_header_membership(self):
-        self.assertIn(TestCaseDoc._HEAD, TestCaseDoc.SECTIONS_ALL)
-        self.assertNotIn(TestCaseDoc._HEAD, TestCaseDoc.SECTIONS)
+        assert TestCaseDoc._HEAD in TestCaseDoc.SECTIONS_ALL
+        assert TestCaseDoc._HEAD not in TestCaseDoc.SECTIONS
 
     def test_sectionsall_contains_section(self):
         for section in TestCaseDoc.SECTIONS:
-            self.assertIn(section, TestCaseDoc.SECTIONS_ALL)
+            assert section in TestCaseDoc.SECTIONS_ALL
 
     def test_has_section(self):
         assert TestCaseDoc.has_section(title="Description")
