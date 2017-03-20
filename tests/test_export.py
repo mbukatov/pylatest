@@ -90,9 +90,8 @@ class TestRst2HtmlBodyTree(unittest.TestCase):
         register_plain()
 
     def test_rst2htmlbodytree_empty(self):
-        self.assertEqual(
-            etree.tostring(export.rst2htmlbodytree("")),
-            get_empty_body_str())
+        assert etree.tostring(export.rst2htmlbodytree("")) == \
+               get_empty_body_str()
 
     def test_rst2htmlbodytree_singleline(self):
         rst_content = textwrap.dedent('''\
@@ -102,9 +101,7 @@ class TestRst2HtmlBodyTree(unittest.TestCase):
         # construct expected tree
         html_body_expected, p_el = get_singleparagraph_body_tree()
         p_el.text = "This is just a test."
-        self.assertEqual(
-            etree.tostring(html_body),
-            etree.tostring(html_body_expected))
+        assert etree.tostring(html_body) == etree.tostring(html_body_expected)
 
     def test_rst2htmlbodytree_pylatest_htmlplain(self):
         rst_content = textwrap.dedent('''\
@@ -118,9 +115,7 @@ class TestRst2HtmlBodyTree(unittest.TestCase):
         html_body_expected = get_empty_body_tree()
         div_el = add_action_div(html_body_expected, '1', 'step')
         div_el.text = '\nThis is just a test.\n'
-        self.assertEqual(
-            etree.tostring(html_body),
-            etree.tostring(html_body_expected))
+        assert etree.tostring(html_body) == etree.tostring(html_body_expected)
 
 
 class TestGetStuffFromHtmlPlain(unittest.TestCase):

@@ -567,9 +567,8 @@ class TestExtractDocumentFragments(unittest.TestCase):
             assert len(doc_fragments) == expected_fragments[doc_id]
         # check that some pylatest strings are the same in both doc fragments
         for linenum in (77, 96):
-            self.assertEqual(
-                doc_fragment_dict['test01'].docstrings[linenum],
-                doc_fragment_dict['test02'].docstrings[linenum],)
+            assert doc_fragment_dict['test01'].docstrings[linenum] == \
+                   doc_fragment_dict['test02'].docstrings[linenum]
 
     def test_extract_documents_splitted_nested_withdefault(self):
         source = read_file("multiplecasesperfile", "splitted-nested-default.py")

@@ -44,11 +44,8 @@ class TestTestActions(unittest.TestCase):
         assert len(self.actions) == 1
         self.actions.add("test_result", "1.result", 1)
         assert len(self.actions) == 1
-        self.assertEqual(
-            list(self.actions.iter_content()), ["1.step", "1.result"])
-        self.assertEqual(
-            list(self.actions),
-            [(1, '1.step', '1.result')])
+        assert list(self.actions.iter_content()) == ["1.step", "1.result"]
+        assert list(self.actions) == [(1, '1.step', '1.result')]
 
     def test_actions_add_error(self):
         with self.assertRaises(pylatest.document.PylatestActionsError):
@@ -58,38 +55,26 @@ class TestTestActions(unittest.TestCase):
     def test_actions_add_onestep(self):
         self.actions.add("test_step", "1.step", 1)
         assert len(self.actions) == 1
-        self.assertEqual(
-            list(self.actions.iter_content()), ["1.step"])
-        self.assertEqual(
-            list(self.actions),
-            [(1, '1.step', None)])
+        assert list(self.actions.iter_content()) == ["1.step"]
+        assert list(self.actions) == [(1, '1.step', None)]
 
     def test_actions_add_oneresult(self):
         self.actions.add("test_result", "1.result", 1)
         assert len(self.actions) == 1
-        self.assertEqual(
-            list(self.actions.iter_content()), ["1.result"])
-        self.assertEqual(
-            list(self.actions),
-            [(1, None, '1.result')])
+        assert list(self.actions.iter_content()) == ["1.result"]
+        assert list(self.actions) == [(1, None, '1.result')]
 
     def test_actions_add_result(self):
         self.actions.add_result("1.result", 1)
         assert len(self.actions) == 1
-        self.assertEqual(
-            list(self.actions.iter_content()), ["1.result"])
-        self.assertEqual(
-            list(self.actions),
-            [(1, None, '1.result')])
+        assert list(self.actions.iter_content()) == ["1.result"]
+        assert list(self.actions) == [(1, None, '1.result')]
 
     def test_actions_add_step(self):
         self.actions.add_step("1.step", 1)
         assert len(self.actions) == 1
-        self.assertEqual(
-            list(self.actions.iter_content()), ["1.step"])
-        self.assertEqual(
-            list(self.actions),
-            [(1, '1.step', None)])
+        assert list(self.actions.iter_content()) == ["1.step"]
+        assert list(self.actions) == [(1, '1.step', None)]
 
     def test_actions_add_clash_enforce_id_false(self):
         self.actions = pylatest.document.TestActions(enforce_id=False)
@@ -98,11 +83,8 @@ class TestTestActions(unittest.TestCase):
         assert len(self.actions) == 1
         self.actions.add("test_step", "1.step-2", 1)
         assert len(self.actions) == 1
-        self.assertEqual(
-            list(self.actions.iter_content()), ["1.step-2", "1.result"])
-        self.assertEqual(
-            list(self.actions),
-            [(1, '1.step-2', '1.result')])
+        assert list(self.actions.iter_content()) == ["1.step-2", "1.result"]
+        assert list(self.actions) == [(1, '1.step-2', '1.result')]
 
     def test_actions_add_clash(self):
         self.actions.add("test_step", "1.step", 1)
@@ -111,42 +93,35 @@ class TestTestActions(unittest.TestCase):
         with self.assertRaises(pylatest.document.PylatestActionsError):
             self.actions.add("test_step", "1.step-clash", 1)
         assert len(self.actions) == 1
-        self.assertEqual(
-            list(self.actions.iter_content()), ["1.step", "1.result"])
-        self.assertEqual(
-            list(self.actions),
-            [(1, '1.step', '1.result')])
+        assert list(self.actions.iter_content()) == ["1.step", "1.result"]
+        assert list(self.actions) == [(1, '1.step', '1.result')]
 
     def test_actions_iter_twofull(self):
         self.actions.add("test_step", "1.step", 1)
         self.actions.add("test_result", "1.result", 1)
         self.actions.add("test_step", "2.step", 2)
         self.actions.add("test_result", "2.result", 2)
-        self.assertEqual(
-            list(self.actions),
-            [(1, '1.step', '1.result'), (2, '2.step', '2.result')])
+        assert list(self.actions) == \
+               [(1, '1.step', '1.result'), (2, '2.step', '2.result')]
 
     def test_actions_add_auto_id(self):
         self.actions.add_step("1.step")
         assert list(self.actions), [(1, '1.step' == None)]
         self.actions.add_step("2.step")
-        self.assertEqual(
-            list(self.actions),
-            [(1, '1.step', None), (2, '2.step', None)])
+        assert list(self.actions) == [(1, '1.step', None), (2, '2.step', None)]
         self.actions.add_result("2.result")
-        self.assertEqual(
-            list(self.actions),
-            [(1, '1.step', None), (2, '2.step', '2.result')])
+        assert list(self.actions) == \
+               [(1, '1.step', None), (2, '2.step', '2.result')]
         self.actions.add_result("3.result")
-        self.assertEqual(list(self.actions), [
+        assert list(self.actions) == [
             (1, '1.step', None),
             (2, '2.step', '2.result'),
-            (3, None, '3.result'), ])
+            (3, None, '3.result'), ]
         self.actions.add_step("3.step")
-        self.assertEqual(list(self.actions), [
+        assert list(self.actions) == [
             (1, '1.step', None),
             (2, '2.step', '2.result'),
-            (3, '3.step', '3.result'), ])
+            (3, '3.step', '3.result'), ]
 
     def test_actions_add_auto_id_value(self):
         auto_id = self.actions.add_step("1.step")
@@ -165,9 +140,8 @@ class TestTestActions(unittest.TestCase):
         self.actions.add("test_result", "1.result")
         self.actions.add("test_step", "2.step")
         self.actions.add("test_result", "2.result")
-        self.assertEqual(
-            list(self.actions),
-            [(1, '1.step', '1.result'), (2, '2.step', '2.result')])
+        assert list(self.actions) == \
+               [(1, '1.step', '1.result'), (2, '2.step', '2.result')]
 
 
 class TestSection(unittest.TestCase):
@@ -177,8 +151,8 @@ class TestSection(unittest.TestCase):
         s2 = Section("Test Steps")
         s3 = Section("Requirements")
         assert s1 == s2
-        self.assertNotEqual(s2, s3)
-        self.assertNotEqual(s1, s3)
+        assert s2 != s3
+        assert s1 != s3
 
     def test_plainhtml_id(self):
         s1 = Section("Description")
@@ -199,9 +173,7 @@ class TestTestCaseDoc(unittest.TestCase):
     """
 
     def test_section_vs_sectionall_len(self):
-        self.assertEqual(
-            len(TestCaseDoc.SECTIONS) + 1,
-            len(TestCaseDoc.SECTIONS_ALL))
+        assert len(TestCaseDoc.SECTIONS) + 1 == len(TestCaseDoc.SECTIONS_ALL)
 
     def test_header_membership(self):
         self.assertIn(TestCaseDoc._HEAD, TestCaseDoc.SECTIONS_ALL)
@@ -240,21 +212,18 @@ class TestRstTestCaseDoc(unittest.TestCase):
         tc.add_section(TestCaseDoc.DESCR, "string content", lineno=42)
         self.assertFalse(tc.is_empty())
         assert tc.sections == [TestCaseDoc.DESCR]
-        self.assertEqual(
-            sorted(tc.missing_sections + tc.sections),
-            sorted(TestCaseDoc.SECTIONS_ALL))
+        assert sorted(tc.missing_sections + tc.sections) == \
+               sorted(TestCaseDoc.SECTIONS_ALL)
 
     def test_rsttestcasedoc_add_section_multiple(self):
         tc = RstTestCaseDoc()
         tc.add_section(TestCaseDoc._HEAD, "header", lineno=42)
         tc.add_section(TestCaseDoc.DESCR, "description", lineno=83)
         self.assertFalse(tc.is_empty())
-        self.assertEqual(
-            sorted(tc.sections),
-            sorted([TestCaseDoc._HEAD, TestCaseDoc.DESCR]))
-        self.assertEqual(
-            sorted(tc.missing_sections + tc.sections),
-            sorted(TestCaseDoc.SECTIONS_ALL))
+        assert sorted(tc.sections) == \
+               sorted([TestCaseDoc._HEAD, TestCaseDoc.DESCR])
+        assert sorted(tc.missing_sections + tc.sections) == \
+               sorted(TestCaseDoc.SECTIONS_ALL)
 
     def test_rsttestcasedoc_get_section_one(self):
         tc = RstTestCaseDoc()
@@ -281,9 +250,8 @@ class TestRstTestCaseDoc(unittest.TestCase):
         # additional checks
         self.assertFalse(tc.is_empty())
         assert sorted(tc.sections) == sorted([TestCaseDoc.DESCR])
-        self.assertEqual(
-            sorted(tc.missing_sections + tc.sections),
-            sorted(TestCaseDoc.SECTIONS_ALL))
+        assert sorted(tc.missing_sections + tc.sections) == \
+               sorted(TestCaseDoc.SECTIONS_ALL)
 
     def test_rsttestcasedoc_add_section_few_multiple(self):
         tc = RstTestCaseDoc()
@@ -292,15 +260,14 @@ class TestRstTestCaseDoc(unittest.TestCase):
         tc.add_section(TestCaseDoc.SETUP, "setup", lineno=98)
         tc.add_section(TestCaseDoc.TEARD, "teardown", lineno=150)
         self.assertFalse(tc.is_empty())
-        self.assertEqual(sorted(tc.sections), sorted([
+        assert sorted(tc.sections) == sorted([
             TestCaseDoc._HEAD,
             TestCaseDoc.DESCR,
             TestCaseDoc.SETUP,
-            TestCaseDoc.TEARD]))
+            TestCaseDoc.TEARD])
         assert tc.missing_sections == [TestCaseDoc.STEPS]
-        self.assertEqual(
-            sorted(tc.missing_sections + tc.sections),
-            sorted(TestCaseDoc.SECTIONS_ALL))
+        assert sorted(tc.missing_sections + tc.sections) == \
+               sorted(TestCaseDoc.SECTIONS_ALL)
 
     def test_rsttestcasedoc_add_testaction_wrong(self):
         tc = RstTestCaseDoc()
@@ -309,18 +276,16 @@ class TestRstTestCaseDoc(unittest.TestCase):
         self.assertTrue(tc.is_empty())
         assert tc.sections == []
         assert tc.missing_sections == TestCaseDoc.SECTIONS_ALL
-        self.assertEqual(
-            sorted(tc.missing_sections + tc.sections),
-            sorted(TestCaseDoc.SECTIONS_ALL))
+        assert sorted(tc.missing_sections + tc.sections) == \
+               sorted(TestCaseDoc.SECTIONS_ALL)
 
     def test_rsttestcasedoc_add_testaction_simple(self):
         tc = RstTestCaseDoc()
         tc.add_test_action("test_step", "content", 1)
         self.assertFalse(tc.is_empty())
         assert tc.sections == [TestCaseDoc.STEPS]
-        self.assertEqual(
-            sorted(tc.missing_sections + tc.sections),
-            sorted(TestCaseDoc.SECTIONS_ALL))
+        assert sorted(tc.missing_sections + tc.sections) == \
+               sorted(TestCaseDoc.SECTIONS_ALL)
 
     def test_rsttestcasedoc_add_testaction_multiple(self):
         tc = RstTestCaseDoc()
@@ -329,9 +294,8 @@ class TestRstTestCaseDoc(unittest.TestCase):
         tc.add_test_action("test_step", "another test step", 2)
         self.assertFalse(tc.is_empty())
         assert tc.sections == [TestCaseDoc.STEPS]
-        self.assertEqual(
-            sorted(tc.missing_sections + tc.sections),
-            sorted(TestCaseDoc.SECTIONS_ALL))
+        assert sorted(tc.missing_sections + tc.sections) == \
+               sorted(TestCaseDoc.SECTIONS_ALL)
 
     def test_rsttestcasedoc_add_testaction_multiple_duplicit(self):
         tc = RstTestCaseDoc()
@@ -340,9 +304,8 @@ class TestRstTestCaseDoc(unittest.TestCase):
             tc.add_test_action("test_step", "another test step", 1)
         self.assertFalse(tc.is_empty())
         assert tc.sections == [TestCaseDoc.STEPS]
-        self.assertEqual(
-            sorted(tc.missing_sections + tc.sections),
-            sorted(TestCaseDoc.SECTIONS_ALL))
+        assert sorted(tc.missing_sections + tc.sections) == \
+               sorted(TestCaseDoc.SECTIONS_ALL)
 
     def test_rsttestcasedoc_eq_self_nonempty(self):
         tc = RstTestCaseDoc()
