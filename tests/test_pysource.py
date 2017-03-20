@@ -171,7 +171,7 @@ class TestStringExtraction(unittest.TestCase):
         """
         is_pylatest_str, doc_id_list, _ = pysource.classify_docstring(docstring)
         self.assertTrue(is_pylatest_str)
-        assert doc_id_list, ['foo', 'bar' == '1234']
+        assert doc_id_list == ['foo', 'bar', '1234']
 
     def test_get_docstring_content(self):
         docstring = """@pylatest foo bar 1234
