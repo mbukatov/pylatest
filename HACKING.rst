@@ -4,11 +4,19 @@ the source code.
 Unit tests
 ==========
 
-Unit tests are located in ``tests/`` directory and are written using plain
-``unittest`` module from python standard library. There are no custom test
-runners or test suites.
+Unit tests are located in ``tests/`` directory and were originally written
+using plain unittest_ module from python standard library (without custom
+test runners or test suites). Later I decided to switch to pytest_, which can
+execute test code written in plain ``unittest`` just fine, but I at least
+converted all ``unittest`` asserts calls to ``pytest`` assert statements (this
+way, one can use additional ``pytest`` features during debugging of test
+failure).
 
-To execute all unit tests use predefined tox configuration::
+At this point, only small part of unit test code (eg.
+``test_xdocutils_nodes.py``) is fully converted to ``pytest``. On the other
+hand, any new unit test files should be build using pytest from the start.
+
+To execute all unit tests use predefined tox_ configuration::
 
     $ tox
 
@@ -71,3 +79,8 @@ with global system or user environment::
     >>> import pylatest
     >>> pylatest.__file__
     '/home/martin/projects/pylatest/.env/lib/python2.7/site-packages/pylatest-0.1-py2.7.egg/pylatest/__init__.pyc'
+
+
+.. _unittest: https://docs.python.org/3.5/library/unittest.html
+.. _pytest: http://docs.pytest.org/en/latest/
+.. _tox: https://tox.readthedocs.io/en/latest/
