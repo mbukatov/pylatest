@@ -53,15 +53,7 @@ def parse_content(state, content, content_offset, options):
     # first of all, parse text content of this directive
     # into anonymous node element (can't be used directly in the tree)
     content_node = nodes.Element()
-    if 'include' in options:
-        # include HACK: link to the referred test case
-        # TODO: use a proper referece (nested parse?)
-        # TODO: the final solutions is a working include though
-        ref_tc, ref_action = str(options['include']).split(":", 2)
-        text_content = "See {0}, action {1}".format(ref_tc, ref_action)
-        content_node += nodes.paragraph(text=text_content)
-    else:
-        state.nested_parse(content, content_offset, content_node)
+    state.nested_parse(content, content_offset, content_node)
     return content_node
 
 
@@ -79,9 +71,6 @@ class TestActionDirective(rst.Directive):
     optional_arguments = 0
     final_argument_whitespace = False
     has_content = True
-    option_spec = {
-        'include': str,
-        }
 
     # Class of rst transformation for this directive, which creates final
     # representation of all test steps directives in rst node tree.
@@ -153,9 +142,6 @@ class TestActionPlainDirective(rst.Directive):
     optional_arguments = 0
     final_argument_whitespace = False
     has_content = True
-    option_spec = {
-        'include': str,
-        }
 
     def run(self):
         action_id = arguments2action_id(self.arguments)
