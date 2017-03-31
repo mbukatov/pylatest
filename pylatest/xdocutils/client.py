@@ -37,12 +37,10 @@ from docutils.core import publish_parts
 from docutils import nodes
 from docutils.writers.html4css1 import HTMLTranslator
 
-from pylatest.xdocutils.directives import TestActionTableDirective
-from pylatest.xdocutils.directives import TestActionPlainDirective
-from pylatest.xdocutils.directives import TestActionTableDirectiveAutoId
-from pylatest.xdocutils.directives import TestActionPlainDirectiveAutoId
+from pylatest.xdocutils.directives import TestActionDirective
 from pylatest.xdocutils.directives import RequirementPlainDirective
 from pylatest.xdocutils.directives import RequirementSectionDirective
+from pylatest.xdocutils.readers import TestActionsTableReader
 from pylatest.xdocutils.roles import redhat_bugzilla_role
 from pylatest.xdocutils.roles import pylaref_html_role
 import pylatest.xdocutils.nodes
@@ -81,38 +79,29 @@ def register_pylatest_roles():
     roles.register_local_role("rhbz", redhat_bugzilla_role)
     roles.register_local_role("pylaref", pylaref_html_role)
 
-def register_table(auto_id=False):
+def register_pylatest_directives():
     """
-    Register table generating implementation of pylatest rst directives
-    and roles.
+    Register custome pylatest directives.
     """
-    if auto_id:
-        directives.register_directive("test_step",
-            TestActionTableDirectiveAutoId)
-        directives.register_directive("test_result",
-            TestActionTableDirectiveAutoId)
-    else:
-        directives.register_directive("test_step", TestActionTableDirective)
-        directives.register_directive("test_result", TestActionTableDirective)
-    directives.register_directive("requirement", RequirementSectionDirective)
-    register_pylatest_roles()
+    directives.register_directive("test_step", TestActionDirective)
+    directives.register_directive("test_result", TestActionDirective)
 
 def register_plain(auto_id=False):
     """
-    Register plain implementation of pylatest rst directives and roles.
-    This is intended for further processing (HTML only).
+    Temporary, compat. hack, will be removed.
     """
-    if auto_id:
-        directives.register_directive("test_step",
-            TestActionPlainDirectiveAutoId)
-        directives.register_directive("test_result",
-            TestActionPlainDirectiveAutoId)
-    else:
-        directives.register_directive("test_step", TestActionPlainDirective)
-        directives.register_directive("test_result", TestActionPlainDirective)
+    register_pylatest_directives()
     directives.register_directive("requirement", RequirementPlainDirective)
     register_pylatest_roles()
     register_pylatest_nodes()
+
+def register_table(auto_id=False):
+    """
+    Temporary, compat. hack, will be removed.
+    """
+    register_pylatest_directives()
+    directives.register_directive("requirement", RequirementSectionDirective)
+    register_pylatest_roles()
 
 def publish_cmdline_html():
     """
@@ -121,7 +110,11 @@ def publish_cmdline_html():
     See: ``bin/pylatest2html`` script for usage.
     """
     # see: http://docutils.sourceforge.net/docs/api/cmdline-tool.html
-    publish_cmdline(writer_name='html', settings_overrides=HTML_OVERRIDES)
+    publish_cmdline(
+        writer_name='html',
+        settings_overrides=HTML_OVERRIDES,
+        reader=TestActionsTableReader(),
+        )
 
 def publish_cmdline_pseudoxml():
     """
@@ -139,11 +132,30 @@ def publish_cmdline_man():
     """
     publish_cmdline(writer_name='manpage')
 
-def publish_parts_wrapper(rst_document):
+
+def publish_parts_plain_wrapper(rst_document):
     """
     Publish method for pylatest.export module.
+    TODO: acutally by using TestActionsTableReader it's usable for unit tests
+    which tests table (no plain) output.
     """
     parts = publish_parts(
         source=rst_document,
-        writer_name='html', settings_overrides=HTML_OVERRIDES)
+        writer_name='html',
+        settings_overrides=HTML_OVERRIDES,
+        )
+    return parts
+
+def publish_parts_table_wrapper(rst_document):
+    """
+    Publish method for pylatest.export module.
+    TODO: acutally by using TestActionsTableReader it's usable for unit tests
+    which tests table (no plain) output.
+    """
+    parts = publish_parts(
+        source=rst_document,
+        writer_name='html',
+        settings_overrides=HTML_OVERRIDES,
+        reader=TestActionsTableReader(),
+        )
     return parts

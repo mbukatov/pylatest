@@ -25,8 +25,63 @@ See: http://docutils.sourceforge.net/docs/ref/transforms.html
 from docutils import nodes
 from docutils import transforms
 
+from pylatest.xdocutils.nodes import test_step_node, test_result_node
 import pylatest.document
-import pylatest.xdocutils.nodes
+
+
+def find_test_action_nodes(document):
+    """
+    Find all test action nodes (of pylatest test action directive).
+    """
+    actions = pylatest.document.TestActions()
+    # TODO: validate id (eg. report error when conflicts are found)
+    for node in document.traverse(lambda n:
+            isinstance(n, test_step_node) or isinstance(n, test_result_node)):
+        if 'action_id' not in node.attributes:  # TODO: find out why?
+            continue
+        action_id = node.attributes['action_id']
+        action_name = node.tagname[:-5]
+        actions.add(action_name, node, action_id)
+    return actions
+
+
+def drop_test_action_nodes(actions):
+    """
+    Remove all test action nodes from rst document tree.
+    """
+    action_node_iter = actions.iter_content()
+    # skip current action node element because this one
+    # has been already removed from document tree via replace_self()
+    next(action_node_iter)
+    # remove all remaining pylatest action nodes from document tree
+    for action_node in action_node_iter:
+        action_node.parent.remove(action_node)
+
+def create_content(actions):
+    """
+    Generate table node tree based on data stored in test action nodes.
+    """
+    row_nodes = []
+    for action_id, step_nodes, result_nodes in actions:
+        row_data = []
+        # add action_id into row_data as 1st entry
+        row_data.append([nodes.paragraph(text=str(action_id))])
+        # for each action check if we have step and result pending node
+        # this defines order of collumns in resulting table
+        for action_nodes in (step_nodes, result_nodes):
+            if action_nodes is not None:
+                row_data.append(action_nodes.children)
+            else:
+                row_data.append(nodes.paragraph())
+        row_node = build_row(row_data)
+        row_nodes.append(row_node)
+    headrow_data = [
+        nodes.paragraph(),
+        [nodes.paragraph(text="Step")],
+        [nodes.paragraph(text="Expected Result")],
+        ]
+    table_node = build_table(row_nodes, [2, 44, 44], headrow_data)
+    return table_node
 
 
 def build_table(row_nodes, colwidth_list, headrow_data=None):
@@ -59,6 +114,7 @@ def build_table(row_nodes, colwidth_list, headrow_data=None):
         tbody += row
     return table
 
+
 def build_row(row_data):
     """
     Creates new rst table row node tree.
@@ -80,110 +136,26 @@ def build_row(row_data):
     return row_node
 
 
-class PylatestTransform(transforms.Transform):
+class TestActionsTableTransform(transforms.Transform):
     """
-    Base class of all pylatest transformations.
+    Builds doctree table from pylatest test action nodes.
 
     Pylatest transformations (extending this base class) collect data from
-    pending elements, remove them from document tree and generate rst node tree
-    (which contains all data from pending elements) in the place of 1st pending
-    element.
+    test action nodes, remove them from document tree and generate rst node
+    tree (which contains all data from test action nodes) in the place of 1st
+    such node.
     """
 
     # use priority in "very late (non-standard)" range so that all
     # standard transformations will be executed before this one
     default_priority = 999
 
-    def _find_pending_nodes(self):
-        """
-        Find all pending nodes (of given rst directive) in rst document tree.
-        """
-        raise NotImplementedError
-
-    def _drop_pending_nodes(self):
-        """
-        Drop all pending nodes (of given rst directive) from rst document tree.
-        """
-        raise NotImplementedError
-
-    def _create_content(self):
-        """
-        Generate new content which will be insterted into place where the
-        1st pending element was found.
-        """
-        raise NotImplementedError
-
     def apply(self):
-        self._find_pending_nodes()
-        content_node = self._create_content()
+        actions = find_test_action_nodes(self.document)
+        content_node = create_content(actions)
+        startnode = next(actions.iter_content())
         # replace current pending node with new content
         # we assume that this is called on the first pending node only
         # TODO: check the assumption
-        self.startnode.replace_self(content_node)
-        self._drop_pending_nodes()
-
-
-class TestStepsTransform(PylatestTransform):
-    """
-    Base trasformation class for test steps directive.
-    """
-
-    _actions = None
-
-    def _find_pending_nodes(self):
-        """
-        Find all pending nodes of pylatest directive and store them in
-        ``_actions`` attribute.
-        """
-        self._actions = pylatest.document.TestActions()
-        # TODO: validate id (eg. report error when conflicts are found)
-        for node in self.document.traverse(nodes.pending):
-            if 'action_id' not in node.details:
-                continue
-            action_id = node.details['action_id']
-            action_name = node.details['action_name']
-            self._actions.add(action_name, node, action_id)
-
-    def _drop_pending_nodes(self):
-        """
-        Remove all pending nodes from rst document tree.
-        """
-        pending_node_iter = self._actions.iter_content()
-        # skip current pending element because this one
-        # has been already removed from document tree via replace_self()
-        next(pending_node_iter)
-        # remove all remaining pylatest pending nodes from document tree
-        for pending_node in pending_node_iter:
-            pending_node.parent.remove(pending_node)
-
-
-class TestStepsTableTransform(TestStepsTransform):
-    """
-    Builds table from pending test step nodes.
-    """
-
-    def _create_content(self):
-        """
-        Generate table node tree based on data stored in pending elements.
-        """
-        row_nodes = []
-        for action_id, step_nodes, result_nodes in self._actions:
-            row_data = []
-            # add action_id into row_data as 1st entry
-            row_data.append([nodes.paragraph(text=str(action_id))])
-            # for each action check if we have step and result pending node
-            # this defines order of collumns in resulting table
-            for action_nodes in (step_nodes, result_nodes):
-                if action_nodes is not None:
-                    row_data.append(action_nodes.details['nodes'])
-                else:
-                    row_data.append(nodes.paragraph())
-            row_node = build_row(row_data)
-            row_nodes.append(row_node)
-        headrow_data = [
-            nodes.paragraph(),
-            [nodes.paragraph(text="Step")],
-            [nodes.paragraph(text="Expected Result")],
-            ]
-        table_node = build_table(row_nodes, [2, 44, 44], headrow_data)
-        return table_node
+        startnode.replace_self(content_node)
+        drop_test_action_nodes(actions)

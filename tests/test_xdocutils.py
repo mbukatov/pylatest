@@ -44,7 +44,7 @@ class TestBasePlain(unittest.TestCase):
         self.maxDiff = None
 
     def check_html_body(self, rst_input, exp_result):
-        htmlbody_str = xclient.publish_parts_wrapper(rst_input)['html_body']
+        htmlbody_str = xclient.publish_parts_plain_wrapper(rst_input)['html_body']
         assert htmlbody_str == exp_result
 
 
@@ -272,6 +272,10 @@ class TestTestActionsTable(TestBasePlain):
         xclient.register_table()
         # show full diff (note: python3 unittest diff is much better)
         self.maxDiff = None
+
+    def check_html_body(self, rst_input, exp_result):
+        htmlbody_str = xclient.publish_parts_table_wrapper(rst_input)['html_body']
+        assert htmlbody_str == exp_result
 
     def test_teststep_empty(self):
         rst_input = '.. test_step:: 1'
