@@ -113,7 +113,7 @@ class TestRst2HtmlBodyTree(unittest.TestCase):
         html_body = export.rst2htmlbodytree(rst_content)
         # construct expected tree
         html_body_expected = get_empty_body_tree()
-        div_el = add_action_div(html_body_expected, '1', 'step')
+        div_el = add_action_div(html_body_expected, '1', 'test_step')
         div_el.text = '\nThis is just a test.\n'
         assert etree.tostring(html_body) == etree.tostring(html_body_expected)
 
@@ -134,9 +134,9 @@ class TestGetStuffFromHtmlPlain(unittest.TestCase):
     def test_get_actions_singleaction(self):
         # construct input
         body_tree, p_el = get_singleparagraph_body_tree()
-        step_div_el = add_action_div(p_el, '1', 'step')
+        step_div_el = add_action_div(p_el, '1', 'test_step')
         step_div_el.text = "This is a test step"
-        result_div_el = add_action_div(p_el, '1', 'result')
+        result_div_el = add_action_div(p_el, '1', 'test_result')
         result_div_el.text = "This is the expected result."
         # construct expected output
         exp_res = TestActions()

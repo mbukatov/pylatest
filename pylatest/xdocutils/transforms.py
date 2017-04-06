@@ -25,7 +25,7 @@ See: http://docutils.sourceforge.net/docs/ref/transforms.html
 from docutils import nodes
 from docutils import transforms
 
-from pylatest.xdocutils.nodes import test_step_node, test_result_node
+from pylatest.xdocutils.nodes import test_action_node
 import pylatest.document
 
 
@@ -35,12 +35,11 @@ def find_test_action_nodes(document):
     """
     actions = pylatest.document.TestActions()
     # TODO: validate id (eg. report error when conflicts are found)
-    for node in document.traverse(lambda n:
-            isinstance(n, test_step_node) or isinstance(n, test_result_node)):
+    for node in document.traverse(test_action_node):
         if 'action_id' not in node.attributes:  # TODO: find out why?
             continue
         action_id = node.attributes['action_id']
-        action_name = node.tagname[:-5]
+        action_name = node.attributes['action_name']
         actions.add(action_name, node, action_id)
     return actions
 

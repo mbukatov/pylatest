@@ -94,13 +94,13 @@ def test_all_custom_nodes(empty_doctree, node_name):
     assert output == exp_result
 
 
-@pytest.mark.parametrize("node_name", ["test_step_node", "test_result_node"])
-def test_action_node_with_content_html(empty_doctree, node_name, register_nodes):
+@pytest.mark.parametrize("action_name", ["test_step", "test_result"])
+def test_action_node_with_content_html(empty_doctree, action_name, register_nodes):
     doctree = empty_doctree
     # create test step node with some content
-    node_class = getattr(pylatest.xdocutils.nodes, node_name)
-    node = node_class()
+    node = pylatest.xdocutils.nodes.test_action_node()
     node.attributes["action_id"] = 7
+    node.attributes["action_name"] = action_name
     node += nodes.paragraph(text="Just do it!")
     # add this node into doctree
     doctree += node
@@ -118,4 +118,4 @@ def test_action_node_with_content_html(empty_doctree, node_name, register_nodes)
     node_el = node_list[0]
     assert node_el.text.strip() == "Just do it!"
     assert node_el.get("action_id") == "7"
-    assert node_el.get("action_name") == node_name.split("_")[1]
+    assert node_el.get("action_name") == action_name

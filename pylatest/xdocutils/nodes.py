@@ -30,14 +30,12 @@ See: http://epydoc.sourceforge.net/docutils/public/docutils.nodes-module.html
 from docutils import nodes
 
 
-class test_step_node(nodes.Element): pass
-class test_result_node(nodes.Element): pass
+class test_action_node(nodes.Element): pass
 class requirement_node(nodes.Element): pass
 
 
 node_class_names = [
-    "test_step_node",
-    "test_result_node",
+    "test_action_node",
     "requirement_node",
     ]
 """A list of names of all pylatest Node subclasses."""

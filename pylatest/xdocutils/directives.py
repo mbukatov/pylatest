@@ -82,15 +82,14 @@ class TestActionDirective(rst.Directive):
         content_node = parse_content(
             self.state, self.content, self.content_offset, self.options)
 
-        # create new action node (either ``test_steprgr_node`` or
-        # ``test_result_node``)
-        node_name = "{}_node".format(self.name)
-        action_node = getattr(pylatest.xdocutils.nodes, node_name)()
+        # create new action node
+        action_node = pylatest.xdocutils.nodes.test_action_node()
 
         # add all content nodes into the new action node
         for content in content_node:
             action_node += content
         action_node.attributes['action_id'] = action_id
+        action_node.attributes['action_name'] = self.name
 
         # and finally return the action node as the only result
         return [action_node]

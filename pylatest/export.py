@@ -82,7 +82,7 @@ def get_actions(tree):
     # check all pylatest action div elements
     for div_el in tree.xpath('//div[@class="pylatest_action"]'):
         action_id = int(div_el.get("action_id"))
-        action_name = "test_{0}".format(div_el.get("action_name"))
+        action_name = div_el.get("action_name")
         content = etree.tostring(div_el, method='html')
         actions.add(action_name, content, action_id)
     return actions
