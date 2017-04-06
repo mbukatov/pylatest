@@ -426,6 +426,7 @@ class TestTestActionsTableAutoId(TestTestActionsTable):
         # show full diff (note: python3 unittest diff is much better)
         self.maxDiff = None
 
+    @pytest.mark.xfail(reason="https://gitlab.com/mbukatov/pylatest/issues/11")
     def test_test_action_simple_autoid(self):
         rst_input = textwrap.dedent('''\
         .. test_step:: 1
@@ -461,6 +462,7 @@ class TestTestActionsTableAutoId(TestTestActionsTable):
         ''')
         self.check_html_body(rst_input, exp_result)
 
+    @pytest.mark.xfail(reason="https://gitlab.com/mbukatov/pylatest/issues/11")
     def test_test_actions_two_autoid(self):
         rst_input = textwrap.dedent('''\
         .. test_step:: 1
