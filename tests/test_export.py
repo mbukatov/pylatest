@@ -22,7 +22,7 @@ import unittest
 from lxml import etree
 
 from pylatest.document import TestActions, TestCaseDoc
-from pylatest.xdocutils.client import register_plain
+from pylatest.xdocutils.core import register_all_plain
 import pylatest.export as export
 
 
@@ -87,7 +87,7 @@ class TestRst2HtmlBodyTree(unittest.TestCase):
         # show full diff (note: python3 unittest diff is much better)
         self.maxDiff = None
         # register pylatest docutils extensions for htmlplain output
-        register_plain()
+        register_all_plain()
 
     def test_rst2htmlbodytree_empty(self):
         assert etree.tostring(export.rst2htmlbodytree("")) == \

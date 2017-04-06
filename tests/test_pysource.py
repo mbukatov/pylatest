@@ -24,7 +24,7 @@ import codecs
 
 from pylatest.document import TestCaseDoc
 import pylatest.pysource as pysource
-import pylatest.xdocutils.client
+import pylatest.xdocutils.core
 
 
 HERE = os.path.abspath(os.path.dirname(__file__))
@@ -188,7 +188,7 @@ class TestTestCaseDocFragments(unittest.TestCase):
     """
 
     def setUp(self):
-        pylatest.xdocutils.client.register_plain()
+        pylatest.xdocutils.core.register_all_plain()
         self.fragments = pysource.TestCaseDocFragments()
 
     def test_docfragments_null(self):
@@ -514,7 +514,7 @@ class TestExtractDocumentFragments(unittest.TestCase):
         # show full diff (note: python3 unittest diff is much better)
         self.maxDiff = None
         # commons steps required for all test cases
-        pylatest.xdocutils.client.register_plain()
+        pylatest.xdocutils.core.register_all_plain()
 
     def test_extract_doc_fragments_null_str(self):
         doc_fragment_dict = pysource.extract_doc_fragments("")
@@ -595,7 +595,7 @@ class TestPylatestDocumentExtractionOneCaseOneFile(unittest.TestCase):
         # show full diff (note: python3 unittest diff is much better)
         self.maxDiff = None
         # commons steps required for all test cases
-        pylatest.xdocutils.client.register_plain()
+        pylatest.xdocutils.core.register_all_plain()
 
     def _test_extract_document_noerrors(self, testname):
         source = read_file("onecaseperfile", testname)
@@ -693,7 +693,7 @@ class TestPylatestDocumentsExtractionMultipleCasesPerFile(unittest.TestCase):
         # show full diff (note: python3 unittest diff is much better)
         self.maxDiff = None
         # common steps required for all test cases
-        pylatest.xdocutils.client.register_plain()
+        pylatest.xdocutils.core.register_all_plain()
 
     def _test_extract_documents_noerrors(self, doc_num, testname):
         # TODO: needs update to work with new error handling (not yet done)

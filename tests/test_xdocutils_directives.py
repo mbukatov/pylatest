@@ -25,7 +25,7 @@ import docutils.parsers.rst
 import docutils.utils
 
 import pylatest.xdocutils.directives
-import pylatest.xdocutils.client
+import pylatest.xdocutils.core
 
 
 def _testparse(rst_str):
@@ -51,7 +51,7 @@ class TestBasePlain(unittest.TestCase):
 
     def setUp(self):
         # register custom pylatest nodes with html translator
-        pylatest.xdocutils.client.register_plain()
+        pylatest.xdocutils.core.register_all_plain()
         # show full diff (note: python3 unittest diff is much better)
         self.maxDiff = None
 
@@ -185,7 +185,7 @@ class TestRequirementDirectiveTable(TestBasePlain):
 
     def setUp(self):
         # register custom pylatest nodes with html translator
-        pylatest.xdocutils.client.register_table()
+        pylatest.xdocutils.core.register_all()
         # show full diff (note: python3 unittest diff is much better)
         self.maxDiff = None
 

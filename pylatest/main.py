@@ -2,6 +2,8 @@
 
 """
 Commandline script module for pylatest docutils clients.
+
+See: https://docutils.readthedocs.io/en/sphinx-docs/api/cmdline-tool.html
 """
 
 # Copyright (C) 2016 mbukatov@redhat.com
@@ -20,7 +22,8 @@ Commandline script module for pylatest docutils clients.
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-from pylatest.xdocutils import client
+from pylatest.xdocutils.core import pylatest_publish_cmdline
+from pylatest.xdocutils.core import pylatest_plain_publish_cmdline
 
 
 def pylatest2html():
@@ -29,21 +32,19 @@ def pylatest2html():
     but it knows how to handle pylatest rst directives and doesn't produce
     embedded css code.
     """
-    client.register_table()
-    client.publish_cmdline_html()
+    pylatest_publish_cmdline(writer_name='html')
+
 
 def pylatest2htmlplain():
-    client.register_plain()
-    client.publish_cmdline_html()
+    pylatest_plain_publish_cmdline(writer_name='html')
+
 
 def pylatest2man():
-    # TODO: run manpage viewer immediately
-    client.register_table()
-    client.publish_cmdline_man()
+    pylatest_publish_cmdline(writer_name='manpage')
+
 
 def pylatest2pseudoxml():
     """
     This client is useful for debugging purposes only.
     """
-    client.register_table()
-    client.publish_cmdline_pseudoxml()
+    pylatest_plain_publish_cmdline(writer_name='pseudoxml')

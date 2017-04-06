@@ -24,20 +24,6 @@ Pylatest command line tools can be classified into several groups:
   from python source code with pylatest string literals
 * various helpers (eg. ``pylatest-template``)
 
-Usage with Sphinx
------------------
-
-To use *pylatest rst extensions* (eg. directives or roles) in a sphinx project,
-you need to register them into docutils rst parser in a similar way as it's
-done in ``pylatest2html`` command line client (see ``pylatest/main.py``).
-Assuming you have pylatest installed properly (so that you can import pylatest
-module without any problems), add following lines into ``conf.py`` of your
-sphinx project::
-
-    import pylatest.xdocutils.client
-
-    pylatest.xdocutils.client.register_table()
-
 Development and testing
 -----------------------
 

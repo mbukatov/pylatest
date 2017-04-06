@@ -28,7 +28,8 @@ import unittest
 
 import pytest
 
-import pylatest.xdocutils.client as xclient
+from pylatest.xdocutils.core import pylatest_plain_publish_parts
+from pylatest.xdocutils.core import pylatest_publish_parts
 
 
 class TestBasePlain(unittest.TestCase):
@@ -38,14 +39,12 @@ class TestBasePlain(unittest.TestCase):
     """
 
     def setUp(self):
-        # register custom pylatest nodes with html translator
-        xclient.register_plain()
         # show full diff (note: python3 unittest diff is much better)
         self.maxDiff = None
 
     def check_html_body(self, rst_input, exp_result):
-        htmlbody_str = xclient.publish_parts_plain_wrapper(rst_input)['html_body']
-        assert htmlbody_str == exp_result
+        parts = pylatest_plain_publish_parts(rst_input, writer_name='html')
+        assert parts['html_body'] == exp_result
 
 
 class TestDocutilsPlain(TestBasePlain):
@@ -92,8 +91,6 @@ class TestDocutilsTable(TestDocutilsPlain):
     """
 
     def setUp(self):
-        # register custom pylatest nodes with html translator
-        xclient.register_table()
         # show full diff (note: python3 unittest diff is much better)
         self.maxDiff = None
 
@@ -197,7 +194,7 @@ class TestTestActionsPlainAutoId(TestTestActionsPlain):
 
     def setUp(self):
         # register custom pylatest nodes with html translator
-        xclient.register_plain(auto_id=True)
+        # xclient.register_plain(auto_id=True)
         # show full diff (note: python3 unittest diff is much better)
         self.maxDiff = None
 
@@ -268,14 +265,12 @@ class TestTestActionsTable(TestBasePlain):
     """
 
     def setUp(self):
-        # register custom pylatest nodes with html translator
-        xclient.register_table()
         # show full diff (note: python3 unittest diff is much better)
         self.maxDiff = None
 
     def check_html_body(self, rst_input, exp_result):
-        htmlbody_str = xclient.publish_parts_table_wrapper(rst_input)['html_body']
-        assert htmlbody_str == exp_result
+        parts = pylatest_publish_parts(rst_input, writer_name='html')
+        assert parts['html_body'] == exp_result
 
     def test_teststep_empty(self):
         rst_input = '.. test_step:: 1'
@@ -422,7 +417,7 @@ class TestTestActionsTableAutoId(TestTestActionsTable):
 
     def setUp(self):
         # register custom pylatest nodes with html translator
-        xclient.register_table(auto_id=True)
+        # xclient.register_table(auto_id=True)
         # show full diff (note: python3 unittest diff is much better)
         self.maxDiff = None
 

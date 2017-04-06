@@ -23,7 +23,7 @@ from docutils import nodes
 from docutils.core import publish_from_doctree, publish_doctree
 import pytest
 
-import pylatest.xdocutils.client
+import pylatest.xdocutils.core
 import pylatest.xdocutils.nodes
 
 
@@ -44,7 +44,7 @@ def register_nodes(scope="module"):
     """
     Register custom pylatest nodes with html translator.
     """
-    pylatest.xdocutils.client.register_pylatest_nodes()
+    pylatest.xdocutils.core.register_pylatest_nodes()
 
 
 def publish_pseudoxml(doctree):

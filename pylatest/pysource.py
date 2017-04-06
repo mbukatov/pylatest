@@ -29,7 +29,7 @@ import sys
 
 from pylatest.document import TestCaseDoc, RstTestCaseDoc, Section
 from pylatest.rstsource import find_actions, find_sections
-import pylatest.xdocutils.client
+from pylatest.xdocutils.core import register_all_plain
 
 
 def get_string_literals(content):
@@ -225,7 +225,7 @@ def main():
         return 1
 
     # register pylatest rst extensions (parsing friendly plain implementation)
-    pylatest.xdocutils.client.register_plain()
+    register_all_plain()
 
     with open(args.filepath, 'r') as python_file:
         source_content = python_file.read()
