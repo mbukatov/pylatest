@@ -28,7 +28,7 @@ import argparse
 from lxml import etree
 
 from pylatest.document import TestActions, TestCaseDoc
-from pylatest.xdocutils.client import publish_parts_wrapper, register_plain
+from pylatest.xdocutils.core import pylatest_plain_publish_parts
 
 
 class XmlExportDoc(object):
@@ -81,7 +81,7 @@ def get_actions(tree):
     # check all pylatest action div elements
     for div_el in tree.xpath('//div[@class="pylatest_action"]'):
         action_id = int(div_el.get("action_id"))
-        action_name = "test_{0}".format(div_el.get("action_name"))
+        action_name = div_el.get("action_name")
         content = etree.tostring(div_el, method='html')
         actions.add(action_name, content, action_id)
     return actions
@@ -123,8 +123,8 @@ def rst2htmlbodytree(rst_content):
     Translate given string which contains a content of rst file into processing
     friendly "pylatest plain html" xml tree.
     """
-    htmlbody_str = publish_parts_wrapper(rst_content)['html_body']
-    htmlbody_tree = etree.fromstring(htmlbody_str)
+    parts = pylatest_plain_publish_parts(rst_content, writer_name='html')
+    htmlbody_tree = etree.fromstring(parts['html_body'])
     return htmlbody_tree
 
 def main():
@@ -137,9 +137,6 @@ def main():
         "rstfile",
         help="filename of testcase to be exported into xml form")
     args = parser.parse_args()
-
-    # register plain html output with docutils
-    register_plain()
 
     # TODO: except IOError
     with open(args.rstfile, 'r') as src_file:

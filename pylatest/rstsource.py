@@ -23,7 +23,7 @@ Helper functions for processing of rst source text strings.
 from docutils.core import publish_doctree
 from docutils import nodes
 
-import pylatest.xdocutils.nodes
+from pylatest.xdocutils.nodes import test_action_node
 
 
 def _debug(nodetree):
@@ -139,21 +139,12 @@ def find_sections(rst_source):
     return sections
 
 
-def _teststeps_condition(node):
-    """
-    Traverse condition for filtering nodes of test steps directives.
-    """
-    return (
-        isinstance(node, pylatest.xdocutils.nodes.test_step_node) or
-        isinstance(node, pylatest.xdocutils.nodes.test_result_node))
-
-
 def find_actions(rst_source):
     # parse rst_source string to get rst node tree
     nodetree = publish_doctree(source=rst_source)
 
     actions = []
-    for node in nodetree.traverse(_teststeps_condition):
+    for node in nodetree.traverse(test_action_node):
         # we can't get line of the directive node directly, because docutils
         # doesn't provide it (node.line is None), but we can use the fact that
         # a paragraph node (which contains content of the directive) has line
@@ -161,9 +152,13 @@ def find_actions(rst_source):
         #
         # pseudoxml tree of directive node looks like this:
         #
-        # <test_result_node action_id="1">   # no line value for this node
-        #     <paragraph>                    # we have line value here
+        # <test_action_node action_id="1" action_name="test_result">
+        #     <paragraph>
         #         There are no files, output should be empty.
+        #
+        # where:
+        #  * test_action_node.line is None
+        #  * paragraph.line have a value here
         start_line = node.children[0].line - 2
         # to get end line of a content of the directive node, we have to do
         # another hack (docutils node objects doesn't contain any information
@@ -175,7 +170,7 @@ def find_actions(rst_source):
             )
         if len(next_siblings) > 0:
             next_node = next_siblings[0]
-            if next_node.tagname in ("test_step_node", "test_result_node"):
+            if next_node.tagname == "test_action_node":
                 end_line = next_node.children[0].line - 4
             elif next_node.tagname == "section":
                 end_line = next_node.line - 3
@@ -196,7 +191,7 @@ def find_actions(rst_source):
                 # but on the higher level, see this example:
                 #
                 # <paragraph>
-                #     <test_step_node action_id="1">
+                #     <test_action_node action_id="1" action_name="test_step">
                 #         <paragraph>
                 #             Maecenas congue ligula ac quam viverra nec
                 #             consectetur ante hendrerit.
@@ -215,7 +210,7 @@ def find_actions(rst_source):
                 # ok, it seems this node is the last one in the rst source
                 end_line = get_last_line_num(rst_source)
         action_id = node.attributes['action_id']
-        action_name = node.tagname[:-5]  # dropping '_node' suffix
+        action_name = node.attributes['action_name']
         action = RstTestAction(action_id, action_name, start_line, end_line)
         actions.append(action)
     return actions

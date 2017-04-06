@@ -22,14 +22,14 @@ import unittest
 
 from pylatest.document import TestCaseDoc
 import pylatest.rstsource as rstsource
-import pylatest.xdocutils.client
+import pylatest.xdocutils.core
 
 
 class TestFindSections(unittest.TestCase):
 
     def setUp(self):
         # commons steps required for all test cases
-        pylatest.xdocutils.client.register_plain()
+        pylatest.xdocutils.core.register_all_plain()
 
     def test_find_sections_emptydoc(self):
         assert rstsource.find_sections("") == []
@@ -369,7 +369,7 @@ class TestFindActions(unittest.TestCase):
 
     def setUp(self):
         # commons steps required for all test cases
-        pylatest.xdocutils.client.register_plain()
+        pylatest.xdocutils.core.register_all_plain()
 
     def test_find_actions_null(self):
         assert rstsource.find_actions("") == []

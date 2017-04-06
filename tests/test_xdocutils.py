@@ -28,7 +28,8 @@ import unittest
 
 import pytest
 
-import pylatest.xdocutils.client as xclient
+from pylatest.xdocutils.core import pylatest_plain_publish_parts
+from pylatest.xdocutils.core import pylatest_publish_parts
 
 
 class TestBasePlain(unittest.TestCase):
@@ -38,14 +39,12 @@ class TestBasePlain(unittest.TestCase):
     """
 
     def setUp(self):
-        # register custom pylatest nodes with html translator
-        xclient.register_plain()
         # show full diff (note: python3 unittest diff is much better)
         self.maxDiff = None
 
     def check_html_body(self, rst_input, exp_result):
-        htmlbody_str = xclient.publish_parts_wrapper(rst_input)['html_body']
-        assert htmlbody_str == exp_result
+        parts = pylatest_plain_publish_parts(rst_input, writer_name='html')
+        assert parts['html_body'] == exp_result
 
 
 class TestDocutilsPlain(TestBasePlain):
@@ -92,8 +91,6 @@ class TestDocutilsTable(TestDocutilsPlain):
     """
 
     def setUp(self):
-        # register custom pylatest nodes with html translator
-        xclient.register_table()
         # show full diff (note: python3 unittest diff is much better)
         self.maxDiff = None
 
@@ -107,7 +104,7 @@ class TestTestActionsPlain(TestBasePlain):
         rst_input = '.. test_step:: 1'
         exp_result = textwrap.dedent('''\
         <div class="document">
-        <div action_id="1" action_name="step" class="pylatest_action">
+        <div action_id="1" action_name="test_step" class="pylatest_action">
 
         </div>
         </div>
@@ -122,7 +119,7 @@ class TestTestActionsPlain(TestBasePlain):
         ''')
         exp_result = textwrap.dedent('''\
         <div class="document">
-        <div action_id="1" action_name="step" class="pylatest_action">
+        <div action_id="1" action_name="test_step" class="pylatest_action">
         Ceterum censeo Carthaginem esse delendam.
         </div>
         </div>
@@ -141,10 +138,10 @@ class TestTestActionsPlain(TestBasePlain):
         ''')
         exp_result = textwrap.dedent('''\
         <div class="document">
-        <div action_id="1" action_name="step" class="pylatest_action">
+        <div action_id="1" action_name="test_step" class="pylatest_action">
         Ceterum censeo Carthaginem esse delendam.
         </div>
-        <div action_id="1" action_name="result" class="pylatest_action">
+        <div action_id="1" action_name="test_result" class="pylatest_action">
         This city is no more ... it has ceased to be ...
         </div>
         </div>
@@ -171,16 +168,16 @@ class TestTestActionsPlain(TestBasePlain):
         ''')
         exp_result = textwrap.dedent('''\
         <div class="document">
-        <div action_id="1" action_name="step" class="pylatest_action">
+        <div action_id="1" action_name="test_step" class="pylatest_action">
         Ceterum censeo Carthaginem esse delendam.
         </div>
-        <div action_id="1" action_name="result" class="pylatest_action">
+        <div action_id="1" action_name="test_result" class="pylatest_action">
         This city is no more ... it has ceased to be ...
         </div>
-        <div action_id="2" action_name="step" class="pylatest_action">
+        <div action_id="2" action_name="test_step" class="pylatest_action">
         Step foo.
         </div>
-        <div action_id="2" action_name="result" class="pylatest_action">
+        <div action_id="2" action_name="test_result" class="pylatest_action">
         Result bar.
         </div>
         </div>
@@ -197,7 +194,7 @@ class TestTestActionsPlainAutoId(TestTestActionsPlain):
 
     def setUp(self):
         # register custom pylatest nodes with html translator
-        xclient.register_plain(auto_id=True)
+        # xclient.register_plain(auto_id=True)
         # show full diff (note: python3 unittest diff is much better)
         self.maxDiff = None
 
@@ -214,10 +211,10 @@ class TestTestActionsPlainAutoId(TestTestActionsPlain):
         ''')
         exp_result = textwrap.dedent('''\
         <div class="document">
-        <div action_id="1" action_name="step" class="pylatest_action">
+        <div action_id="1" action_name="test_step" class="pylatest_action">
         Ceterum censeo Carthaginem esse delendam.
         </div>
-        <div action_id="1" action_name="result" class="pylatest_action">
+        <div action_id="1" action_name="test_result" class="pylatest_action">
         This city is no more ... it has ceased to be ...
         </div>
         </div>
@@ -245,16 +242,16 @@ class TestTestActionsPlainAutoId(TestTestActionsPlain):
         ''')
         exp_result = textwrap.dedent('''\
         <div class="document">
-        <div action_id="1" action_name="step" class="pylatest_action">
+        <div action_id="1" action_name="test_step" class="pylatest_action">
         Ceterum censeo Carthaginem esse delendam.
         </div>
-        <div action_id="1" action_name="result" class="pylatest_action">
+        <div action_id="1" action_name="test_result" class="pylatest_action">
         This city is no more ... it has ceased to be ...
         </div>
-        <div action_id="2" action_name="step" class="pylatest_action">
+        <div action_id="2" action_name="test_step" class="pylatest_action">
         Step foo.
         </div>
-        <div action_id="2" action_name="result" class="pylatest_action">
+        <div action_id="2" action_name="test_result" class="pylatest_action">
         Result bar.
         </div>
         </div>
@@ -268,10 +265,12 @@ class TestTestActionsTable(TestBasePlain):
     """
 
     def setUp(self):
-        # register custom pylatest nodes with html translator
-        xclient.register_table()
         # show full diff (note: python3 unittest diff is much better)
         self.maxDiff = None
+
+    def check_html_body(self, rst_input, exp_result):
+        parts = pylatest_publish_parts(rst_input, writer_name='html')
+        assert parts['html_body'] == exp_result
 
     def test_teststep_empty(self):
         rst_input = '.. test_step:: 1'
@@ -418,10 +417,11 @@ class TestTestActionsTableAutoId(TestTestActionsTable):
 
     def setUp(self):
         # register custom pylatest nodes with html translator
-        xclient.register_table(auto_id=True)
+        # xclient.register_table(auto_id=True)
         # show full diff (note: python3 unittest diff is much better)
         self.maxDiff = None
 
+    @pytest.mark.xfail(reason="https://gitlab.com/mbukatov/pylatest/issues/11")
     def test_test_action_simple_autoid(self):
         rst_input = textwrap.dedent('''\
         .. test_step:: 1
@@ -457,6 +457,7 @@ class TestTestActionsTableAutoId(TestTestActionsTable):
         ''')
         self.check_html_body(rst_input, exp_result)
 
+    @pytest.mark.xfail(reason="https://gitlab.com/mbukatov/pylatest/issues/11")
     def test_test_actions_two_autoid(self):
         rst_input = textwrap.dedent('''\
         .. test_step:: 1

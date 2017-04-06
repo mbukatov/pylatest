@@ -1,17 +1,10 @@
 # -*- coding: utf8 -*-
-# flake8: noqa
 
 """
-Pylatest document tree element class module.
-
-This module is used to generate plain html output only, it's not needed for
-default html (with tables). There is a node class for each pylatest directive,
-so that it's possible to wrap directive content into div or span element.
-
-See: http://epydoc.sourceforge.net/docutils/public/docutils.nodes-module.html
+Pylatest ReStructuredText Readers module.
 """
 
-# Copyright (C) 2015 martin.bukatovic@gmail.com
+# Copyright (C) 2017 mbukatov@redhat.com
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,15 +20,18 @@ See: http://epydoc.sourceforge.net/docutils/public/docutils.nodes-module.html
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-from docutils import nodes
+from docutils.readers import standalone
+
+from pylatest.xdocutils.transforms import TestActionsTableTransform
 
 
-class test_action_node(nodes.Element): pass
-class requirement_node(nodes.Element): pass
+class TestActionsTableReader(standalone.Reader):
+    """
+    TestActionsTableReader extends docutils standalone ReStructuredText reader
+    to add transformation, everything else remains the same.
+    """
 
-
-node_class_names = [
-    "test_action_node",
-    "requirement_node",
-    ]
-"""A list of names of all pylatest Node subclasses."""
+    def get_transforms(self):
+        transforms = standalone.Reader.get_transforms(self)
+        transforms.append(TestActionsTableTransform)
+        return transforms

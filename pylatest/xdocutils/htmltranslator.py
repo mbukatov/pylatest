@@ -24,26 +24,15 @@ pylatest nodes (see pylatest.xdocutils.nodes module).
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-def visit_test_step_node(self, node):
+def visit_test_action_node(self, node):
     attributes = {
         'class': 'pylatest_action',
-        'action_name': 'step',
+        'action_name': node.attributes['action_name'],
         'action_id': node.attributes['action_id'],
         }
     self.body.append(self.starttag(node, 'div', **attributes))
 
-def depart_test_step_node(self, node):
-    self.body.append('\n</div>\n')
-
-def visit_test_result_node(self, node):
-    attributes = {
-        'class': 'pylatest_action',
-        'action_name': 'result',
-        'action_id': node.attributes['action_id'],
-        }
-    self.body.append(self.starttag(node, 'div', **attributes))
-
-def depart_test_result_node(self, node):
+def depart_test_action_node(self, node):
     self.body.append('\n</div>\n')
 
 def visit_requirement_node(self, node):

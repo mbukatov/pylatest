@@ -25,7 +25,7 @@ import docutils.parsers.rst
 import docutils.utils
 
 import pylatest.xdocutils.directives
-import pylatest.xdocutils.client
+import pylatest.xdocutils.core
 
 
 def _testparse(rst_str):
@@ -51,7 +51,7 @@ class TestBasePlain(unittest.TestCase):
 
     def setUp(self):
         # register custom pylatest nodes with html translator
-        pylatest.xdocutils.client.register_plain()
+        pylatest.xdocutils.core.register_all_plain()
         # show full diff (note: python3 unittest diff is much better)
         self.maxDiff = None
 
@@ -91,7 +91,7 @@ class TestTestActionsDirectivePlain(TestBasePlain):
         rst_input = '.. test_step:: 1'
         exp_result = textwrap.dedent('''\
         <document source="_testparse() method">
-            <test_step_node action_id="1">
+            <test_action_node action_id="1" action_name="test_step">
         ''')
         self.check_directive(rst_input, exp_result)
 
@@ -112,7 +112,7 @@ class TestTestActionsDirectivePlain(TestBasePlain):
         rst_input = '.. test_result:: 1'
         exp_result = textwrap.dedent('''\
         <document source="_testparse() method">
-            <test_result_node action_id="1">
+            <test_action_node action_id="1" action_name="test_result">
         ''')
         self.check_directive(rst_input, exp_result)
 
@@ -124,7 +124,7 @@ class TestTestActionsDirectivePlain(TestBasePlain):
         ''')
         exp_result = textwrap.dedent('''\
         <document source="_testparse() method">
-            <test_step_node action_id="7">
+            <test_action_node action_id="7" action_name="test_step">
                 <paragraph>
                     Some content.
         ''')
@@ -138,7 +138,7 @@ class TestTestActionsDirectivePlain(TestBasePlain):
         ''')
         exp_result = textwrap.dedent('''\
         <document source="_testparse() method">
-            <test_result_node action_id="7">
+            <test_action_node action_id="7" action_name="test_result">
                 <paragraph>
                     Some content.
         ''')
@@ -185,7 +185,7 @@ class TestRequirementDirectiveTable(TestBasePlain):
 
     def setUp(self):
         # register custom pylatest nodes with html translator
-        pylatest.xdocutils.client.register_table()
+        pylatest.xdocutils.core.register_all()
         # show full diff (note: python3 unittest diff is much better)
         self.maxDiff = None
 
