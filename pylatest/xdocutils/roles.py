@@ -44,7 +44,7 @@ def redhat_bugzilla_role(role, rawtext, text, lineno, inliner,
             raise ValueError
     except ValueError:
         msg = inliner.reporter.error(
-            'BZ number must be a number greater than or equal to 1; '
+            'RHBZ number must be a number greater than or equal to 1; '
             '"%s" is invalid.' % text, line=lineno)
         prb = inliner.problematic(rawtext, rawtext, msg)
         return [prb], [msg]
@@ -52,7 +52,7 @@ def redhat_bugzilla_role(role, rawtext, text, lineno, inliner,
     ref = "https://bugzilla.redhat.com/show_bug.cgi?id={0:d}".format(bznum)
     roles.set_classes(options)
     node = nodes.reference(
-        rawtext, 'BZ ' + utils.unescape(text), refuri=ref, **options)
+        rawtext, 'RHBZ ' + utils.unescape(text), refuri=ref, **options)
     return [node], []
 
 def pylaref_html_role(role, rawtext, text, lineno, inliner,
