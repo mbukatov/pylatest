@@ -29,7 +29,7 @@ class TestFindSections(unittest.TestCase):
 
     def setUp(self):
         # commons steps required for all test cases
-        pylatest.xdocutils.core.register_all_plain()
+        pylatest.xdocutils.core.register_all(use_plain=True)
 
     def test_find_sections_emptydoc(self):
         assert rstsource.find_sections("") == []
@@ -369,7 +369,7 @@ class TestFindActions(unittest.TestCase):
 
     def setUp(self):
         # commons steps required for all test cases
-        pylatest.xdocutils.core.register_all_plain()
+        pylatest.xdocutils.core.register_all(use_plain=True)
 
     def test_find_actions_null(self):
         assert rstsource.find_actions("") == []

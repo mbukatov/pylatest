@@ -51,7 +51,7 @@ class TestBasePlain(unittest.TestCase):
 
     def setUp(self):
         # register custom pylatest nodes with html translator
-        pylatest.xdocutils.core.register_all_plain()
+        pylatest.xdocutils.core.register_all(use_plain=True)
         # show full diff (note: python3 unittest diff is much better)
         self.maxDiff = None
 

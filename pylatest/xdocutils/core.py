@@ -94,33 +94,25 @@ def register_pylatest_directives():
     rst.directives.register_directive("test_result", TestActionDirective)
 
 
-def register_all_plain():
+def register_all(use_plain=False):
     """
-    Register all custom pylatest items for plain (machine readable) output.
-    """
-    register_pylatest_roles()
-    register_pylatest_directives()
-    rst.directives.register_directive("requirement", RequirementPlainDirective)
-    register_pylatest_nodes()
-
-
-def register_all():
-    """
-    Register all custom pylatest items.
+    Register all custom pylatest items. Set use_plain to True for plain
+    (machine readable) output.
     """
     register_pylatest_roles()
     register_pylatest_directives()
-    rst.directives.register_directive(
-        "requirement", RequirementSectionDirective)
+    if use_plain:
+        requirement_directive_cls = RequirementPlainDirective
+    else:
+        requirement_directive_cls = RequirementSectionDirective
+    rst.directives.register_directive("requirement", requirement_directive_cls)
+    if use_plain:
+        register_pylatest_nodes()
 
 
-def wrapper(kwargs):
-    kwargs["reader"] = TestActionsTableReader()
-    kwargs["settings_overrides"] = HTML_OVERRIDES
-    return kwargs
-
-
-def wrapper_plain(kwargs):
+def wrapper(kwargs, use_plain=False):
+    if not use_plain:
+        kwargs["reader"] = TestActionsTableReader()
     kwargs["settings_overrides"] = HTML_OVERRIDES
     return kwargs
 
@@ -130,8 +122,8 @@ def pylatest_plain_publish_cmdline(*args, **kwargs):
     Pylatest publish_cmdline function for plain (machine readable) output.
     This is a wrapper of ``docutils.core.publish_cmdline()``.
     """
-    register_all_plain()
-    kwargs = wrapper_plain(kwargs)
+    register_all(use_plain=True)
+    kwargs = wrapper(kwargs, use_plain=True)
     return core.publish_cmdline(*args, **kwargs)
 
 
@@ -150,8 +142,8 @@ def pylatest_plain_publish_parts(*args, **kwargs):
     Pylatest publish parts function for plain (machine readable) output.
     This is a wrapper of ``docutils.core.publish_parts()``.
     """
-    register_all_plain()
-    kwargs = wrapper_plain(kwargs)
+    register_all(use_plain=True)
+    kwargs = wrapper(kwargs, use_plain=True)
     return core.publish_parts(*args, **kwargs)
 
 
