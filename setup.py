@@ -48,7 +48,7 @@ setup(
         'Programming Language :: Python :: 3.5',
         ],
     packages=find_packages(exclude=['doc', 'tests']),
-    install_requires=['docutils', 'lxml'],
+    install_requires=['docutils', 'lxml', 'sphinx'],
     # TODO: make this work with git (and remove MANIFEST.in?)
     # setup_requires=['setuptools_scm'],
     # use_scm_version=True,
