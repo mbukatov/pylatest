@@ -28,7 +28,6 @@ import unittest
 
 import pytest
 
-from pylatest.xdocutils.core import pylatest_plain_publish_parts
 from pylatest.xdocutils.core import pylatest_publish_parts
 
 
@@ -43,7 +42,8 @@ class TestBasePlain(unittest.TestCase):
         self.maxDiff = None
 
     def check_html_body(self, rst_input, exp_result):
-        parts = pylatest_plain_publish_parts(rst_input, writer_name='html')
+        parts = pylatest_publish_parts(
+            rst_input, writer_name='html', use_plain=True)
         assert parts['html_body'] == exp_result
 
 

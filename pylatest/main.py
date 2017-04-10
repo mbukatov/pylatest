@@ -23,7 +23,6 @@ See: https://docutils.readthedocs.io/en/sphinx-docs/api/cmdline-tool.html
 
 
 from pylatest.xdocutils.core import pylatest_publish_cmdline
-from pylatest.xdocutils.core import pylatest_plain_publish_cmdline
 
 
 def pylatest2html():
@@ -36,7 +35,7 @@ def pylatest2html():
 
 
 def pylatest2htmlplain():
-    pylatest_plain_publish_cmdline(writer_name='html')
+    pylatest_publish_cmdline(writer_name='html', use_plain=True)
 
 
 def pylatest2man():
@@ -47,4 +46,4 @@ def pylatest2pseudoxml():
     """
     This client is useful for debugging purposes only.
     """
-    pylatest_plain_publish_cmdline(writer_name='pseudoxml')
+    pylatest_publish_cmdline(writer_name='pseudoxml', use_plain=True)

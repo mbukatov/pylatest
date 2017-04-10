@@ -114,17 +114,10 @@ def wrapper(kwargs, use_plain=False):
     if not use_plain:
         kwargs["reader"] = TestActionsTableReader()
     kwargs["settings_overrides"] = HTML_OVERRIDES
+    # let's not pullute kwargs passed into docutils publisher function
+    if "use_plain" in kwargs:
+        del kwargs["use_plain"]
     return kwargs
-
-
-def pylatest_plain_publish_cmdline(*args, **kwargs):
-    """
-    Pylatest publish_cmdline function for plain (machine readable) output.
-    This is a wrapper of ``docutils.core.publish_cmdline()``.
-    """
-    register_all(use_plain=True)
-    kwargs = wrapper(kwargs, use_plain=True)
-    return core.publish_cmdline(*args, **kwargs)
 
 
 def pylatest_publish_cmdline(*args, **kwargs):
@@ -132,19 +125,10 @@ def pylatest_publish_cmdline(*args, **kwargs):
     Pylatest publish_cmdline function.
     This is a wrapper of ``docutils.core.publish_cmdline()``.
     """
-    register_all()
-    kwargs = wrapper(kwargs)
+    use_plain = kwargs.get("use_plain", False)
+    register_all(use_plain)
+    kwargs = wrapper(kwargs, use_plain)
     return core.publish_cmdline(*args, **kwargs)
-
-
-def pylatest_plain_publish_parts(*args, **kwargs):
-    """
-    Pylatest publish parts function for plain (machine readable) output.
-    This is a wrapper of ``docutils.core.publish_parts()``.
-    """
-    register_all(use_plain=True)
-    kwargs = wrapper(kwargs, use_plain=True)
-    return core.publish_parts(*args, **kwargs)
 
 
 def pylatest_publish_parts(*args, **kwargs):
@@ -152,6 +136,7 @@ def pylatest_publish_parts(*args, **kwargs):
     Pylatest publish parts function.
     This is a wrapper of ``docutils.core.publish_parts()``.
     """
-    register_all()
-    kwargs = wrapper(kwargs)
+    use_plain = kwargs.get("use_plain", False)
+    register_all(use_plain)
+    kwargs = wrapper(kwargs, use_plain)
     return core.publish_parts(*args, **kwargs)

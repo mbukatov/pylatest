@@ -28,7 +28,7 @@ import argparse
 from lxml import etree
 
 from pylatest.document import TestActions, TestCaseDoc
-from pylatest.xdocutils.core import pylatest_plain_publish_parts
+from pylatest.xdocutils.core import pylatest_publish_parts
 
 
 class XmlExportDoc(object):
@@ -123,7 +123,8 @@ def rst2htmlbodytree(rst_content):
     Translate given string which contains a content of rst file into processing
     friendly "pylatest plain html" xml tree.
     """
-    parts = pylatest_plain_publish_parts(rst_content, writer_name='html')
+    parts = pylatest_publish_parts(
+        rst_content, writer_name='html', use_plain=True)
     htmlbody_tree = etree.fromstring(parts['html_body'])
     return htmlbody_tree
 
