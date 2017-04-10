@@ -41,10 +41,9 @@ from docutils import nodes
 from docutils.parsers import rst
 from docutils.writers.html4css1 import HTMLTranslator
 
-from pylatest.xdocutils.directives import RequirementPlainDirective
-from pylatest.xdocutils.directives import RequirementSectionDirective
+from pylatest.xdocutils.directives import RequirementDirective
 from pylatest.xdocutils.directives import TestActionDirective
-from pylatest.xdocutils.readers import TestActionsTableReader
+from pylatest.xdocutils.readers import NoPlainReader
 from pylatest.xdocutils.roles import pylaref_html_role
 from pylatest.xdocutils.roles import redhat_bugzilla_role
 import pylatest.xdocutils.htmltranslator
@@ -92,6 +91,7 @@ def register_pylatest_directives():
     """
     rst.directives.register_directive("test_step", TestActionDirective)
     rst.directives.register_directive("test_result", TestActionDirective)
+    rst.directives.register_directive("requirement", RequirementDirective)
 
 
 def register_all(use_plain=False):
@@ -102,17 +102,12 @@ def register_all(use_plain=False):
     register_pylatest_roles()
     register_pylatest_directives()
     if use_plain:
-        requirement_directive_cls = RequirementPlainDirective
-    else:
-        requirement_directive_cls = RequirementSectionDirective
-    rst.directives.register_directive("requirement", requirement_directive_cls)
-    if use_plain:
         register_pylatest_nodes()
 
 
 def wrapper(kwargs, use_plain=False):
     if not use_plain:
-        kwargs["reader"] = TestActionsTableReader()
+        kwargs["reader"] = NoPlainReader()
     kwargs["settings_overrides"] = HTML_OVERRIDES
     # let's not pullute kwargs passed into docutils publisher function
     if "use_plain" in kwargs:
