@@ -152,6 +152,8 @@ class TestActionsTableTransform(transforms.Transform):
 
     def apply(self):
         actions = find_test_action_nodes(self.document)
+        if len(actions) == 0:
+            return
         content_node = create_content(actions)
         startnode = next(actions.iter_content())
         # replace current pending node with new content
