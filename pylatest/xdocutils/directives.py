@@ -44,18 +44,6 @@ def arguments2action_id(arguments):
     return action_id
 
 
-def parse_content(state, content, content_offset, options):
-    """
-    Parse content of a directive (via state.nexted_parse) into new anonymous
-    node element.
-    """
-    # first of all, parse text content of this directive
-    # into anonymous node element (can't be used directly in the tree)
-    content_node = nodes.Element()
-    state.nested_parse(content, content_offset, content_node)
-    return content_node
-
-
 class TestActionDirective(rst.Directive):
     """
     Implementation of ``test_step`` and ``test_result`` directives for
@@ -79,8 +67,9 @@ class TestActionDirective(rst.Directive):
 
         # parse text content of this directive into anonymous node element
         # (can't be used directly in the tree)
-        content_node = parse_content(
-            self.state, self.content, self.content_offset, self.options)
+        content_node = nodes.Element()
+        self.state.nested_parse(
+            self.content, self.content_offset, content_node)
 
         # create new action node
         action_node = pylatest.xdocutils.nodes.test_action_node()
