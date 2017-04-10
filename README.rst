@@ -17,26 +17,29 @@ low in the long term.
 Using Pylatest
 --------------
 
-The main way to use pylatest is via Sphinx_ project.
+The main way to use Pylatest is via Sphinx_ project.
 
-To use pylatest with your existing sphinx project, add ``pylatest.xsphinx``
+To use Pylatest with your existing sphinx project, add ``pylatest.xsphinx``
 module into list of extensions in ``conf.py`` of the project::
 
     extensions = [
         'pylatest.xsphinx',
         ]
 
-Pylatest Tools
---------------
+Pylatest Command Line Tools
+---------------------------
 
 Pylatest command line tools can be classified into several groups:
 
-* ``pylatest2html`` and ``pylatest2htmlplain``: custom docutils clients
-  which uses several docutils extensions (custom pylatest directives,
-  roles, transformations ...)
-* ``py2pylatest`` python source code extractor which can generate rst file
-  from python source code with pylatest string literals
-* various helpers (eg. ``pylatest-template``)
+* Docutils wrappers ``pylatest-rst*`` (eg. ``pylatest-rst2html`` or
+  ``pylatest-rst2pseudoxml``). These are simple wrappers of `docutils front-end
+  tools`_ with Pylatest extensions enabled. Note that they are expected
+  to be used mainly for debugging/testing and some features may be missing
+  compated to Sphinx module described above, which is the primary way to use
+  Pylatest.
+* Python source code extractor ``py2pylatest`` which can generate rst file
+  from python source code with pylatest string literals.
+* Various helpers (eg. ``pylatest-template``).
 
 Development and testing
 -----------------------
@@ -55,3 +58,4 @@ pylatest is free and open source software.
 .. _Docutils: http://docutils.sourceforge.net/
 .. _Sphinx: http://www.sphinx-doc.org/en/stable/index.html
 .. _`reStructuredText syntax`: http://www.sphinx-doc.org/en/stable/rest.html
+.. _`docutils front-end tools`: http://docutils.sourceforge.net/docs/user/tools.html
