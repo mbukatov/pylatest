@@ -60,8 +60,8 @@ setup(
             'py2pylatest=pylatest.pysource:main',
             'pylatest-rst2html=pylatest.main:pylatest2html',
             'pylatest-rst2htmlplain=pylatest.main:pylatest2htmlplain',
-            'pylatest-rst2man=pylatest.main:pylatest2man',
             'pylatest-rst2pseudoxml=pylatest.main:pylatest2pseudoxml',
+            'pylatest-preview=pylatest.main:pylatest_preview',
         ],
     },
     )

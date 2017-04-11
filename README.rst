@@ -37,6 +37,11 @@ Pylatest command line tools can be classified into several groups:
   to be used mainly for debugging/testing and some features may be missing
   compated to Sphinx module described above, which is the primary way to use
   Pylatest.
+* Tool ``pylatest-preview`` produces a man page representation of given
+  pylatest rst file and shows it using ``/usr/bin/man``. This is useful for
+  quick checking of rst file from command line. It's basically equivalent to
+  ``pylatest-rst2man testcase.rst | man -l -`` and for this reason the same
+  limitations as for other pylatest wrappers of docutils front-end tools apply.
 * Python source code extractor ``py2pylatest`` which can generate rst file
   from python source code with pylatest string literals.
 * Various helpers (eg. ``pylatest-template``).

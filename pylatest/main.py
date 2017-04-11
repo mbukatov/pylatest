@@ -22,6 +22,10 @@ See: https://docutils.readthedocs.io/en/sphinx-docs/api/cmdline-tool.html
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
+from __future__ import print_function
+import sys
+import os
+
 from pylatest.xdocutils.core import pylatest_publish_cmdline
 
 
@@ -38,12 +42,31 @@ def pylatest2htmlplain():
     pylatest_publish_cmdline(writer_name='html', use_plain=True)
 
 
-def pylatest2man():
-    pylatest_publish_cmdline(writer_name='manpage')
-
-
 def pylatest2pseudoxml():
     """
     This client is useful for debugging purposes only.
     """
     pylatest_publish_cmdline(writer_name='pseudoxml', use_plain=True)
+
+
+def pylatest_preview():
+    """
+    Preview front-end tool based on manpage output.
+
+    Constructs a pipe which would look like this::
+
+        pylatest-rst2man testcase.rst | man -l -
+    """
+    r_fd, w_fd = os.pipe()
+    pid = os.fork()
+    if pid == 0:
+        # child process
+        os.close(r_fd)
+        os.dup2(w_fd, 1)
+        pylatest_publish_cmdline(writer_name='manpage')
+        os._exit(0)
+    else:
+        # parent process
+        os.close(w_fd)
+        os.dup2(r_fd, 0)
+        os.execv('/usr/bin/man', ["man", "-l", "-"])
