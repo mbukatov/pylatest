@@ -22,8 +22,6 @@ See: https://docutils.readthedocs.io/en/sphinx-docs/api/cmdline-tool.html
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-from __future__ import print_function
-import sys
 import os
 
 from pylatest.xdocutils.core import pylatest_publish_cmdline
