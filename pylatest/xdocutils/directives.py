@@ -44,7 +44,7 @@ def arguments2action_id(arguments):
     return action_id
 
 
-class TestActionDirective(rst.Directive):
+class OldTestActionDirective(rst.Directive):
     """
     Implementation of ``test_step`` and ``test_result`` directives for
     either human readable table representation for html output or further
