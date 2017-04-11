@@ -19,11 +19,19 @@ Using Pylatest
 
 The main way to use Pylatest is via Sphinx_ project.
 
-To use Pylatest with your existing sphinx project, add ``pylatest.xsphinx``
+You can start a new Sphinx/Pylatest project using the quickstart script::
+
+    $ pylatest-quickstart
+
+This very simple wrapper of ``sphinx-quickstart`` will generate initial Sphinx
+project with pylatest extension enabled and few configuration values predefined
+(eg. ``Makefile`` will be always generated) having Pylatest use case in mind.
+
+To use Pylatest with your existing sphinx project, add ``pylatest``
 module into list of extensions in ``conf.py`` of the project::
 
     extensions = [
-        'pylatest.xsphinx',
+        'pylatest',
         ]
 
 Pylatest Command Line Tools
@@ -31,6 +39,8 @@ Pylatest Command Line Tools
 
 Pylatest command line tools can be classified into several groups:
 
+* Already mentioned ``pylatest-quickstart`` is a simple wrapper of
+  ``sphinx-quickstart`` tool for starting new Sphinx/Pylatest project.
 * Docutils wrappers ``pylatest-rst*`` (eg. ``pylatest-rst2html`` or
   ``pylatest-rst2pseudoxml``). These are simple wrappers of `docutils front-end
   tools`_ with Pylatest extensions enabled. Note that they are expected
