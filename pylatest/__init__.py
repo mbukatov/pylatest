@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
 
 
-from pylatest.xsphinx import setup as sphinx_setup
+from pylatest.xsphinx.extension import setup as sphinx_setup
 
 
 # This makes it possible to refer to *Pylatest Sphinx plugin module* as just
