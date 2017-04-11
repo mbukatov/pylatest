@@ -19,11 +19,11 @@ Using Pylatest
 
 The main way to use Pylatest is via Sphinx_ project.
 
-To use Pylatest with your existing sphinx project, add ``pylatest.xsphinx``
+To use Pylatest with your existing sphinx project, add ``pylatest``
 module into list of extensions in ``conf.py`` of the project::
 
     extensions = [
-        'pylatest.xsphinx',
+        'pylatest',
         ]
 
 Pylatest Command Line Tools
