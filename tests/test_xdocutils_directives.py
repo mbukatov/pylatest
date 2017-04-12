@@ -163,7 +163,7 @@ def test_oldtestaction_paragraph(register_all_plain, action_name):
 
 
 @pytest.mark.parametrize("req_id", ["SOME_ID", 111])
-def test_testmetadata_full_nooptions(register_all_plain, req_id):
+def test_requirement_full_nooptions(register_all_plain, req_id):
     rst_input = textwrap.dedent('''\
     .. requirement:: {}
 
@@ -178,7 +178,7 @@ def test_testmetadata_full_nooptions(register_all_plain, req_id):
     _test_directive(rst_input, exp_result)
 
 
-def test_testmetadata_full_alloptions(register_all_plain):
+def test_requirement_full_alloptions(register_all_plain):
     rst_input = textwrap.dedent('''\
     .. requirement:: FOO123
         :priority: high
