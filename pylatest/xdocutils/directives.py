@@ -24,6 +24,7 @@ module.
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
+from docutils import core
 from docutils import nodes
 from docutils.parsers import rst
 
@@ -82,6 +83,45 @@ class OldTestActionDirective(rst.Directive):
 
         # and finally return the action node as the only result
         return [action_node]
+
+
+def make_action_node(action_name, content_str):
+    """
+    Create doctree node for given test action.
+    """
+    action_node = pylatest.xdocutils.nodes.test_action_node()
+    action_node.attributes['action_name'] = action_name
+    # TODO action_node.attributes['action_id'] = None
+    content_nodes = core.publish_doctree(source=content_str)
+    action_node += content_nodes[0]
+    return action_node
+
+
+class TestActionDirective(rst.Directive):
+    """
+    Implementation of ``test_action`` directive for either human readable table
+    representation for html output or further processing (aka plain output),
+    eg. checking particular part of resulting document.
+    """
+
+    required_arguments = 0
+    optional_arguments = 0
+    has_content = False
+    option_spec = {
+        'step': str,
+        'result': str,
+        }
+
+    def run(self):
+        node_list = []
+        if 'step' in self.options:
+            action_node = make_action_node("test_step", self.options['step'])
+            node_list.append(action_node)
+        if 'result' in self.options:
+            action_node = make_action_node(
+                "test_result", self.options['result'])
+            node_list.append(action_node)
+        return node_list
 
 
 class RequirementDirective(rst.Directive):

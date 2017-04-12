@@ -43,6 +43,7 @@ from docutils.writers.html4css1 import HTMLTranslator
 
 from pylatest.xdocutils.directives import RequirementDirective
 from pylatest.xdocutils.directives import OldTestActionDirective
+from pylatest.xdocutils.directives import TestActionDirective
 from pylatest.xdocutils.readers import NoPlainReader
 from pylatest.xdocutils.roles import pylaref_html_role
 from pylatest.xdocutils.roles import redhat_bugzilla_role
@@ -91,6 +92,7 @@ def register_pylatest_directives():
     """
     rst.directives.register_directive("test_step", OldTestActionDirective)
     rst.directives.register_directive("test_result", OldTestActionDirective)
+    rst.directives.register_directive("test_action", TestActionDirective)
     rst.directives.register_directive("requirement", RequirementDirective)
 
 
