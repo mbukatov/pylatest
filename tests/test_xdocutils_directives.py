@@ -82,80 +82,99 @@ def test_docutils_works_fine_somedirective(register_all_plain):
     _test_directive(rst_input, exp_result)
 
 
-def test_teststep_empty(register_all_plain):
-    rst_input = '.. test_step:: 1'
+@pytest.mark.parametrize("action_id", [1, 23, 129])
+@pytest.mark.parametrize("action_name", ["test_step", "test_result"])
+def test_oldtestaction_empty(register_all_plain, action_id, action_name):
+    rst_input = '.. {}:: {}'.format(action_name, action_id)
     exp_result = textwrap.dedent('''\
     <document source="_testparse() method">
-        <test_action_node action_id="1" action_name="test_step">
-    ''')
+        <test_action_node action_id="{}" action_name="{}">
+    '''.format(action_id, action_name))
     _test_directive(rst_input, exp_result)
 
 
-def test_teststep_empty_noid(register_all_plain):
-    rst_input = '.. test_step::'
+@pytest.mark.parametrize("action_name", ["test_step", "test_result"])
+def test_oldtestaction_empty_noid(register_all_plain, action_name):
+    rst_input = '.. {}::'.format(action_name)
     exp_result = textwrap.dedent('''\
     <document source="_testparse() method">
         <system_message level="3" line="1" source="_testparse() method" type="ERROR">
             <paragraph>
-                Error in "test_step" directive:
+                Error in "{0}" directive:
                 1 argument(s) required, 0 supplied.
             <literal_block xml:space="preserve">
-                .. test_step::
-    ''')
+                .. {0}::
+    '''.format(action_name))
     _test_directive(rst_input, exp_result)
 
 
-def test_testresult_empty(register_all_plain):
-    rst_input = '.. test_result:: 1'
+@pytest.mark.xfail(reason="https://gitlab.com/mbukatov/pylatest/issues/10")
+@pytest.mark.parametrize("action_id", ["foo", None])
+@pytest.mark.parametrize("action_name", ["test_step", "test_result"])
+def test_oldtestaction_empty_wrongid(register_all_plain, action_id, action_name):
+    rst_input = '.. {}:: {}'.format(action_name, action_id)
     exp_result = textwrap.dedent('''\
     <document source="_testparse() method">
-        <test_action_node action_id="1" action_name="test_result">
-    ''')
+        <test_action_node action_id="{}" action_name="{}">
+    '''.format(action_id, action_name))
     _test_directive(rst_input, exp_result)
 
 
-def test_teststep_simple(register_all_plain):
+@pytest.mark.parametrize("action_name", ["test_step", "test_result"])
+def test_oldtestaction_simple(register_all_plain, action_name):
     rst_input = textwrap.dedent('''\
-    .. test_step:: 7
+    .. {}:: 7
 
         Some content.
-    ''')
+    '''.format(action_name))
     exp_result = textwrap.dedent('''\
     <document source="_testparse() method">
-        <test_action_node action_id="7" action_name="test_step">
+        <test_action_node action_id="7" action_name="{}">
             <paragraph>
                 Some content.
-    ''')
+    '''.format(action_name))
     _test_directive(rst_input, exp_result)
 
 
-def test_testresult_simple(register_all_plain):
+@pytest.mark.parametrize("action_name", ["test_step", "test_result"])
+def test_oldtestaction_paragraph(register_all_plain, action_name):
     rst_input = textwrap.dedent('''\
-    .. test_result:: 7
+    .. {}:: 7
 
         Some content.
-    ''')
+
+        Donec et mollis dolor::
+
+            $ foo --extra sth
+            $ bar -vvv
+    '''.format(action_name))
     exp_result = textwrap.dedent('''\
     <document source="_testparse() method">
-        <test_action_node action_id="7" action_name="test_result">
+        <test_action_node action_id="7" action_name="{}">
             <paragraph>
                 Some content.
-    ''')
+            <paragraph>
+                Donec et mollis dolor:
+            <literal_block xml:space="preserve">
+                $ foo --extra sth
+                $ bar -vvv
+    '''.format(action_name))
     _test_directive(rst_input, exp_result)
 
 
-def test_testmetadata_full_nooptions(register_all_plain):
+@pytest.mark.parametrize("req_id", ["SOME_ID", 111])
+def test_testmetadata_full_nooptions(register_all_plain, req_id):
     rst_input = textwrap.dedent('''\
-    .. requirement:: SOME_ID
+    .. requirement:: {}
 
         Some content.
-    ''')
+    '''.format(req_id))
     exp_result = textwrap.dedent('''\
     <document source="_testparse() method">
-        <requirement_node req_id="SOME_ID">
+        <requirement_node req_id="{}">
             <paragraph>
                 Some content.
-    ''')
+    '''.format(req_id))
     _test_directive(rst_input, exp_result)
 
 
