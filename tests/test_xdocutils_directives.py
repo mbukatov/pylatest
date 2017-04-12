@@ -162,6 +162,144 @@ def test_oldtestaction_paragraph(register_all_plain, action_name):
     _test_directive(rst_input, exp_result)
 
 
+def test_testaction_empty(register_all_plain):
+    rst_input = '.. test_action::'
+    exp_result = textwrap.dedent('''\
+    <document source="_testparse() method">
+    ''')
+    _test_directive(rst_input, exp_result)
+
+
+# TODO: consider reporting error instead, see https://gitlab.com/mbukatov/pylatest/issues/10
+def test_testaction_with_other_content(register_all_plain):
+    rst_input = textwrap.dedent('''\
+    .. test_action::
+
+        Hello there.
+    ''')
+    exp_result = textwrap.dedent('''\
+    <document source="_testparse() method">
+    ''')
+    _test_directive(rst_input, exp_result)
+
+
+@pytest.mark.parametrize("action_name", ["test_step", "test_result"])
+def test_testaction_single_valid_field_empty(register_all_plain, action_name):
+    rst_input = textwrap.dedent('''\
+    .. test_action::
+       :{}:
+    '''.format(action_name[5:]))
+    exp_result = textwrap.dedent('''\
+    <document source="_testparse() method">
+        <test_action_node action_id="True" action_name="{}">
+    '''.format(action_name))
+    _test_directive(rst_input, exp_result)
+
+
+@pytest.mark.xfail(reason="https://gitlab.com/mbukatov/pylatest/issues/10")
+@pytest.mark.parametrize("action_name", ["test_foo", "test_123"])
+def test_testaction_single_invalid_field_empty(register_all_plain, action_name):
+    rst_input = textwrap.dedent('''\
+    .. test_action::
+       :{}:
+    '''.format(action_name[5:]))
+    exp_result = textwrap.dedent('''\
+    <document source="_testparse() method">
+        TODO: there should be node with error message
+    '''.format(action_name))
+    _test_directive(rst_input, exp_result)
+
+
+@pytest.mark.parametrize("step_val", [
+    " Wait about 20 minutes.",
+    "\n           Wait about 20 minutes.\n",
+    ])
+@pytest.mark.parametrize("result_val", [
+    " Nothing happens.",
+    "\n           Nothing happens.\n",
+    ])
+def test_testaction_both_fields_simple(register_all_plain, step_val, result_val):
+    rst_input = textwrap.dedent('''\
+    .. test_action::
+       :step:{}
+       :result:{}
+    '''.format(step_val, result_val))
+    exp_result = textwrap.dedent('''\
+    <document source="_testparse() method">
+        <test_action_node action_id="True" action_name="test_step">
+            <paragraph>
+                Wait about 20 minutes.
+        <test_action_node action_id="True" action_name="test_result">
+            <paragraph>
+                Nothing happens.
+    ''')
+    _test_directive(rst_input, exp_result)
+
+
+def test_testaction_both_fields_paragraph(register_all_plain):
+    rst_input = textwrap.dedent('''\
+    .. test_action::
+       :step:
+           List files in the volume: ``ls -a /mnt/helloworld`` ...
+
+           and wait about 20 minutes.
+
+       :result:
+           Some content.
+
+           Donec et mollis dolor::
+
+               $ foo --extra sth
+               $ bar -vvv
+    ''')
+    exp_result = textwrap.dedent('''\
+    <document source="_testparse() method">
+        <test_action_node action_id="True" action_name="test_step">
+            <paragraph>
+                List files in the volume: 
+                <literal>
+                    ls -a /mnt/helloworld
+                 ...
+            <paragraph>
+                and wait about 20 minutes.
+        <test_action_node action_id="True" action_name="test_result">
+            <paragraph>
+                Some content.
+            <paragraph>
+                Donec et mollis dolor:
+            <literal_block xml:space="preserve">
+                $ foo --extra sth
+                $ bar -vvv
+    ''')
+    _test_directive(rst_input, exp_result)
+
+
+@pytest.mark.parametrize("action_name", ["test_step", "test_result"])
+def test_testaction_single_valid_field_paragraph(register_all_plain, action_name):
+    rst_input = textwrap.dedent('''\
+    .. test_action::
+       :{}:
+           Some content.
+
+           Donec et mollis dolor::
+
+               $ foo --extra sth
+               $ bar -vvv
+    '''.format(action_name[5:]))
+    exp_result = textwrap.dedent('''\
+    <document source="_testparse() method">
+        <test_action_node action_id="True" action_name="{}">
+            <paragraph>
+                Some content.
+            <paragraph>
+                Donec et mollis dolor:
+            <literal_block xml:space="preserve">
+                $ foo --extra sth
+                $ bar -vvv
+    '''.format(action_name))
+    _test_directive(rst_input, exp_result)
+
+
 @pytest.mark.parametrize("req_id", ["SOME_ID", 111])
 def test_requirement_full_nooptions(register_all_plain, req_id):
     rst_input = textwrap.dedent('''\

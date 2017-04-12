@@ -24,7 +24,6 @@ module.
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-from docutils import core
 from docutils import nodes
 from docutils.parsers import rst
 
@@ -85,18 +84,6 @@ class OldTestActionDirective(rst.Directive):
         return [action_node]
 
 
-def make_action_node(action_name, content_str):
-    """
-    Create doctree node for given test action.
-    """
-    action_node = pylatest.xdocutils.nodes.test_action_node()
-    action_node.attributes['action_name'] = action_name
-    # TODO action_node.attributes['action_id'] = None
-    content_nodes = core.publish_doctree(source=content_str)
-    action_node += content_nodes[0]
-    return action_node
-
-
 class TestActionDirective(rst.Directive):
     """
     Implementation of ``test_action`` directive for either human readable table
@@ -106,21 +93,48 @@ class TestActionDirective(rst.Directive):
 
     required_arguments = 0
     optional_arguments = 0
-    has_content = False
-    option_spec = {
-        'step': str,
-        'result': str,
-        }
+    has_content = True
 
     def run(self):
         node_list = []
-        if 'step' in self.options:
-            action_node = make_action_node("test_step", self.options['step'])
+
+        # parse text content of this directive into anonymous node element
+        # (which can't be used directly in the tree)
+        content_node = nodes.Element()
+        self.state.nested_parse(
+            self.content, self.content_offset, content_node)
+
+        # field list node tree looks like this:
+        #
+        #   <field_list>
+        #       <field>
+        #           <field_name>
+        #               result
+        #           <field_body>
+        #               <paragraph>
+        #                   Output should be empty.
+
+        # TODO: report error when step is missing
+        # TODO: report error for unknown field_name (neither step nor result)
+
+        # search for field nodes in parsed content
+        for field in content_node.traverse(nodes.field):
+            # TODO: better error checking
+            # TODO: find out details of valid states of nodetree of field list
+            # make clear my intentions here (in case something breaks later)
+            assert field[0].tagname == "field_name"
+            assert field[1].tagname == "field_body"
+            field_name_value = field[0][0]  # text node
+            field_body_node = field[1]
+            # create action node
+            action_node = pylatest.xdocutils.nodes.test_action_node()
+            action_name = "test_{}".format(field_name_value)
+            action_node.attributes['action_name'] = action_name
+            action_node.attributes['action_id'] = None
+            for child_node in field_body_node:
+                action_node += child_node
             node_list.append(action_node)
-        if 'result' in self.options:
-            action_node = make_action_node(
-                "test_result", self.options['result'])
-            node_list.append(action_node)
+
         return node_list
 
 
