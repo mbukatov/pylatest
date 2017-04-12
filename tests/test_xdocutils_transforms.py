@@ -33,7 +33,7 @@ def _publish(rst_input):
     return result['whole']
 
 
-def test_testmetadata_full_nooptions():
+def test_requirementsectiontransform_full_nooptions():
     rst_input = textwrap.dedent('''\
     .. requirement:: SOME_ID
 
@@ -50,7 +50,7 @@ def test_testmetadata_full_nooptions():
     assert _publish(rst_input) == exp_result
 
 
-def test_testmetadata_full_alloptions():
+def test_requirementsectiontransform_full_alloptions():
     rst_input = textwrap.dedent('''\
     .. requirement:: FOO123
         :priority: high
