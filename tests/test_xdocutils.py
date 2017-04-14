@@ -24,483 +24,427 @@ rst source into html build and then checks the result.
 
 
 import textwrap
-import unittest
 
 import pytest
 
 from pylatest.xdocutils.core import pylatest_publish_parts
 
 
-class TestBasePlain(unittest.TestCase):
-    """
-    Tests to to make sure that docutils module isn't broken (via pylatest
-    extensions) and still works fine.
-    """
-
-    def setUp(self):
-        # show full diff (note: python3 unittest diff is much better)
-        self.maxDiff = None
-
-    def check_html_body(self, rst_input, exp_result):
-        parts = pylatest_publish_parts(
-            rst_input, writer_name='html', use_plain=True)
-        assert parts['html_body'] == exp_result
+def _publish_html(rst_input, use_plain=True):
+    parts = pylatest_publish_parts(
+        rst_input, writer_name='html', use_plain=use_plain)
+    return parts['html_body']
 
 
-class TestDocutilsPlain(TestBasePlain):
-    """
-    Tests to to make sure that docutils module isn't broken (via pylatest
-    extensions) and still works fine.
-    """
-
-    def test_doc_empty(self):
-        rst_input = ""
-        exp_result = textwrap.dedent('''\
-        <div class="document">
-        </div>
-        ''')
-        self.check_html_body(rst_input, exp_result)
-
-    def test_doc_simple(self):
-        rst_input = "Ceterum censeo Carthaginem esse delendam"
-        exp_result = textwrap.dedent('''\
-        <div class="document">
-        <p>Ceterum censeo Carthaginem esse delendam</p>
-        </div>
-        ''')
-        self.check_html_body(rst_input, exp_result)
-
-    def test_doc_somedirective(self):
-        rst_input = textwrap.dedent('''\
-        .. container::
-
-            Ceterum censeo Carthaginem esse delendam.
-        ''')
-        exp_result = textwrap.dedent('''\
-        <div class="document">
-        <div class="docutils container">
-        Ceterum censeo Carthaginem esse delendam.</div>
-        </div>
-        ''')
-        self.check_html_body(rst_input, exp_result)
+def test_docutilsworks_doc_empty():
+    rst_input = ""
+    exp_result = textwrap.dedent('''\
+    <div class="document">
+    </div>
+    ''')
+    assert _publish_html(rst_input, use_plain=True) == exp_result
 
 
-class TestDocutilsTable(TestDocutilsPlain):
-    """
-    The same basic tests, but with pylatest table transformations.
-    """
+def test_docutilsworks_doc_simple():
+    rst_input = "Ceterum censeo Carthaginem esse delendam"
+    exp_result = textwrap.dedent('''\
+    <div class="document">
+    <p>Ceterum censeo Carthaginem esse delendam</p>
+    </div>
+    ''')
+    assert _publish_html(rst_input, use_plain=True) == exp_result
 
-    def setUp(self):
-        # show full diff (note: python3 unittest diff is much better)
-        self.maxDiff = None
 
+def test_docutilsworks_doc_somedirective():
+    rst_input = textwrap.dedent('''\
+    .. container::
 
-class TestTestActionsPlain(TestBasePlain):
-    """
-    Test of test action directives and transformations.
-    """
-
-    def test_teststep_empty(self):
-        rst_input = '.. test_step:: 1'
-        exp_result = textwrap.dedent('''\
-        <div class="document">
-        <div action_id="1" action_name="test_step" class="pylatest_action">
-
-        </div>
-        </div>
-        ''')
-        self.check_html_body(rst_input, exp_result)
-
-    def test_teststep_simple(self):
-        rst_input = textwrap.dedent('''\
-        .. test_step:: 1
-
-            Ceterum censeo Carthaginem esse delendam.
-        ''')
-        exp_result = textwrap.dedent('''\
-        <div class="document">
-        <div action_id="1" action_name="test_step" class="pylatest_action">
         Ceterum censeo Carthaginem esse delendam.
-        </div>
-        </div>
-        ''')
-        self.check_html_body(rst_input, exp_result)
+    ''')
+    exp_result = textwrap.dedent('''\
+    <div class="document">
+    <div class="docutils container">
+    Ceterum censeo Carthaginem esse delendam.</div>
+    </div>
+    ''')
+    assert _publish_html(rst_input, use_plain=True) == exp_result
 
-    def test_test_action_simple(self):
-        rst_input = textwrap.dedent('''\
-        .. test_step:: 1
 
-            Ceterum censeo Carthaginem esse delendam.
+def test_actions_plain_teststep_empty():
+    rst_input = '.. test_step:: 1'
+    exp_result = textwrap.dedent('''\
+    <div class="document">
+    <div action_id="1" action_name="test_step" class="pylatest_action">
 
-        .. test_result:: 1
+    </div>
+    </div>
+    ''')
+    assert _publish_html(rst_input, use_plain=True) == exp_result
 
-            This city is no more ... it has ceased to be ...
-        ''')
-        exp_result = textwrap.dedent('''\
-        <div class="document">
-        <div action_id="1" action_name="test_step" class="pylatest_action">
+
+def test_actions_plain_teststep_simple():
+    rst_input = textwrap.dedent('''\
+    .. test_step:: 1
+
         Ceterum censeo Carthaginem esse delendam.
-        </div>
-        <div action_id="1" action_name="test_result" class="pylatest_action">
+    ''')
+    exp_result = textwrap.dedent('''\
+    <div class="document">
+    <div action_id="1" action_name="test_step" class="pylatest_action">
+    Ceterum censeo Carthaginem esse delendam.
+    </div>
+    </div>
+    ''')
+    assert _publish_html(rst_input, use_plain=True) == exp_result
+
+
+def test_actions_plain_test_action_simple():
+    rst_input = textwrap.dedent('''\
+    .. test_step:: 1
+
+        Ceterum censeo Carthaginem esse delendam.
+
+    .. test_result:: 1
+
         This city is no more ... it has ceased to be ...
-        </div>
-        </div>
-        ''')
-        self.check_html_body(rst_input, exp_result)
+    ''')
+    exp_result = textwrap.dedent('''\
+    <div class="document">
+    <div action_id="1" action_name="test_step" class="pylatest_action">
+    Ceterum censeo Carthaginem esse delendam.
+    </div>
+    <div action_id="1" action_name="test_result" class="pylatest_action">
+    This city is no more ... it has ceased to be ...
+    </div>
+    </div>
+    ''')
+    assert _publish_html(rst_input, use_plain=True) == exp_result
 
-    def test_test_actions_two(self):
-        rst_input = textwrap.dedent('''\
-        .. test_step:: 1
 
-            Ceterum censeo Carthaginem esse delendam.
+def test_actions_plain_test_actions_two():
+    rst_input = textwrap.dedent('''\
+    .. test_step:: 1
 
-        .. test_result:: 1
-
-            This city is no more ... it has ceased to be ...
-
-        .. test_step:: 2
-
-            Step foo.
-
-        .. test_result:: 2
-
-            Result bar.
-        ''')
-        exp_result = textwrap.dedent('''\
-        <div class="document">
-        <div action_id="1" action_name="test_step" class="pylatest_action">
         Ceterum censeo Carthaginem esse delendam.
-        </div>
-        <div action_id="1" action_name="test_result" class="pylatest_action">
+
+    .. test_result:: 1
+
         This city is no more ... it has ceased to be ...
-        </div>
-        <div action_id="2" action_name="test_step" class="pylatest_action">
+
+    .. test_step:: 2
+
         Step foo.
-        </div>
-        <div action_id="2" action_name="test_result" class="pylatest_action">
+
+    .. test_result:: 2
+
         Result bar.
-        </div>
-        </div>
-        ''')
-        self.check_html_body(rst_input, exp_result)
+    ''')
+    exp_result = textwrap.dedent('''\
+    <div class="document">
+    <div action_id="1" action_name="test_step" class="pylatest_action">
+    Ceterum censeo Carthaginem esse delendam.
+    </div>
+    <div action_id="1" action_name="test_result" class="pylatest_action">
+    This city is no more ... it has ceased to be ...
+    </div>
+    <div action_id="2" action_name="test_step" class="pylatest_action">
+    Step foo.
+    </div>
+    <div action_id="2" action_name="test_result" class="pylatest_action">
+    Result bar.
+    </div>
+    </div>
+    ''')
+    assert _publish_html(rst_input, use_plain=True) == exp_result
 
 
-class TestTestActionsPlainAutoId(TestTestActionsPlain):
-    """
-    Test cases of autoid directive ... runs all test cases of superclass
-    and some special cases when action id is ommited. Note that one can't
-    ommit action id for 1st test step directive!
-    """
+@pytest.mark.xfail(reason="https://gitlab.com/mbukatov/pylatest/issues/11")
+def test_actions_plain_autoid_test_action_simple_autoid():
+    rst_input = textwrap.dedent('''\
+    .. test_step:: 1
 
-    def setUp(self):
-        # register custom pylatest nodes with html translator
-        # xclient.register_plain(auto_id=True)
-        # show full diff (note: python3 unittest diff is much better)
-        self.maxDiff = None
-
-    @pytest.mark.xfail(reason="https://gitlab.com/mbukatov/pylatest/issues/11")
-    def test_test_action_simple_autoid(self):
-        rst_input = textwrap.dedent('''\
-        .. test_step:: 1
-
-            Ceterum censeo Carthaginem esse delendam.
-
-        .. test_result::
-
-            This city is no more ... it has ceased to be ...
-        ''')
-        exp_result = textwrap.dedent('''\
-        <div class="document">
-        <div action_id="1" action_name="test_step" class="pylatest_action">
         Ceterum censeo Carthaginem esse delendam.
-        </div>
-        <div action_id="1" action_name="test_result" class="pylatest_action">
+
+    .. test_result::
+
         This city is no more ... it has ceased to be ...
-        </div>
-        </div>
-        ''')
-        self.check_html_body(rst_input, exp_result)
+    ''')
+    exp_result = textwrap.dedent('''\
+    <div class="document">
+    <div action_id="1" action_name="test_step" class="pylatest_action">
+    Ceterum censeo Carthaginem esse delendam.
+    </div>
+    <div action_id="1" action_name="test_result" class="pylatest_action">
+    This city is no more ... it has ceased to be ...
+    </div>
+    </div>
+    ''')
+    assert _publish_html(rst_input, use_plain=True) == exp_result
 
-    @pytest.mark.xfail(reason="https://gitlab.com/mbukatov/pylatest/issues/11")
-    def test_test_actions_two_autoid(self):
-        rst_input = textwrap.dedent('''\
-        .. test_step:: 1
 
-            Ceterum censeo Carthaginem esse delendam.
+@pytest.mark.xfail(reason="https://gitlab.com/mbukatov/pylatest/issues/11")
+def test_actions_plain_autoid_test_actions_two_autoid():
+    rst_input = textwrap.dedent('''\
+    .. test_step:: 1
 
-        .. test_result::
-
-            This city is no more ... it has ceased to be ...
-
-        .. test_step::
-
-            Step foo.
-
-        .. test_result::
-
-            Result bar.
-        ''')
-        exp_result = textwrap.dedent('''\
-        <div class="document">
-        <div action_id="1" action_name="test_step" class="pylatest_action">
         Ceterum censeo Carthaginem esse delendam.
-        </div>
-        <div action_id="1" action_name="test_result" class="pylatest_action">
+
+    .. test_result::
+
         This city is no more ... it has ceased to be ...
-        </div>
-        <div action_id="2" action_name="test_step" class="pylatest_action">
+
+    .. test_step::
+
         Step foo.
-        </div>
-        <div action_id="2" action_name="test_result" class="pylatest_action">
+
+    .. test_result::
+
         Result bar.
-        </div>
-        </div>
-        ''')
-        self.check_html_body(rst_input, exp_result)
+    ''')
+    exp_result = textwrap.dedent('''\
+    <div class="document">
+    <div action_id="1" action_name="test_step" class="pylatest_action">
+    Ceterum censeo Carthaginem esse delendam.
+    </div>
+    <div action_id="1" action_name="test_result" class="pylatest_action">
+    This city is no more ... it has ceased to be ...
+    </div>
+    <div action_id="2" action_name="test_step" class="pylatest_action">
+    Step foo.
+    </div>
+    <div action_id="2" action_name="test_result" class="pylatest_action">
+    Result bar.
+    </div>
+    </div>
+    ''')
+    assert _publish_html(rst_input, use_plain=True) == exp_result
 
 
-class TestTestActionsTable(TestBasePlain):
-    """
-    Test of test action directives and transformations.
-    """
-
-    def setUp(self):
-        # show full diff (note: python3 unittest diff is much better)
-        self.maxDiff = None
-
-    def check_html_body(self, rst_input, exp_result):
-        parts = pylatest_publish_parts(rst_input, writer_name='html')
-        assert parts['html_body'] == exp_result
-
-    def test_teststep_empty(self):
-        rst_input = '.. test_step:: 1'
-        exp_result = textwrap.dedent('''\
-        <div class="document">
-        <table border="1" class="docutils">
-        <colgroup>
-        <col width="2%" />
-        <col width="49%" />
-        <col width="49%" />
-        </colgroup>
-        <thead valign="bottom">
-        <tr><th class="head">&nbsp;</th>
-        <th class="head">Step</th>
-        <th class="head">Expected Result</th>
-        </tr>
-        </thead>
-        <tbody valign="top">
-        <tr><td>1</td>
-        <td>&nbsp;</td>
-        <td>&nbsp;</td>
-        </tr>
-        </tbody>
-        </table>
-        </div>
-        ''')
-        self.check_html_body(rst_input, exp_result)
-
-    def test_teststep_simple(self):
-        rst_input = textwrap.dedent('''\
-        .. test_step:: 1
-
-            Ceterum censeo Carthaginem esse delendam.
-        ''')
-        exp_result = textwrap.dedent('''\
-        <div class="document">
-        <table border="1" class="docutils">
-        <colgroup>
-        <col width="2%" />
-        <col width="49%" />
-        <col width="49%" />
-        </colgroup>
-        <thead valign="bottom">
-        <tr><th class="head">&nbsp;</th>
-        <th class="head">Step</th>
-        <th class="head">Expected Result</th>
-        </tr>
-        </thead>
-        <tbody valign="top">
-        <tr><td>1</td>
-        <td>Ceterum censeo Carthaginem esse delendam.</td>
-        <td>&nbsp;</td>
-        </tr>
-        </tbody>
-        </table>
-        </div>
-        ''')
-        self.check_html_body(rst_input, exp_result)
-
-    def test_test_action_simple(self):
-        rst_input = textwrap.dedent('''\
-        .. test_step:: 1
-
-            Ceterum censeo Carthaginem esse delendam.
-
-        .. test_result:: 1
-
-            This city is no more ... it has ceased to be ...
-        ''')
-        exp_result = textwrap.dedent('''\
-        <div class="document">
-        <table border="1" class="docutils">
-        <colgroup>
-        <col width="2%" />
-        <col width="49%" />
-        <col width="49%" />
-        </colgroup>
-        <thead valign="bottom">
-        <tr><th class="head">&nbsp;</th>
-        <th class="head">Step</th>
-        <th class="head">Expected Result</th>
-        </tr>
-        </thead>
-        <tbody valign="top">
-        <tr><td>1</td>
-        <td>Ceterum censeo Carthaginem esse delendam.</td>
-        <td>This city is no more ... it has ceased to be ...</td>
-        </tr>
-        </tbody>
-        </table>
-        </div>
-        ''')
-        self.check_html_body(rst_input, exp_result)
-
-    def test_test_actions_two(self):
-        rst_input = textwrap.dedent('''\
-        .. test_step:: 1
-
-            Ceterum censeo Carthaginem esse delendam.
-
-        .. test_result:: 1
-
-            This city is no more ... it has ceased to be ...
-
-        .. test_step:: 2
-
-            Step foo.
-
-        .. test_result:: 2
-
-            Result bar.
-        ''')
-        exp_result = textwrap.dedent('''\
-        <div class="document">
-        <table border="1" class="docutils">
-        <colgroup>
-        <col width="2%" />
-        <col width="49%" />
-        <col width="49%" />
-        </colgroup>
-        <thead valign="bottom">
-        <tr><th class="head">&nbsp;</th>
-        <th class="head">Step</th>
-        <th class="head">Expected Result</th>
-        </tr>
-        </thead>
-        <tbody valign="top">
-        <tr><td>1</td>
-        <td>Ceterum censeo Carthaginem esse delendam.</td>
-        <td>This city is no more ... it has ceased to be ...</td>
-        </tr>
-        <tr><td>2</td>
-        <td>Step foo.</td>
-        <td>Result bar.</td>
-        </tr>
-        </tbody>
-        </table>
-        </div>
-        ''')
-        self.check_html_body(rst_input, exp_result)
+def test_actions_noplain_teststep_empty():
+    rst_input = '.. test_step:: 1'
+    exp_result = textwrap.dedent('''\
+    <div class="document">
+    <table border="1" class="docutils">
+    <colgroup>
+    <col width="2%" />
+    <col width="49%" />
+    <col width="49%" />
+    </colgroup>
+    <thead valign="bottom">
+    <tr><th class="head">&nbsp;</th>
+    <th class="head">Step</th>
+    <th class="head">Expected Result</th>
+    </tr>
+    </thead>
+    <tbody valign="top">
+    <tr><td>1</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    </tr>
+    </tbody>
+    </table>
+    </div>
+    ''')
+    assert _publish_html(rst_input, use_plain=False) == exp_result
 
 
-class TestTestActionsTableAutoId(TestTestActionsTable):
+def test_actions_noplain_teststep_simple():
+    rst_input = textwrap.dedent('''\
+    .. test_step:: 1
 
-    def setUp(self):
-        # register custom pylatest nodes with html translator
-        # xclient.register_table(auto_id=True)
-        # show full diff (note: python3 unittest diff is much better)
-        self.maxDiff = None
+        Ceterum censeo Carthaginem esse delendam.
+    ''')
+    exp_result = textwrap.dedent('''\
+    <div class="document">
+    <table border="1" class="docutils">
+    <colgroup>
+    <col width="2%" />
+    <col width="49%" />
+    <col width="49%" />
+    </colgroup>
+    <thead valign="bottom">
+    <tr><th class="head">&nbsp;</th>
+    <th class="head">Step</th>
+    <th class="head">Expected Result</th>
+    </tr>
+    </thead>
+    <tbody valign="top">
+    <tr><td>1</td>
+    <td>Ceterum censeo Carthaginem esse delendam.</td>
+    <td>&nbsp;</td>
+    </tr>
+    </tbody>
+    </table>
+    </div>
+    ''')
+    assert _publish_html(rst_input, use_plain=False) == exp_result
 
-    @pytest.mark.xfail(reason="https://gitlab.com/mbukatov/pylatest/issues/11")
-    def test_test_action_simple_autoid(self):
-        rst_input = textwrap.dedent('''\
-        .. test_step:: 1
 
-            Ceterum censeo Carthaginem esse delendam.
+def test_actions_noplain_test_action_simple():
+    rst_input = textwrap.dedent('''\
+    .. test_step:: 1
 
-        .. test_result::
+        Ceterum censeo Carthaginem esse delendam.
 
-            This city is no more ... it has ceased to be ...
-        ''')
-        exp_result = textwrap.dedent('''\
-        <div class="document">
-        <table border="1" class="docutils">
-        <colgroup>
-        <col width="2%" />
-        <col width="49%" />
-        <col width="49%" />
-        </colgroup>
-        <thead valign="bottom">
-        <tr><th class="head">&nbsp;</th>
-        <th class="head">Step</th>
-        <th class="head">Expected Result</th>
-        </tr>
-        </thead>
-        <tbody valign="top">
-        <tr><td>1</td>
-        <td>Ceterum censeo Carthaginem esse delendam.</td>
-        <td>This city is no more ... it has ceased to be ...</td>
-        </tr>
-        </tbody>
-        </table>
-        </div>
-        ''')
-        self.check_html_body(rst_input, exp_result)
+    .. test_result:: 1
 
-    @pytest.mark.xfail(reason="https://gitlab.com/mbukatov/pylatest/issues/11")
-    def test_test_actions_two_autoid(self):
-        rst_input = textwrap.dedent('''\
-        .. test_step:: 1
+        This city is no more ... it has ceased to be ...
+    ''')
+    exp_result = textwrap.dedent('''\
+    <div class="document">
+    <table border="1" class="docutils">
+    <colgroup>
+    <col width="2%" />
+    <col width="49%" />
+    <col width="49%" />
+    </colgroup>
+    <thead valign="bottom">
+    <tr><th class="head">&nbsp;</th>
+    <th class="head">Step</th>
+    <th class="head">Expected Result</th>
+    </tr>
+    </thead>
+    <tbody valign="top">
+    <tr><td>1</td>
+    <td>Ceterum censeo Carthaginem esse delendam.</td>
+    <td>This city is no more ... it has ceased to be ...</td>
+    </tr>
+    </tbody>
+    </table>
+    </div>
+    ''')
+    assert _publish_html(rst_input, use_plain=False) == exp_result
 
-            Ceterum censeo Carthaginem esse delendam.
 
-        .. test_result::
+def test_actions_noplain_test_actions_two():
+    rst_input = textwrap.dedent('''\
+    .. test_step:: 1
 
-            This city is no more ... it has ceased to be ...
+        Ceterum censeo Carthaginem esse delendam.
 
-        .. test_step::
+    .. test_result:: 1
 
-            Step foo.
+        This city is no more ... it has ceased to be ...
 
-        .. test_result::
+    .. test_step:: 2
 
-            Result bar.
-        ''')
-        exp_result = textwrap.dedent('''\
-        <div class="document">
-        <table border="1" class="docutils">
-        <colgroup>
-        <col width="2%" />
-        <col width="49%" />
-        <col width="49%" />
-        </colgroup>
-        <thead valign="bottom">
-        <tr><th class="head">&nbsp;</th>
-        <th class="head">Step</th>
-        <th class="head">Expected Result</th>
-        </tr>
-        </thead>
-        <tbody valign="top">
-        <tr><td>1</td>
-        <td>Ceterum censeo Carthaginem esse delendam.</td>
-        <td>This city is no more ... it has ceased to be ...</td>
-        </tr>
-        <tr><td>2</td>
-        <td>Step foo.</td>
-        <td>Result bar.</td>
-        </tr>
-        </tbody>
-        </table>
-        </div>
-        ''')
-        self.check_html_body(rst_input, exp_result)
+        Step foo.
+
+    .. test_result:: 2
+
+        Result bar.
+    ''')
+    exp_result = textwrap.dedent('''\
+    <div class="document">
+    <table border="1" class="docutils">
+    <colgroup>
+    <col width="2%" />
+    <col width="49%" />
+    <col width="49%" />
+    </colgroup>
+    <thead valign="bottom">
+    <tr><th class="head">&nbsp;</th>
+    <th class="head">Step</th>
+    <th class="head">Expected Result</th>
+    </tr>
+    </thead>
+    <tbody valign="top">
+    <tr><td>1</td>
+    <td>Ceterum censeo Carthaginem esse delendam.</td>
+    <td>This city is no more ... it has ceased to be ...</td>
+    </tr>
+    <tr><td>2</td>
+    <td>Step foo.</td>
+    <td>Result bar.</td>
+    </tr>
+    </tbody>
+    </table>
+    </div>
+    ''')
+    assert _publish_html(rst_input, use_plain=False) == exp_result
+
+
+@pytest.mark.xfail(reason="https://gitlab.com/mbukatov/pylatest/issues/11")
+def test_actions_noplain_autoid_test_action_simple_autoid():
+    rst_input = textwrap.dedent('''\
+    .. test_step:: 1
+
+        Ceterum censeo Carthaginem esse delendam.
+
+    .. test_result::
+
+        This city is no more ... it has ceased to be ...
+    ''')
+    exp_result = textwrap.dedent('''\
+    <div class="document">
+    <table border="1" class="docutils">
+    <colgroup>
+    <col width="2%" />
+    <col width="49%" />
+    <col width="49%" />
+    </colgroup>
+    <thead valign="bottom">
+    <tr><th class="head">&nbsp;</th>
+    <th class="head">Step</th>
+    <th class="head">Expected Result</th>
+    </tr>
+    </thead>
+    <tbody valign="top">
+    <tr><td>1</td>
+    <td>Ceterum censeo Carthaginem esse delendam.</td>
+    <td>This city is no more ... it has ceased to be ...</td>
+    </tr>
+    </tbody>
+    </table>
+    </div>
+    ''')
+    assert _publish_html(rst_input, use_plain=True) == exp_result
+
+
+@pytest.mark.xfail(reason="https://gitlab.com/mbukatov/pylatest/issues/11")
+def test_actions_noplain_autoid_test_actions_two_autoid():
+    rst_input = textwrap.dedent('''\
+    .. test_step:: 1
+
+        Ceterum censeo Carthaginem esse delendam.
+
+    .. test_result::
+
+        This city is no more ... it has ceased to be ...
+
+    .. test_step::
+
+        Step foo.
+
+    .. test_result::
+
+        Result bar.
+    ''')
+    exp_result = textwrap.dedent('''\
+    <div class="document">
+    <table border="1" class="docutils">
+    <colgroup>
+    <col width="2%" />
+    <col width="49%" />
+    <col width="49%" />
+    </colgroup>
+    <thead valign="bottom">
+    <tr><th class="head">&nbsp;</th>
+    <th class="head">Step</th>
+    <th class="head">Expected Result</th>
+    </tr>
+    </thead>
+    <tbody valign="top">
+    <tr><td>1</td>
+    <td>Ceterum censeo Carthaginem esse delendam.</td>
+    <td>This city is no more ... it has ceased to be ...</td>
+    </tr>
+    <tr><td>2</td>
+    <td>Step foo.</td>
+    <td>Result bar.</td>
+    </tr>
+    </tbody>
+    </table>
+    </div>
+    ''')
+    assert _publish_html(rst_input, use_plain=True) == exp_result
