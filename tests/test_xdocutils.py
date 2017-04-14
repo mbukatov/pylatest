@@ -71,11 +71,14 @@ def test_docutilsworks_doc_somedirective():
     assert _publish_html(rst_input, use_plain=True) == exp_result
 
 
-@pytest.mark.parametrize("rst_input", [
-    '.. test_step:: 1',
-    pytest.mark.xfail('.. test_action::\n   :step:'),
-    ])
-def test_actions_plain_teststep_empty(rst_input):
+@pytest.fixture(
+    scope="module",
+    params=['.. test_step:: 1', '.. test_action::\n   :step:'])
+def rst_input_teststep_empty(request):
+    return request.param
+
+
+def test_actions_plain_teststep_empty(rst_input_teststep_empty):
     exp_result = textwrap.dedent('''\
     <div class="document">
     <div action_id="1" action_name="test_step" class="pylatest_action">
@@ -83,22 +86,55 @@ def test_actions_plain_teststep_empty(rst_input):
     </div>
     </div>
     ''')
-    assert _publish_html(rst_input, use_plain=True) == exp_result
+    assert _publish_html(rst_input_teststep_empty, use_plain=True) == exp_result
 
 
-@pytest.mark.parametrize("rst_input", [
-    textwrap.dedent('''\
-    .. test_step:: 1
+def test_actions_noplain_teststep_empty(rst_input_teststep_empty):
+    exp_result = textwrap.dedent('''\
+    <div class="document">
+    <table border="1" class="docutils">
+    <colgroup>
+    <col width="2%" />
+    <col width="49%" />
+    <col width="49%" />
+    </colgroup>
+    <thead valign="bottom">
+    <tr><th class="head">&nbsp;</th>
+    <th class="head">Step</th>
+    <th class="head">Expected Result</th>
+    </tr>
+    </thead>
+    <tbody valign="top">
+    <tr><td>1</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    </tr>
+    </tbody>
+    </table>
+    </div>
+    ''')
+    assert _publish_html(rst_input_teststep_empty, use_plain=False) == exp_result
 
-        Ceterum censeo Carthaginem esse delendam.
-    '''),
-    pytest.mark.xfail(textwrap.dedent('''\
-    .. test_action::
-       :step:
-           Ceterum censeo Carthaginem esse delendam.
-    ''')),
-    ])
-def test_actions_plain_teststep_simple(rst_input):
+
+@pytest.fixture(
+    scope="module",
+    params=[
+        textwrap.dedent('''\
+        .. test_step:: 1
+
+            Ceterum censeo Carthaginem esse delendam.
+        '''),
+        textwrap.dedent('''\
+        .. test_action::
+           :step:
+               Ceterum censeo Carthaginem esse delendam.
+        '''),
+        ])
+def rst_input_teststep_simple(request):
+    return request.param
+
+
+def test_actions_plain_teststep_simple(rst_input_teststep_simple):
     exp_result = textwrap.dedent('''\
     <div class="document">
     <div action_id="1" action_name="test_step" class="pylatest_action">
@@ -106,26 +142,59 @@ def test_actions_plain_teststep_simple(rst_input):
     </div>
     </div>
     ''')
-    assert _publish_html(rst_input, use_plain=True) == exp_result
+    assert _publish_html(rst_input_teststep_simple, use_plain=True) == exp_result
 
 
-@pytest.mark.parametrize("rst_input", [
-    textwrap.dedent('''\
-    .. test_step:: 1
+def test_actions_noplain_teststep_simple(rst_input_teststep_simple):
+    exp_result = textwrap.dedent('''\
+    <div class="document">
+    <table border="1" class="docutils">
+    <colgroup>
+    <col width="2%" />
+    <col width="49%" />
+    <col width="49%" />
+    </colgroup>
+    <thead valign="bottom">
+    <tr><th class="head">&nbsp;</th>
+    <th class="head">Step</th>
+    <th class="head">Expected Result</th>
+    </tr>
+    </thead>
+    <tbody valign="top">
+    <tr><td>1</td>
+    <td>Ceterum censeo Carthaginem esse delendam.</td>
+    <td>&nbsp;</td>
+    </tr>
+    </tbody>
+    </table>
+    </div>
+    ''')
+    assert _publish_html(rst_input_teststep_simple, use_plain=False) == exp_result
 
-        Ceterum censeo Carthaginem esse delendam.
 
-    .. test_result:: 1
+@pytest.fixture(
+    scope="module",
+    params=[
+        textwrap.dedent('''\
+        .. test_step:: 1
 
-        This city is no more ... it has ceased to be ...
-    '''),
-    pytest.mark.xfail(textwrap.dedent('''\
-    .. test_action::
-       :step: Ceterum censeo Carthaginem esse delendam.
-       :result: This city is no more ... it has ceased to be ...
-    ''')),
-    ])
-def test_actions_plain_test_action_simple(rst_input):
+            Ceterum censeo Carthaginem esse delendam.
+
+        .. test_result:: 1
+
+            This city is no more ... it has ceased to be ...
+        '''),
+        textwrap.dedent('''\
+        .. test_action::
+           :step: Ceterum censeo Carthaginem esse delendam.
+           :result: This city is no more ... it has ceased to be ...
+        '''),
+        ])
+def rst_input_test_action_simple(request):
+    return request.param
+
+
+def test_actions_plain_test_action_simple(rst_input_test_action_simple):
     exp_result = textwrap.dedent('''\
     <div class="document">
     <div action_id="1" action_name="test_step" class="pylatest_action">
@@ -136,38 +205,71 @@ def test_actions_plain_test_action_simple(rst_input):
     </div>
     </div>
     ''')
-    assert _publish_html(rst_input, use_plain=True) == exp_result
+    assert _publish_html(rst_input_test_action_simple, use_plain=True) == exp_result
 
 
-@pytest.mark.parametrize("rst_input", [
-    textwrap.dedent('''\
-    .. test_step:: 1
+def test_actions_noplain_test_action_simple(rst_input_test_action_simple):
+    exp_result = textwrap.dedent('''\
+    <div class="document">
+    <table border="1" class="docutils">
+    <colgroup>
+    <col width="2%" />
+    <col width="49%" />
+    <col width="49%" />
+    </colgroup>
+    <thead valign="bottom">
+    <tr><th class="head">&nbsp;</th>
+    <th class="head">Step</th>
+    <th class="head">Expected Result</th>
+    </tr>
+    </thead>
+    <tbody valign="top">
+    <tr><td>1</td>
+    <td>Ceterum censeo Carthaginem esse delendam.</td>
+    <td>This city is no more ... it has ceased to be ...</td>
+    </tr>
+    </tbody>
+    </table>
+    </div>
+    ''')
+    assert _publish_html(rst_input_test_action_simple, use_plain=False) == exp_result
 
-        Ceterum censeo Carthaginem esse delendam.
 
-    .. test_result:: 1
+@pytest.fixture(
+    scope="module",
+    params=[
+        textwrap.dedent('''\
+        .. test_step:: 1
 
-        This city is no more ... it has ceased to be ...
+            Ceterum censeo Carthaginem esse delendam.
 
-    .. test_step:: 2
+        .. test_result:: 1
 
-        Step foo.
+            This city is no more ... it has ceased to be ...
 
-    .. test_result:: 2
+        .. test_step:: 2
 
-        Result bar.
-    '''),
-    pytest.mark.xfail(textwrap.dedent('''\
-    .. test_action::
-       :step: Ceterum censeo Carthaginem esse delendam.
-       :result: This city is no more ... it has ceased to be ...
+            Step foo.
 
-    .. test_action::
-       :step: Step foo.
-       :result: Result bar.
-    ''')),
-    ])
-def test_actions_plain_test_actions_two(rst_input):
+        .. test_result:: 2
+
+            Result bar.
+        '''),
+        textwrap.dedent('''\
+        .. test_action::
+           :step: Ceterum censeo Carthaginem esse delendam.
+           :result: This city is no more ... it has ceased to be ...
+
+        .. test_action::
+           :step: Step foo.
+           :result: Result bar.
+        '''),
+        ])
+def rst_input_test_action_two(request):
+    return request.param
+
+
+def test_actions_plain_test_actions_two(rst_input_test_action_two):
     exp_result = textwrap.dedent('''\
     <div class="document">
     <div action_id="1" action_name="test_step" class="pylatest_action">
@@ -184,7 +286,38 @@ def test_actions_plain_test_actions_two(rst_input):
     </div>
     </div>
     ''')
-    assert _publish_html(rst_input, use_plain=True) == exp_result
+    assert _publish_html(rst_input_test_action_two, use_plain=True) == exp_result
+
+
+def test_actions_noplain_test_actions_two(rst_input_test_action_two):
+    exp_result = textwrap.dedent('''\
+    <div class="document">
+    <table border="1" class="docutils">
+    <colgroup>
+    <col width="2%" />
+    <col width="49%" />
+    <col width="49%" />
+    </colgroup>
+    <thead valign="bottom">
+    <tr><th class="head">&nbsp;</th>
+    <th class="head">Step</th>
+    <th class="head">Expected Result</th>
+    </tr>
+    </thead>
+    <tbody valign="top">
+    <tr><td>1</td>
+    <td>Ceterum censeo Carthaginem esse delendam.</td>
+    <td>This city is no more ... it has ceased to be ...</td>
+    </tr>
+    <tr><td>2</td>
+    <td>Step foo.</td>
+    <td>Result bar.</td>
+    </tr>
+    </tbody>
+    </table>
+    </div>
+    ''')
+    assert _publish_html(rst_input_test_action_two, use_plain=False) == exp_result
 
 
 @pytest.mark.xfail
@@ -241,178 +374,6 @@ def test_actions_plain_autoid_test_actions_two_autoid():
     </div>
     ''')
     assert _publish_html(rst_input, use_plain=True) == exp_result
-
-
-@pytest.mark.parametrize("rst_input", [
-    '.. test_step:: 1',
-    '.. test_action::\n   :step:',
-    ])
-def test_actions_noplain_teststep_empty(rst_input):
-    exp_result = textwrap.dedent('''\
-    <div class="document">
-    <table border="1" class="docutils">
-    <colgroup>
-    <col width="2%" />
-    <col width="49%" />
-    <col width="49%" />
-    </colgroup>
-    <thead valign="bottom">
-    <tr><th class="head">&nbsp;</th>
-    <th class="head">Step</th>
-    <th class="head">Expected Result</th>
-    </tr>
-    </thead>
-    <tbody valign="top">
-    <tr><td>1</td>
-    <td>&nbsp;</td>
-    <td>&nbsp;</td>
-    </tr>
-    </tbody>
-    </table>
-    </div>
-    ''')
-    assert _publish_html(rst_input, use_plain=False) == exp_result
-
-
-@pytest.mark.parametrize("rst_input", [
-    textwrap.dedent('''\
-    .. test_step:: 1
-
-        Ceterum censeo Carthaginem esse delendam.
-    '''),
-    textwrap.dedent('''\
-    .. test_action::
-       :step:
-           Ceterum censeo Carthaginem esse delendam.
-    '''),
-    ])
-def test_actions_noplain_teststep_simple(rst_input):
-    exp_result = textwrap.dedent('''\
-    <div class="document">
-    <table border="1" class="docutils">
-    <colgroup>
-    <col width="2%" />
-    <col width="49%" />
-    <col width="49%" />
-    </colgroup>
-    <thead valign="bottom">
-    <tr><th class="head">&nbsp;</th>
-    <th class="head">Step</th>
-    <th class="head">Expected Result</th>
-    </tr>
-    </thead>
-    <tbody valign="top">
-    <tr><td>1</td>
-    <td>Ceterum censeo Carthaginem esse delendam.</td>
-    <td>&nbsp;</td>
-    </tr>
-    </tbody>
-    </table>
-    </div>
-    ''')
-    assert _publish_html(rst_input, use_plain=False) == exp_result
-
-
-@pytest.mark.parametrize("rst_input", [
-    textwrap.dedent('''\
-    .. test_step:: 1
-
-        Ceterum censeo Carthaginem esse delendam.
-
-    .. test_result:: 1
-
-        This city is no more ... it has ceased to be ...
-    '''),
-    textwrap.dedent('''\
-    .. test_action::
-       :step: Ceterum censeo Carthaginem esse delendam.
-       :result: This city is no more ... it has ceased to be ...
-    '''),
-    ])
-def test_actions_noplain_test_action_simple(rst_input):
-    exp_result = textwrap.dedent('''\
-    <div class="document">
-    <table border="1" class="docutils">
-    <colgroup>
-    <col width="2%" />
-    <col width="49%" />
-    <col width="49%" />
-    </colgroup>
-    <thead valign="bottom">
-    <tr><th class="head">&nbsp;</th>
-    <th class="head">Step</th>
-    <th class="head">Expected Result</th>
-    </tr>
-    </thead>
-    <tbody valign="top">
-    <tr><td>1</td>
-    <td>Ceterum censeo Carthaginem esse delendam.</td>
-    <td>This city is no more ... it has ceased to be ...</td>
-    </tr>
-    </tbody>
-    </table>
-    </div>
-    ''')
-    assert _publish_html(rst_input, use_plain=False) == exp_result
-
-
-@pytest.mark.parametrize("rst_input", [
-    textwrap.dedent('''\
-    .. test_step:: 1
-
-        Ceterum censeo Carthaginem esse delendam.
-
-    .. test_result:: 1
-
-        This city is no more ... it has ceased to be ...
-
-    .. test_step:: 2
-
-        Step foo.
-
-    .. test_result:: 2
-
-        Result bar.
-    '''),
-    textwrap.dedent('''\
-    .. test_action::
-       :step: Ceterum censeo Carthaginem esse delendam.
-       :result: This city is no more ... it has ceased to be ...
-
-    .. test_action::
-       :step: Step foo.
-       :result: Result bar.
-    '''),
-    ])
-def test_actions_noplain_test_actions_two(rst_input):
-    exp_result = textwrap.dedent('''\
-    <div class="document">
-    <table border="1" class="docutils">
-    <colgroup>
-    <col width="2%" />
-    <col width="49%" />
-    <col width="49%" />
-    </colgroup>
-    <thead valign="bottom">
-    <tr><th class="head">&nbsp;</th>
-    <th class="head">Step</th>
-    <th class="head">Expected Result</th>
-    </tr>
-    </thead>
-    <tbody valign="top">
-    <tr><td>1</td>
-    <td>Ceterum censeo Carthaginem esse delendam.</td>
-    <td>This city is no more ... it has ceased to be ...</td>
-    </tr>
-    <tr><td>2</td>
-    <td>Step foo.</td>
-    <td>Result bar.</td>
-    </tr>
-    </tbody>
-    </table>
-    </div>
-    ''')
-    assert _publish_html(rst_input, use_plain=False) == exp_result
 
 
 def test_actions_noplain_autoid_test_action_simple_autoid():
