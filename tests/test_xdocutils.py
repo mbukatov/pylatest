@@ -1,9 +1,10 @@
 # -*- coding: utf8 -*-
 
 """
-Tests of pylatest docutils extensions: pylatest.xdocutils module as a whole.
+Tests of pylatest docutils extensions: pylatest.xdocutils module as a whole,
+which includes effects of pylatest transforms.
 
-This means that tests in this module uses user level docutils API to build
+This means that tests in this module use user level docutils API to build
 rst source into html build and then checks the result.
 """
 
@@ -70,8 +71,11 @@ def test_docutilsworks_doc_somedirective():
     assert _publish_html(rst_input, use_plain=True) == exp_result
 
 
-def test_actions_plain_teststep_empty():
-    rst_input = '.. test_step:: 1'
+@pytest.mark.parametrize("rst_input", [
+    '.. test_step:: 1',
+    pytest.mark.xfail('.. test_action::\n   :step:'),
+    ])
+def test_actions_plain_teststep_empty(rst_input):
     exp_result = textwrap.dedent('''\
     <div class="document">
     <div action_id="1" action_name="test_step" class="pylatest_action">
@@ -82,12 +86,19 @@ def test_actions_plain_teststep_empty():
     assert _publish_html(rst_input, use_plain=True) == exp_result
 
 
-def test_actions_plain_teststep_simple():
-    rst_input = textwrap.dedent('''\
+@pytest.mark.parametrize("rst_input", [
+    textwrap.dedent('''\
     .. test_step:: 1
 
         Ceterum censeo Carthaginem esse delendam.
-    ''')
+    '''),
+    pytest.mark.xfail(textwrap.dedent('''\
+    .. test_action::
+       :step:
+           Ceterum censeo Carthaginem esse delendam.
+    ''')),
+    ])
+def test_actions_plain_teststep_simple(rst_input):
     exp_result = textwrap.dedent('''\
     <div class="document">
     <div action_id="1" action_name="test_step" class="pylatest_action">
@@ -98,8 +109,8 @@ def test_actions_plain_teststep_simple():
     assert _publish_html(rst_input, use_plain=True) == exp_result
 
 
-def test_actions_plain_test_action_simple():
-    rst_input = textwrap.dedent('''\
+@pytest.mark.parametrize("rst_input", [
+    textwrap.dedent('''\
     .. test_step:: 1
 
         Ceterum censeo Carthaginem esse delendam.
@@ -107,7 +118,14 @@ def test_actions_plain_test_action_simple():
     .. test_result:: 1
 
         This city is no more ... it has ceased to be ...
-    ''')
+    '''),
+    pytest.mark.xfail(textwrap.dedent('''\
+    .. test_action::
+       :step: Ceterum censeo Carthaginem esse delendam.
+       :result: This city is no more ... it has ceased to be ...
+    ''')),
+    ])
+def test_actions_plain_test_action_simple(rst_input):
     exp_result = textwrap.dedent('''\
     <div class="document">
     <div action_id="1" action_name="test_step" class="pylatest_action">
@@ -121,8 +139,8 @@ def test_actions_plain_test_action_simple():
     assert _publish_html(rst_input, use_plain=True) == exp_result
 
 
-def test_actions_plain_test_actions_two():
-    rst_input = textwrap.dedent('''\
+@pytest.mark.parametrize("rst_input", [
+    textwrap.dedent('''\
     .. test_step:: 1
 
         Ceterum censeo Carthaginem esse delendam.
@@ -138,7 +156,18 @@ def test_actions_plain_test_actions_two():
     .. test_result:: 2
 
         Result bar.
-    ''')
+    '''),
+    pytest.mark.xfail(textwrap.dedent('''\
+    .. test_action::
+       :step: Ceterum censeo Carthaginem esse delendam.
+       :result: This city is no more ... it has ceased to be ...
+
+    .. test_action::
+       :step: Step foo.
+       :result: Result bar.
+    ''')),
+    ])
+def test_actions_plain_test_actions_two(rst_input):
     exp_result = textwrap.dedent('''\
     <div class="document">
     <div action_id="1" action_name="test_step" class="pylatest_action">
@@ -158,16 +187,15 @@ def test_actions_plain_test_actions_two():
     assert _publish_html(rst_input, use_plain=True) == exp_result
 
 
-@pytest.mark.xfail(reason="https://gitlab.com/mbukatov/pylatest/issues/11")
+@pytest.mark.xfail
 def test_actions_plain_autoid_test_action_simple_autoid():
     rst_input = textwrap.dedent('''\
     .. test_step:: 1
 
         Ceterum censeo Carthaginem esse delendam.
 
-    .. test_result::
-
-        This city is no more ... it has ceased to be ...
+    .. test_action::
+       :result: This city is no more ... it has ceased to be ...
     ''')
     exp_result = textwrap.dedent('''\
     <div class="document">
@@ -182,24 +210,19 @@ def test_actions_plain_autoid_test_action_simple_autoid():
     assert _publish_html(rst_input, use_plain=True) == exp_result
 
 
-@pytest.mark.xfail(reason="https://gitlab.com/mbukatov/pylatest/issues/11")
+@pytest.mark.xfail
 def test_actions_plain_autoid_test_actions_two_autoid():
     rst_input = textwrap.dedent('''\
     .. test_step:: 1
 
         Ceterum censeo Carthaginem esse delendam.
 
-    .. test_result::
+    .. test_action::
+       :result: This city is no more ... it has ceased to be ...
 
-        This city is no more ... it has ceased to be ...
-
-    .. test_step::
-
-        Step foo.
-
-    .. test_result::
-
-        Result bar.
+    .. test_action::
+       :step: Step foo.
+       :result: Result bar.
     ''')
     exp_result = textwrap.dedent('''\
     <div class="document">
@@ -220,8 +243,11 @@ def test_actions_plain_autoid_test_actions_two_autoid():
     assert _publish_html(rst_input, use_plain=True) == exp_result
 
 
-def test_actions_noplain_teststep_empty():
-    rst_input = '.. test_step:: 1'
+@pytest.mark.parametrize("rst_input", [
+    '.. test_step:: 1',
+    '.. test_action::\n   :step:',
+    ])
+def test_actions_noplain_teststep_empty(rst_input):
     exp_result = textwrap.dedent('''\
     <div class="document">
     <table border="1" class="docutils">
@@ -248,12 +274,19 @@ def test_actions_noplain_teststep_empty():
     assert _publish_html(rst_input, use_plain=False) == exp_result
 
 
-def test_actions_noplain_teststep_simple():
-    rst_input = textwrap.dedent('''\
+@pytest.mark.parametrize("rst_input", [
+    textwrap.dedent('''\
     .. test_step:: 1
 
         Ceterum censeo Carthaginem esse delendam.
-    ''')
+    '''),
+    textwrap.dedent('''\
+    .. test_action::
+       :step:
+           Ceterum censeo Carthaginem esse delendam.
+    '''),
+    ])
+def test_actions_noplain_teststep_simple(rst_input):
     exp_result = textwrap.dedent('''\
     <div class="document">
     <table border="1" class="docutils">
@@ -280,8 +313,8 @@ def test_actions_noplain_teststep_simple():
     assert _publish_html(rst_input, use_plain=False) == exp_result
 
 
-def test_actions_noplain_test_action_simple():
-    rst_input = textwrap.dedent('''\
+@pytest.mark.parametrize("rst_input", [
+    textwrap.dedent('''\
     .. test_step:: 1
 
         Ceterum censeo Carthaginem esse delendam.
@@ -289,7 +322,14 @@ def test_actions_noplain_test_action_simple():
     .. test_result:: 1
 
         This city is no more ... it has ceased to be ...
-    ''')
+    '''),
+    textwrap.dedent('''\
+    .. test_action::
+       :step: Ceterum censeo Carthaginem esse delendam.
+       :result: This city is no more ... it has ceased to be ...
+    '''),
+    ])
+def test_actions_noplain_test_action_simple(rst_input):
     exp_result = textwrap.dedent('''\
     <div class="document">
     <table border="1" class="docutils">
@@ -316,8 +356,8 @@ def test_actions_noplain_test_action_simple():
     assert _publish_html(rst_input, use_plain=False) == exp_result
 
 
-def test_actions_noplain_test_actions_two():
-    rst_input = textwrap.dedent('''\
+@pytest.mark.parametrize("rst_input", [
+    textwrap.dedent('''\
     .. test_step:: 1
 
         Ceterum censeo Carthaginem esse delendam.
@@ -333,7 +373,18 @@ def test_actions_noplain_test_actions_two():
     .. test_result:: 2
 
         Result bar.
-    ''')
+    '''),
+    textwrap.dedent('''\
+    .. test_action::
+       :step: Ceterum censeo Carthaginem esse delendam.
+       :result: This city is no more ... it has ceased to be ...
+
+    .. test_action::
+       :step: Step foo.
+       :result: Result bar.
+    '''),
+    ])
+def test_actions_noplain_test_actions_two(rst_input):
     exp_result = textwrap.dedent('''\
     <div class="document">
     <table border="1" class="docutils">
@@ -364,16 +415,14 @@ def test_actions_noplain_test_actions_two():
     assert _publish_html(rst_input, use_plain=False) == exp_result
 
 
-@pytest.mark.xfail(reason="https://gitlab.com/mbukatov/pylatest/issues/11")
 def test_actions_noplain_autoid_test_action_simple_autoid():
     rst_input = textwrap.dedent('''\
     .. test_step:: 1
 
         Ceterum censeo Carthaginem esse delendam.
 
-    .. test_result::
-
-        This city is no more ... it has ceased to be ...
+    .. test_action::
+       :result: This city is no more ... it has ceased to be ...
     ''')
     exp_result = textwrap.dedent('''\
     <div class="document">
@@ -398,27 +447,21 @@ def test_actions_noplain_autoid_test_action_simple_autoid():
     </table>
     </div>
     ''')
-    assert _publish_html(rst_input, use_plain=True) == exp_result
+    assert _publish_html(rst_input, use_plain=False) == exp_result
 
 
-@pytest.mark.xfail(reason="https://gitlab.com/mbukatov/pylatest/issues/11")
 def test_actions_noplain_autoid_test_actions_two_autoid():
     rst_input = textwrap.dedent('''\
     .. test_step:: 1
 
         Ceterum censeo Carthaginem esse delendam.
 
-    .. test_result::
+    .. test_action::
+       :result: This city is no more ... it has ceased to be ...
 
-        This city is no more ... it has ceased to be ...
-
-    .. test_step::
-
-        Step foo.
-
-    .. test_result::
-
-        Result bar.
+    .. test_action::
+       :step: Step foo.
+       :result: Result bar.
     ''')
     exp_result = textwrap.dedent('''\
     <div class="document">
@@ -447,4 +490,4 @@ def test_actions_noplain_autoid_test_actions_two_autoid():
     </table>
     </div>
     ''')
-    assert _publish_html(rst_input, use_plain=True) == exp_result
+    assert _publish_html(rst_input, use_plain=False) == exp_result
