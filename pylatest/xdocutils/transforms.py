@@ -163,6 +163,25 @@ class TestActionsTableTransform(transforms.Transform):
         drop_test_action_nodes(actions)
 
 
+class TestActionsPlainIdTransform(transforms.Transform):
+    """
+    Add/update action IDs into test action nodes (if needed).
+    """
+
+    # use priority in "very late (non-standard)" range so that all
+    # standard transformations will be executed before this one
+    default_priority = 999
+
+    def apply(self):
+        actions = pylatest.document.TestActions()
+        for node in self.document.traverse(test_action_node):
+            action_id = node.attributes.get('action_id')
+            action_name = node.attributes['action_name']
+            new_action_id = actions.add(action_name, node, action_id)
+            # update action id of the node
+            node.attributes['action_id'] = new_action_id
+
+
 class RequirementSectionTransform(transforms.Transform):
     """
     Builds doctree section from pylatest requirement node.

@@ -44,7 +44,7 @@ from docutils.writers.html4css1 import HTMLTranslator
 from pylatest.xdocutils.directives import RequirementDirective
 from pylatest.xdocutils.directives import OldTestActionDirective
 from pylatest.xdocutils.directives import TestActionDirective
-from pylatest.xdocutils.readers import NoPlainReader
+from pylatest.xdocutils.readers import NoPlainReader, PlainReader
 from pylatest.xdocutils.roles import pylaref_html_role
 from pylatest.xdocutils.roles import redhat_bugzilla_role
 import pylatest.xdocutils.htmltranslator
@@ -108,7 +108,9 @@ def register_all(use_plain=False):
 
 
 def wrapper(kwargs, use_plain=False):
-    if not use_plain:
+    if use_plain:
+        kwargs["reader"] = PlainReader()
+    else:
         kwargs["reader"] = NoPlainReader()
     kwargs["settings_overrides"] = HTML_OVERRIDES
     # let's not pullute kwargs passed into docutils publisher function

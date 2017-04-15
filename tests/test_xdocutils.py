@@ -320,7 +320,6 @@ def test_actions_noplain_test_actions_two(rst_input_test_action_two):
     assert _publish_html(rst_input_test_action_two, use_plain=False) == exp_result
 
 
-@pytest.mark.xfail
 def test_actions_plain_autoid_test_action_simple_autoid():
     rst_input = textwrap.dedent('''\
     .. test_step:: 1
@@ -343,7 +342,6 @@ def test_actions_plain_autoid_test_action_simple_autoid():
     assert _publish_html(rst_input, use_plain=True) == exp_result
 
 
-@pytest.mark.xfail
 def test_actions_plain_autoid_test_actions_two_autoid():
     rst_input = textwrap.dedent('''\
     .. test_step:: 1

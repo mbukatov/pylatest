@@ -24,6 +24,7 @@ from docutils.readers import standalone
 
 from pylatest.xdocutils.transforms import TestActionsTableTransform
 from pylatest.xdocutils.transforms import RequirementSectionTransform
+from pylatest.xdocutils.transforms import TestActionsPlainIdTransform
 
 
 class NoPlainReader(standalone.Reader):
@@ -37,4 +38,17 @@ class NoPlainReader(standalone.Reader):
         transforms = standalone.Reader.get_transforms(self)
         transforms.append(TestActionsTableTransform)
         transforms.append(RequirementSectionTransform)
+        return transforms
+
+
+class PlainReader(standalone.Reader):
+    """
+    PlainReader extends docutils standalone ReStructuredText reader
+    to add few transformation to produce machine readable output, everything
+    else remains the same.
+    """
+
+    def get_transforms(self):
+        transforms = standalone.Reader.get_transforms(self)
+        transforms.append(TestActionsPlainIdTransform)
         return transforms
