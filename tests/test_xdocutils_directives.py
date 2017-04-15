@@ -210,6 +210,21 @@ def test_testaction_single_invalid_field_empty(register_all_plain, action_name):
     _test_directive(rst_input, exp_result)
 
 
+@pytest.mark.xfail(reason="https://gitlab.com/mbukatov/pylatest/issues/10")
+@pytest.mark.parametrize("action_name", ["test_step", "test_result"])
+def test_testaction_duplicated_field(register_all_plain, action_name):
+    rst_input = textwrap.dedent('''\
+    .. test_action::
+       :{0}: First value.
+       :{0}: And 2nd value.
+    '''.format(action_name[5:]))
+    exp_result = textwrap.dedent('''\
+    <document source="_testparse() method">
+        TODO: there should be node with clear error message
+    '''.format(action_name))
+    _test_directive(rst_input, exp_result)
+
+
 @pytest.mark.parametrize("step_val", [
     " Wait about 20 minutes.",
     "\n           Wait about 20 minutes.\n",
