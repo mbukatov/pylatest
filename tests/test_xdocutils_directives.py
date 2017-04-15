@@ -47,11 +47,6 @@ def _parse(rst_str):
     return document.pformat()
 
 
-def _test_directive(rst_input, exp_result):
-    result = _parse(rst_input)
-    assert result == exp_result
-
-
 @pytest.fixture
 def register_all_plain(scope="module"):
     """
@@ -64,7 +59,7 @@ def register_all_plain(scope="module"):
 def test_docutils_works_fine_empty(register_all_plain):
     rst_input = ""
     exp_result = '<document source="_testparse() method">\n'
-    _test_directive(rst_input, exp_result)
+    assert _parse(rst_input) == exp_result
 
 
 def test_docutils_works_fine_somedirective(register_all_plain):
@@ -79,7 +74,7 @@ def test_docutils_works_fine_somedirective(register_all_plain):
             <paragraph>
                 Lorem ipsum.
     ''')
-    _test_directive(rst_input, exp_result)
+    assert _parse(rst_input) == exp_result
 
 
 @pytest.mark.parametrize("action_id", [1, 23, 129])
@@ -90,7 +85,7 @@ def test_oldtestaction_empty(register_all_plain, action_id, action_name):
     <document source="_testparse() method">
         <test_action_node action_id="{}" action_name="{}">
     '''.format(action_id, action_name))
-    _test_directive(rst_input, exp_result)
+    assert _parse(rst_input) == exp_result
 
 
 @pytest.mark.parametrize("action_name", ["test_step", "test_result"])
@@ -105,7 +100,7 @@ def test_oldtestaction_empty_noid(register_all_plain, action_name):
             <literal_block xml:space="preserve">
                 .. {0}::
     '''.format(action_name))
-    _test_directive(rst_input, exp_result)
+    assert _parse(rst_input) == exp_result
 
 
 @pytest.mark.xfail(reason="https://gitlab.com/mbukatov/pylatest/issues/10")
@@ -117,7 +112,7 @@ def test_oldtestaction_empty_wrongid(register_all_plain, action_id, action_name)
     <document source="_testparse() method">
         <test_action_node action_id="{}" action_name="{}">
     '''.format(action_id, action_name))
-    _test_directive(rst_input, exp_result)
+    assert _parse(rst_input) == exp_result
 
 
 @pytest.mark.parametrize("action_name", ["test_step", "test_result"])
@@ -133,7 +128,7 @@ def test_oldtestaction_simple(register_all_plain, action_name):
             <paragraph>
                 Some content.
     '''.format(action_name))
-    _test_directive(rst_input, exp_result)
+    assert _parse(rst_input) == exp_result
 
 
 @pytest.mark.parametrize("action_name", ["test_step", "test_result"])
@@ -159,7 +154,7 @@ def test_oldtestaction_paragraph(register_all_plain, action_name):
                 $ foo --extra sth
                 $ bar -vvv
     '''.format(action_name))
-    _test_directive(rst_input, exp_result)
+    assert _parse(rst_input) == exp_result
 
 
 def test_testaction_empty(register_all_plain):
@@ -167,7 +162,7 @@ def test_testaction_empty(register_all_plain):
     exp_result = textwrap.dedent('''\
     <document source="_testparse() method">
     ''')
-    _test_directive(rst_input, exp_result)
+    assert _parse(rst_input) == exp_result
 
 
 # TODO: consider reporting error instead, see https://gitlab.com/mbukatov/pylatest/issues/10
@@ -180,7 +175,7 @@ def test_testaction_with_other_content(register_all_plain):
     exp_result = textwrap.dedent('''\
     <document source="_testparse() method">
     ''')
-    _test_directive(rst_input, exp_result)
+    assert _parse(rst_input) == exp_result
 
 
 @pytest.mark.parametrize("action_name", ["test_step", "test_result"])
@@ -193,7 +188,7 @@ def test_testaction_single_valid_field_empty(register_all_plain, action_name):
     <document source="_testparse() method">
         <test_action_node action_id="True" action_name="{}">
     '''.format(action_name))
-    _test_directive(rst_input, exp_result)
+    assert _parse(rst_input) == exp_result
 
 
 @pytest.mark.xfail(reason="https://gitlab.com/mbukatov/pylatest/issues/10")
@@ -207,7 +202,7 @@ def test_testaction_single_invalid_field_empty(register_all_plain, action_name):
     <document source="_testparse() method">
         TODO: there should be node with error message
     '''.format(action_name))
-    _test_directive(rst_input, exp_result)
+    assert _parse(rst_input) == exp_result
 
 
 @pytest.mark.xfail(reason="https://gitlab.com/mbukatov/pylatest/issues/10")
@@ -222,7 +217,7 @@ def test_testaction_duplicated_field(register_all_plain, action_name):
     <document source="_testparse() method">
         TODO: there should be node with clear error message
     '''.format(action_name))
-    _test_directive(rst_input, exp_result)
+    assert _parse(rst_input) == exp_result
 
 
 @pytest.mark.parametrize("step_val", [
@@ -248,7 +243,7 @@ def test_testaction_both_fields_simple(register_all_plain, step_val, result_val)
             <paragraph>
                 Nothing happens.
     ''')
-    _test_directive(rst_input, exp_result)
+    assert _parse(rst_input) == exp_result
 
 
 def test_testaction_both_fields_paragraph(register_all_plain):
@@ -286,7 +281,7 @@ def test_testaction_both_fields_paragraph(register_all_plain):
                 $ foo --extra sth
                 $ bar -vvv
     ''')
-    _test_directive(rst_input, exp_result)
+    assert _parse(rst_input) == exp_result
 
 
 @pytest.mark.parametrize("action_name", ["test_step", "test_result"])
@@ -312,7 +307,7 @@ def test_testaction_single_valid_field_paragraph(register_all_plain, action_name
                 $ foo --extra sth
                 $ bar -vvv
     '''.format(action_name))
-    _test_directive(rst_input, exp_result)
+    assert _parse(rst_input) == exp_result
 
 
 @pytest.mark.parametrize("req_id", ["SOME_ID", 111])
@@ -328,7 +323,7 @@ def test_requirement_full_nooptions(register_all_plain, req_id):
             <paragraph>
                 Some content.
     '''.format(req_id))
-    _test_directive(rst_input, exp_result)
+    assert _parse(rst_input) == exp_result
 
 
 def test_requirement_full_alloptions(register_all_plain):
@@ -348,4 +343,4 @@ def test_requirement_full_alloptions(register_all_plain):
             <paragraph>
                 Expedita saepe architecto numquam accusamus.
     ''')
-    _test_directive(rst_input, exp_result)
+    assert _parse(rst_input) == exp_result
