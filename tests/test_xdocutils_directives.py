@@ -16,6 +16,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
+import re
 import sys
 import textwrap
 
@@ -186,9 +187,12 @@ def test_testaction_single_valid_field_empty(register_all_plain, action_name):
     '''.format(action_name[5:]))
     exp_result = textwrap.dedent('''\
     <document source="_testparse() method">
-        <test_action_node action_id="True" action_name="{}">
+        <test_action_node action_id="None" action_name="{}">
     '''.format(action_name))
-    assert _parse(rst_input) == exp_result
+    result = _parse(rst_input)
+    result, num = re.subn('action_id="[0-9]+"', 'action_id="None"', result)
+    assert num == 1
+    assert result == exp_result
 
 
 @pytest.mark.xfail(reason="https://gitlab.com/mbukatov/pylatest/issues/10")
@@ -236,14 +240,17 @@ def test_testaction_both_fields_simple(register_all_plain, step_val, result_val)
     '''.format(step_val, result_val))
     exp_result = textwrap.dedent('''\
     <document source="_testparse() method">
-        <test_action_node action_id="True" action_name="test_step">
+        <test_action_node action_id="None" action_name="test_step">
             <paragraph>
                 Wait about 20 minutes.
-        <test_action_node action_id="True" action_name="test_result">
+        <test_action_node action_id="None" action_name="test_result">
             <paragraph>
                 Nothing happens.
     ''')
-    assert _parse(rst_input) == exp_result
+    result = _parse(rst_input)
+    result, num = re.subn('action_id="[0-9]+"', 'action_id="None"', result)
+    assert num == 2
+    assert result == exp_result
 
 
 def test_testaction_both_fields_paragraph(register_all_plain):
@@ -264,7 +271,7 @@ def test_testaction_both_fields_paragraph(register_all_plain):
     ''')
     exp_result = textwrap.dedent('''\
     <document source="_testparse() method">
-        <test_action_node action_id="True" action_name="test_step">
+        <test_action_node action_id="None" action_name="test_step">
             <paragraph>
                 List files in the volume: 
                 <literal>
@@ -272,7 +279,7 @@ def test_testaction_both_fields_paragraph(register_all_plain):
                  ...
             <paragraph>
                 and wait about 20 minutes.
-        <test_action_node action_id="True" action_name="test_result">
+        <test_action_node action_id="None" action_name="test_result">
             <paragraph>
                 Some content.
             <paragraph>
@@ -281,7 +288,10 @@ def test_testaction_both_fields_paragraph(register_all_plain):
                 $ foo --extra sth
                 $ bar -vvv
     ''')
-    assert _parse(rst_input) == exp_result
+    result = _parse(rst_input)
+    result, num = re.subn('action_id="[0-9]+"', 'action_id="None"', result)
+    assert num == 2
+    assert result == exp_result
 
 
 @pytest.mark.parametrize("action_name", ["test_step", "test_result"])
@@ -298,7 +308,7 @@ def test_testaction_single_valid_field_paragraph(register_all_plain, action_name
     '''.format(action_name[5:]))
     exp_result = textwrap.dedent('''\
     <document source="_testparse() method">
-        <test_action_node action_id="True" action_name="{}">
+        <test_action_node action_id="None" action_name="{}">
             <paragraph>
                 Some content.
             <paragraph>
@@ -307,7 +317,10 @@ def test_testaction_single_valid_field_paragraph(register_all_plain, action_name
                 $ foo --extra sth
                 $ bar -vvv
     '''.format(action_name))
-    assert _parse(rst_input) == exp_result
+    result = _parse(rst_input)
+    result, num = re.subn('action_id="[0-9]+"', 'action_id="None"', result)
+    assert num == 1
+    assert result == exp_result
 
 
 @pytest.mark.parametrize("req_id", ["SOME_ID", 111])

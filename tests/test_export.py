@@ -140,8 +140,8 @@ class TestGetStuffFromHtmlPlain(unittest.TestCase):
         result_div_el.text = "This is the expected result."
         # construct expected output
         exp_res = TestActions()
-        exp_res.add_step(etree.tostring(step_div_el))
-        exp_res.add_result(etree.tostring(result_div_el))
+        exp_res.add_step(etree.tostring(step_div_el), 1)
+        exp_res.add_result(etree.tostring(result_div_el), 1)
         # run, run
         actions = export.get_actions(body_tree)
         # checking

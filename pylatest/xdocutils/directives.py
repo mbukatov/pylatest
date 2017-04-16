@@ -26,7 +26,9 @@ module.
 
 from docutils import nodes
 from docutils.parsers import rst
+from random import randint
 
+from pylatest.document import TestActions
 import pylatest.xdocutils.nodes
 
 
@@ -100,7 +102,9 @@ class TestActionDirective(rst.Directive):
         #               <paragraph>
         #                   Output should be empty.
 
-        # TODO: report error when step is missing
+        # HACK: generate action id
+        action_id = randint(TestActions.MIN_AUTO_ID, 9000000)
+
         # TODO: report error for unknown field_name (neither step nor result)
 
         # search for field nodes in parsed content
@@ -116,7 +120,11 @@ class TestActionDirective(rst.Directive):
             action_node = pylatest.xdocutils.nodes.test_action_node()
             action_name = "test_{}".format(field_name_value)
             action_node.attributes['action_name'] = action_name
-            action_node.attributes['action_id'] = None
+            # TODO: remove this hack when support for old test_{step,result}
+            # directives is dropped, it would be much better to wrap both test
+            # and step nodes into single node so that pairing would be clear
+            # without any weird id hacks
+            action_node.attributes['action_id'] = action_id
             for child_node in field_body_node:
                 action_node += child_node
             node_list.append(action_node)

@@ -334,7 +334,7 @@ def test_actions_plain_autoid_test_action_simple_autoid():
     <div action_id="1" action_name="test_step" class="pylatest_action">
     Ceterum censeo Carthaginem esse delendam.
     </div>
-    <div action_id="1" action_name="test_result" class="pylatest_action">
+    <div action_id="2" action_name="test_result" class="pylatest_action">
     This city is no more ... it has ceased to be ...
     </div>
     </div>
@@ -360,13 +360,13 @@ def test_actions_plain_autoid_test_actions_two_autoid():
     <div action_id="1" action_name="test_step" class="pylatest_action">
     Ceterum censeo Carthaginem esse delendam.
     </div>
-    <div action_id="1" action_name="test_result" class="pylatest_action">
+    <div action_id="2" action_name="test_result" class="pylatest_action">
     This city is no more ... it has ceased to be ...
     </div>
-    <div action_id="2" action_name="test_step" class="pylatest_action">
+    <div action_id="3" action_name="test_step" class="pylatest_action">
     Step foo.
     </div>
-    <div action_id="2" action_name="test_result" class="pylatest_action">
+    <div action_id="3" action_name="test_result" class="pylatest_action">
     Result bar.
     </div>
     </div>
@@ -400,6 +400,10 @@ def test_actions_noplain_autoid_test_action_simple_autoid():
     <tbody valign="top">
     <tr><td>1</td>
     <td>Ceterum censeo Carthaginem esse delendam.</td>
+    <td>&nbsp;</td>
+    </tr>
+    <tr><td>2</td>
+    <td>&nbsp;</td>
     <td>This city is no more ... it has ceased to be ...</td>
     </tr>
     </tbody>
@@ -439,9 +443,13 @@ def test_actions_noplain_autoid_test_actions_two_autoid():
     <tbody valign="top">
     <tr><td>1</td>
     <td>Ceterum censeo Carthaginem esse delendam.</td>
-    <td>This city is no more ... it has ceased to be ...</td>
+    <td>&nbsp;</td>
     </tr>
     <tr><td>2</td>
+    <td>&nbsp;</td>
+    <td>This city is no more ... it has ceased to be ...</td>
+    </tr>
+    <tr><td>3</td>
     <td>Step foo.</td>
     <td>Result bar.</td>
     </tr>
@@ -485,7 +493,7 @@ def test_actions_noplain_autoid_test_actions_two_autoid():
             And this result has no test step.
 
         '''),
-        pytest.mark.xfail(textwrap.dedent('''\
+        textwrap.dedent('''\
         .. test_action::
            :step: List files in the volume: ``ls -a /mnt/helloworld``
            :result: There are no files, output should be empty.
@@ -506,7 +514,7 @@ def test_actions_noplain_autoid_test_actions_two_autoid():
 
         .. test_action::
            :result: And this result has no test step.
-        ''')),
+        '''),
         ])
 def rst_input_full_example(request):
     """

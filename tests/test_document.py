@@ -108,42 +108,49 @@ class TestTestActions(unittest.TestCase):
 
     def test_actions_add_auto_id(self):
         self.actions.add_step("1.step")
-        assert list(self.actions), [(1, '1.step' == None)]
+        assert list(self.actions) == [(1, '1.step', None)]
         self.actions.add_step("2.step")
-        assert list(self.actions) == [(1, '1.step', None), (2, '2.step', None)]
-        self.actions.add_result("2.result")
-        assert list(self.actions) == \
-               [(1, '1.step', None), (2, '2.step', '2.result')]
+        assert list(self.actions) == [
+            (1, '1.step', None),
+            (2, '2.step', None)]
         self.actions.add_result("3.result")
         assert list(self.actions) == [
             (1, '1.step', None),
-            (2, '2.step', '2.result'),
-            (3, None, '3.result'), ]
-        self.actions.add_step("3.step")
+            (2, '2.step', None),
+            (3, None, '3.result')]
+
+    def test_actions_add_auto_id_retval(self):
+        auto_id = self.actions.add_step("step")
+        assert auto_id == 1
+        auto_id = self.actions.add_step("step")
+        assert auto_id == 2
+        auto_id = self.actions.add_result("result")
+        assert auto_id == 3
+
+    def test_actions_add_auto_id_reassign(self):
+        new_id = self.actions.add_step("1.step", 1)
+        assert new_id == 1
+        assert list(self.actions) == [(1, '1.step', None)]
+
+        second_id = pylatest.document.TestActions.MIN_AUTO_ID + 1
+        new_id = self.actions.add_step("2.step", second_id)
+        assert new_id == 2
         assert list(self.actions) == [
             (1, '1.step', None),
-            (2, '2.step', '2.result'),
-            (3, '3.step', '3.result'), ]
+            (2, '2.step', None)]
+        new_id = self.actions.add_result("2.result", second_id)
+        assert new_id == 2
+        assert list(self.actions) == [
+            (1, '1.step', None),
+            (2, '2.step', "2.result")]
 
-    def test_actions_add_auto_id_value(self):
-        auto_id = self.actions.add_step("1.step")
-        assert auto_id == 1
-        auto_id = self.actions.add_step("2.step")
-        assert auto_id == 2
-        auto_id = self.actions.add_result("2.result")
-        assert auto_id == 2
-        auto_id = self.actions.add_result("3.result")
-        assert auto_id == 3
-        auto_id = self.actions.add_step("3.step")
-        assert auto_id == 3
-
-    def test_actions_iter_twofull_auto_id_firstonly(self):
-        self.actions.add("test_step", "1.step", 1)
-        self.actions.add("test_result", "1.result")
-        self.actions.add("test_step", "2.step")
-        self.actions.add("test_result", "2.result")
-        assert list(self.actions) == \
-               [(1, '1.step', '1.result'), (2, '2.step', '2.result')]
+        third_id = pylatest.document.TestActions.MIN_AUTO_ID + 123
+        new_id = self.actions.add_step("3.step", third_id)
+        assert new_id == 3
+        assert list(self.actions) == [
+            (1, '1.step', None),
+            (2, '2.step', "2.result"),
+            (3, '3.step', None)]
 
 
 class TestSection(unittest.TestCase):
