@@ -30,20 +30,6 @@ from docutils.parsers import rst
 import pylatest.xdocutils.nodes
 
 
-def arguments2action_id(arguments):
-    """
-    Converts agruments of Rst Directive into action id.
-
-    Note that *action* is couple of test step and result with the same
-    ``action_id``.
-    """
-    if len(arguments) == 0:
-        action_id = None
-    else:
-        action_id = int(arguments[0])
-    return action_id
-
-
 class OldTestActionDirective(rst.Directive):
     """
     Implementation of ``test_step`` and ``test_result`` directives for
@@ -63,7 +49,7 @@ class OldTestActionDirective(rst.Directive):
         # with action_id == 1
         # note:
         # action is couple of test step and result with the same action_id
-        action_id = arguments2action_id(self.arguments)
+        action_id = int(self.arguments[0])
 
         # parse text content of this directive into anonymous node element
         # (can't be used directly in the tree)
