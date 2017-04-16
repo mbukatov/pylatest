@@ -24,9 +24,10 @@ module.
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
+import time
+
 from docutils import nodes
 from docutils.parsers import rst
-from random import randint
 
 from pylatest.document import TestActions
 import pylatest.xdocutils.nodes
@@ -103,7 +104,8 @@ class TestActionDirective(rst.Directive):
         #                   Output should be empty.
 
         # HACK: generate action id
-        action_id = randint(TestActions.MIN_AUTO_ID, 9000000)
+        action_id = int(time.time() * 1000)
+        assert TestActions.MIN_AUTO_ID < action_id
 
         # TODO: report error for unknown field_name (neither step nor result)
 
