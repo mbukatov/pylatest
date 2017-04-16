@@ -24,27 +24,16 @@ module.
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
+import time
+
 from docutils import nodes
 from docutils.parsers import rst
 
+from pylatest.document import TestActions
 import pylatest.xdocutils.nodes
 
 
-def arguments2action_id(arguments):
-    """
-    Converts agruments of Rst Directive into action id.
-
-    Note that *action* is couple of test step and result with the same
-    ``action_id``.
-    """
-    if len(arguments) == 0:
-        action_id = None
-    else:
-        action_id = int(arguments[0])
-    return action_id
-
-
-class TestActionDirective(rst.Directive):
+class OldTestActionDirective(rst.Directive):
     """
     Implementation of ``test_step`` and ``test_result`` directives for
     either human readable table representation for html output or further
@@ -63,7 +52,7 @@ class TestActionDirective(rst.Directive):
         # with action_id == 1
         # note:
         # action is couple of test step and result with the same action_id
-        action_id = arguments2action_id(self.arguments)
+        action_id = int(self.arguments[0])
 
         # parse text content of this directive into anonymous node element
         # (can't be used directly in the tree)
@@ -82,6 +71,67 @@ class TestActionDirective(rst.Directive):
 
         # and finally return the action node as the only result
         return [action_node]
+
+
+class TestActionDirective(rst.Directive):
+    """
+    Implementation of ``test_action`` directive for either human readable table
+    representation for html output or further processing (aka plain output),
+    eg. checking particular part of resulting document.
+    """
+
+    required_arguments = 0
+    optional_arguments = 0
+    has_content = True
+
+    def run(self):
+        node_list = []
+
+        # parse text content of this directive into anonymous node element
+        # (which can't be used directly in the tree)
+        content_node = nodes.Element()
+        self.state.nested_parse(
+            self.content, self.content_offset, content_node)
+
+        # field list node tree looks like this:
+        #
+        #   <field_list>
+        #       <field>
+        #           <field_name>
+        #               result
+        #           <field_body>
+        #               <paragraph>
+        #                   Output should be empty.
+
+        # HACK: generate action id
+        action_id = int(time.time() * 1000)
+        assert TestActions.MIN_AUTO_ID < action_id
+
+        # TODO: report error for unknown field_name (neither step nor result)
+
+        # search for field nodes in parsed content
+        for field in content_node.traverse(nodes.field):
+            # TODO: better error checking
+            # TODO: find out details of valid states of nodetree of field list
+            # make clear my intentions here (in case something breaks later)
+            assert field[0].tagname == "field_name"
+            assert field[1].tagname == "field_body"
+            field_name_value = field[0][0]  # text node
+            field_body_node = field[1]
+            # create action node
+            action_node = pylatest.xdocutils.nodes.test_action_node()
+            action_name = "test_{}".format(field_name_value)
+            action_node.attributes['action_name'] = action_name
+            # TODO: remove this hack when support for old test_{step,result}
+            # directives is dropped, it would be much better to wrap both test
+            # and step nodes into single node so that pairing would be clear
+            # without any weird id hacks
+            action_node.attributes['action_id'] = action_id
+            for child_node in field_body_node:
+                action_node += child_node
+            node_list.append(action_node)
+
+        return node_list
 
 
 class RequirementDirective(rst.Directive):

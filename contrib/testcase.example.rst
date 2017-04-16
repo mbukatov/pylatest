@@ -42,33 +42,27 @@ Setup
 Test Steps
 ==========
 
-.. test_step:: 1
+.. test_action::
+   :step: List files in the volume: ``ls -a /mnt/helloworld``
+   :result: There are no files, output should be empty.
 
-    List files in the volume: ``ls -a /mnt/helloworld``
+.. test_action::
+   :step:
+       Donec et mollis dolor::
 
-.. test_result:: 1
+           $ foo --extra sth
+           $ bar -vvv
 
-    There are no files, output should be empty.
+   :result:
+       Maecenas congue ligula ac quam viverra nec
+       consectetur ante hendrerit.
 
-.. test_step:: 2
+.. test_action::
+   :step: This one has no matching test result.
 
-    Donec et mollis dolor::
-
-        $ foo --extra sth
-        $ bar -vvv
-
-.. test_result:: 2
-
-    Maecenas congue ligula ac quam viverra nec
-    consectetur ante hendrerit.
-
-.. test_step:: 3
-
-    This one has no matching test result.
-
-.. test_result:: 4
-
-    And this result has no test step.
+.. test_action::
+   :step: And this one has.
+   :result: Here it is.
 
 Teardown
 ========

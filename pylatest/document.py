@@ -65,18 +65,27 @@ class TestActions(object):
     note: htmlplain div element uses just 'step' and 'result' - TODO: refactor?
     """
 
+    MIN_AUTO_ID = 1000000
+    """
+    Minimal value of action id for which new id should be assigned.
+    """
+
     # TODO: consider changing inner representation (replace action_dict with
     # something else).
 
     def __init__(self, enforce_id=True):
         self._actions_dict = {}
         self._enforce_id = enforce_id
+        self._action_id_cache = {}
 
     def __len__(self):
         return len(self._actions_dict)
 
     def __eq__(self, other):
         return self._actions_dict == other._actions_dict
+
+    def __repr__(self):
+        return str(self._actions_dict)
 
     def __iter__(self):
         """
@@ -107,21 +116,25 @@ class TestActions(object):
         for _, _, content in self.iter_action():
             yield content
 
-    def _get_id(self, action_name):
+    def _get_id(self):
         if len(self._actions_dict) == 0:
             return 1
         last_id = max(self._actions_dict.keys())
-        if self._actions_dict[last_id].get(action_name) is None:
-            return last_id
-        else:
-            return last_id + 1
+        return last_id + 1
 
     def add(self, action_name, content, action_id=None):
         if action_name not in self.ACTION_NAMES:
             msg = "invalid action_name: {0}".format(action_name)
             raise PylatestActionsError(msg)
         if action_id is None:
-            action_id = self._get_id(action_name)
+            action_id = self._get_id()
+        elif action_id > TestActions.MIN_AUTO_ID:
+            if action_id in self._action_id_cache:
+                action_id = self._action_id_cache.pop(action_id)
+            else:
+                action_id_auto = action_id
+                action_id = self._get_id()
+                self._action_id_cache[action_id_auto] = action_id
         if self._enforce_id:
             action_dict = self._actions_dict.get(action_id)
             if action_dict is not None \

@@ -28,29 +28,30 @@ Setup
 Test Steps
 ==========
 
-.. test_step:: 1
+.. test_action::
+   :step:
+       TODO: write 1st test step of this test case, make sure you maintain 4
+       space indentation in the whole text section which describes this step.
 
-    TODO: write 1st test step of this test case, make sure you maintain 4 space
-    indentation in the whole text section which describes this step.
+       Using code blocks is possible, just maintain indentation properly::
 
-    Using code blocks is possible, just maintain indentation properly::
+           $$ rpm -q python
+           python-2.7.10-8.fc22.x86_64
+           $$
 
-        $$ rpm -q python
-        python-2.7.10-8.fc22.x86_64
-        $$
+   :result:
+       TODO: write expected result of 1st test step, make sure you maintain 4
+       space indentation in the whole text section which describes this result.
 
-.. test_result:: 1
+.. test_action::
+   :step: Use this style when the instructions are short.
+   :result: There is no need to use block when it's not needed.
 
-    TODO: write expected result of 1st test step, make sure you maintain 4
-    space indentation in the whole text section which describes this result.
-
-.. test_step:: 2
-
-    TODO
-
-.. test_result:: 2
-
-    TODO
+.. test_action::
+   :step:
+       TODO
+   :result:
+       TODO
 
 Teardown
 ========
