@@ -22,9 +22,6 @@ representation of all sections of a test case document.
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-from __future__ import print_function
-import argparse
-
 from lxml import etree
 
 from pylatest.document import TestActions, TestCaseDoc
@@ -127,21 +124,3 @@ def rst2htmlbodytree(rst_content):
         rst_content, writer_name='html', use_plain=True)
     htmlbody_tree = etree.fromstring(parts['html_body'])
     return htmlbody_tree
-
-def main():
-    """
-    Main method of ``pylatest-export`` command line tool.
-    """
-    parser = argparse.ArgumentParser(description='pylatest xml export tool')
-    # TODO: automatic output xml filename based on input filename
-    parser.add_argument(
-        "rstfile",
-        help="filename of testcase to be exported into xml form")
-    args = parser.parse_args()
-
-    # TODO: except IOError
-    with open(args.rstfile, 'r') as src_file:
-        rst_content = src_file.read()
-        htmlbody_tree = rst2htmlbodytree(rst_content)
-        xml_export = export_plainhtml(htmlbody_tree)
-        print(xml_export.tostring())
