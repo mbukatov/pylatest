@@ -1,10 +1,11 @@
 # -*- coding: utf8 -*-
 """
-A setuptools based setup module.
+A setuptools based setup module for Pylatest.
 
 See:
-https://packaging.python.org/en/latest/distributing.html
-https://github.com/pypa/sampleproject
+
+* https://packaging.python.org/en/latest/distributing.html
+* https://github.com/pypa/sampleproject
 """
 
 
@@ -14,9 +15,11 @@ import os
 
 
 long_description="""\
-Pylatest project provides a set of tools which allows you to:
+Pylatest project consists of set of Docutils/Sphinx extensions and related
+tools which allows you to:
 
 * Write a description of a test case using reStructuredText syntax.
+* Maintain test case description as Sphinx project.
 * Include this description into a python source code directly, where it can
   be split into individual sections or actions to be performed, so that the
   description and test automation code are stored next to each other.
@@ -31,7 +34,7 @@ setup(
     # See https://packaging.python.org/en/latest/distributing/#choosing-a-versioning-scheme
     # TODO: connect with git tags?
     version='0.0.5.dev1',
-    description='Testcase description generation tools.',
+    description='Testcase description management tools.',
     long_description=long_description,
     url='http://github.com/mbukatov/pylatest/',
     author='Martin Bukatovič',
