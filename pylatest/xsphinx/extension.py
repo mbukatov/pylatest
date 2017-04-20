@@ -21,6 +21,28 @@ from pylatest.xdocutils import htmltranslator
 from pylatest.xdocutils import nodes
 from pylatest.xdocutils import roles
 from pylatest.xdocutils import transforms
+from pylatest.xsphinx import builders
+
+
+# TODO: replace this hack with a proper solution (see dosctring for details)
+def pylatest_transform_handler(app):
+    """
+    This handler fuction adds pylatest transforms based on value of
+    app.builder.
+
+    Note that this is ugly hack: these transforms are applied after Sphinx
+    parses a reST document so that that they affect doctree cached in
+    `_build/doctree` directory. Which is bad because cached doctree build
+    should be the same no matter which builder is used.
+    """
+    if isinstance(app.builder, builders.XmlExportBuilder):
+        # pylatest transforms for plain format
+        app.add_transform(transforms.TestActionsPlainIdTransform)
+    else:
+        # pylatest transforms for human readable html output,
+        # translates pylatest nodes into nice sections or tables
+        app.add_transform(transforms.TestActionsTableTransform)
+        app.add_transform(transforms.RequirementSectionTransform)
 
 
 def setup(app):
@@ -41,9 +63,11 @@ def setup(app):
         depart_func = getattr(htmltranslator, "depart_" + node_name)
         app.add_node(node_class, html=(visit_func, depart_func))
 
-    # pylatest transforms (translates pylatest nodes into human readable form)
-    app.add_transform(transforms.TestActionsTableTransform)
-    app.add_transform(transforms.RequirementSectionTransform)
+    # pylatest transforms are added based on app.builder value
+    app.connect('builder-inited', pylatest_transform_handler)
+
+    # builder for xmlexport output
+    app.add_builder(builders.XmlExportBuilder)
 
     # sphinx plugin metadata
     return {'version': '0.0.5'}
