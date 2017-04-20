@@ -21,8 +21,12 @@ import codecs
 import logging
 import textwrap
 
+from docutils.io import StringOutput
+from docutils.frontend import OptionParser
 from sphinx.builders import Builder
 from sphinx.util.osutil import ensuredir, os_path
+from sphinx.writers.html import HTMLWriter, HTMLTranslator
+from sphinx.highlighting import PygmentsBridge
 
 from pylatest.xdocutils.nodes import test_action_node
 
@@ -46,9 +50,19 @@ class XmlExportBuilder(Builder):
     out_suffix = '.xml'
     link_suffix = '.xml'  # defaults to matching out_suffix
     supported_image_types = []
+    add_permalinks = False
 
     def init(self):
-        pass
+        # writer object is initialized in prepare_writing method
+        self.writer = None
+        # section numbers for headings in the currently visited document
+        self.secnumbers = {}  # type: Dict[unicode, Tuple[int, ...]]
+        # figure numbers
+        self.fignumbers = {}
+        # currently written docname
+        self.current_docname = None  # type: unicode
+        self.translator_class = HTMLTranslator
+        self.init_highlighter()
 
     # TODO: proper implementation
     def get_target_uri(self, docname, typ=None):
@@ -76,7 +90,25 @@ class XmlExportBuilder(Builder):
     def prepare_writing(self, docnames):
         # type: (Set[unicode]) -> None
         """A place where you can add logic before :meth:`write_doc` is run"""
-        pass
+        self.writer = HTMLWriter(self)
+        self.settings = OptionParser(
+            defaults=self.env.settings,
+            components=(self.writer,),
+            read_config_files=True).get_default_values()
+        self.settings.compact_lists = bool(self.config.html_compact_lists)
+
+    # from StandaloneHTMLBuilder
+    def init_highlighter(self):
+        # type: () -> None
+        # determine Pygments style and create the highlighter
+        if self.config.pygments_style is not None:
+            style = self.config.pygments_style
+        elif self.theme:
+            style = self.theme.get_confstr('theme', 'pygments_style', 'none')
+        else:
+            style = 'sphinx'
+        self.highlighter = PygmentsBridge('html', style,
+                                          self.config.trim_doctest_flags)
 
     def write_doc(self, docname, doctree):
         # type: (unicode, nodes.Node) -> None
@@ -95,10 +127,15 @@ class XmlExportBuilder(Builder):
         template = textwrap.dedent('''\
         <?xml version="1.0" encoding="utf-8" ?>
         <xmlexport>
-        Content of {} test case.
+        <!-- content of {0} test case -->
+        {1}
         </xmlexport>
         ''')
-        output = template.format(docname)
+        destination = StringOutput(encoding='utf-8')  # TODO: what is this?
+        doctree.settings = self.settings
+        self.current_docname = docname
+        self.writer.write(doctree, destination)
+        output = template.format(docname, self.writer.output)
 
         # write content into file
         outfilename = path.join(self.outdir, os_path(docname) + self.out_suffix)
