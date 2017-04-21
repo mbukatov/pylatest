@@ -78,46 +78,6 @@ def add_section_div(elem, section_id):
     return div_el
 
 
-class TestRst2HtmlBodyTree(unittest.TestCase):
-    """
-    Tests of ``pylatest.export.rst2htmlbodytree`` function.
-    """
-
-    def setUp(self):
-        # show full diff (note: python3 unittest diff is much better)
-        self.maxDiff = None
-        # register pylatest docutils extensions for htmlplain output
-        register_all(use_plain=True)
-
-    def test_rst2htmlbodytree_empty(self):
-        assert etree.tostring(export.rst2htmlbodytree("")) == \
-               get_empty_body_str()
-
-    def test_rst2htmlbodytree_singleline(self):
-        rst_content = textwrap.dedent('''\
-        This is just a test.
-        ''')
-        html_body = export.rst2htmlbodytree(rst_content)
-        # construct expected tree
-        html_body_expected, p_el = get_singleparagraph_body_tree()
-        p_el.text = "This is just a test."
-        assert etree.tostring(html_body) == etree.tostring(html_body_expected)
-
-    def test_rst2htmlbodytree_pylatest_htmlplain(self):
-        rst_content = textwrap.dedent('''\
-        .. test_step:: 1
-
-            This is just a test.
-        ''')
-        # TODO: if the pylatest directive is unknown, error goes to stderr!
-        html_body = export.rst2htmlbodytree(rst_content)
-        # construct expected tree
-        html_body_expected = get_empty_body_tree()
-        div_el = add_action_div(html_body_expected, '1', 'test_step')
-        div_el.text = '\nThis is just a test.\n'
-        assert etree.tostring(html_body) == etree.tostring(html_body_expected)
-
-
 class TestGetStuffFromHtmlPlain(unittest.TestCase):
     """
     Tests of functions extracting data from htmlplain format.

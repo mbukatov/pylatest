@@ -25,7 +25,6 @@ representation of all sections of a test case document.
 from lxml import etree
 
 from pylatest.document import TestActions, TestCaseDoc
-from pylatest.xdocutils.core import pylatest_publish_parts
 
 
 class XmlExportDoc(object):
@@ -114,13 +113,3 @@ def export_plainhtml(body_tree):
         xml_export.add_section(section, content)
     # TODO: process test metadata, also use local configuration of defaults
     return xml_export
-
-def rst2htmlbodytree(rst_content):
-    """
-    Translate given string which contains a content of rst file into processing
-    friendly "pylatest plain html" xml tree.
-    """
-    parts = pylatest_publish_parts(
-        rst_content, writer_name='html', use_plain=True)
-    htmlbody_tree = etree.fromstring(parts['html_body'])
-    return htmlbody_tree
