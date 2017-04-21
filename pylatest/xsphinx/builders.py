@@ -14,6 +14,35 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+# This file incorporates work covered by the following copyright and
+# permission notice:
+#
+#    Copyright (c) 2007-2017 by the Sphinx team (see AUTHORS file).
+#    All rights reserved.
+#
+#    Redistribution and use in source and binary forms, with or without
+#    modification, are permitted provided that the following conditions are
+#    met:
+#
+#    * Redistributions of source code must retain the above copyright
+#      notice, this list of conditions and the following disclaimer.
+#
+#    * Redistributions in binary form must reproduce the above copyright
+#      notice, this list of conditions and the following disclaimer in the
+#      documentation and/or other materials provided with the distribution.
+#
+#    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+#    "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+#    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+#    A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+#    OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+#    SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+#    LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+#    DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+#    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+#    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+#    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 from os import path
@@ -36,19 +65,24 @@ logger = logging.getLogger(__name__)
 
 class XmlExportBuilder(Builder):
     """
-    Builds XML export format.
+    Builds XML export file with html content.
+
+    The builder extends base Builder class with as minimal extra attributes as
+    possible to use HTMLWriter (sphinx html writer). I originally wanted to
+    extend StandaloneHTMLBuilder instead, but I would need to disable most of
+    it's functionality anyway.
     """
-    # The builder's name, for the -b command line option.
+    # the builder's name, for the -b command line option
     name = 'xmlexport'
-    # The builder's output format, or '' if no document output is produced.
-    # Used for self.tags only (instance of sphinx.util.tags.Tags)
-    format = 'xmlexport'
-    # Allow parallel write_doc() calls.
+    # the builder's output format, or '' if no document output is produced,
+    # value used for self.tags (instance of sphinx.util.tags.Tags)
+    format = 'html'
+    # allow parallel write_doc() calls
     allow_parallel = False
 
     # from StandaloneHTMLBuilder, not directly mentioned in Builder
     out_suffix = '.xml'
-    link_suffix = '.xml'  # defaults to matching out_suffix
+    link_suffix = '.xml'
     supported_image_types = []
     add_permalinks = False
 
@@ -56,13 +90,18 @@ class XmlExportBuilder(Builder):
         # writer object is initialized in prepare_writing method
         self.writer = None
         # section numbers for headings in the currently visited document
-        self.secnumbers = {}  # type: Dict[unicode, Tuple[int, ...]]
+        self.secnumbers = {}
         # figure numbers
         self.fignumbers = {}
         # currently written docname
         self.current_docname = None  # type: unicode
+        # docutils translator
         self.translator_class = HTMLTranslator
-        self.init_highlighter()
+        # sphinx highlighter, from StandaloneHTMLBuilder.init_highlighter()
+        self.highlighter = PygmentsBridge(
+            'html',
+            'sphinx',
+            self.config.trim_doctest_flags)
 
     # TODO: proper implementation
     def get_target_uri(self, docname, typ=None):
@@ -97,19 +136,6 @@ class XmlExportBuilder(Builder):
             read_config_files=True).get_default_values()
         self.settings.compact_lists = bool(self.config.html_compact_lists)
 
-    # from StandaloneHTMLBuilder
-    def init_highlighter(self):
-        # type: () -> None
-        # determine Pygments style and create the highlighter
-        if self.config.pygments_style is not None:
-            style = self.config.pygments_style
-        elif self.theme:
-            style = self.theme.get_confstr('theme', 'pygments_style', 'none')
-        else:
-            style = 'sphinx'
-        self.highlighter = PygmentsBridge('html', style,
-                                          self.config.trim_doctest_flags)
-
     def write_doc(self, docname, doctree):
         # type: (unicode, nodes.Node) -> None
         """Where you actually write something to the filesystem."""
@@ -138,7 +164,8 @@ class XmlExportBuilder(Builder):
         output = template.format(docname, self.writer.output)
 
         # write content into file
-        outfilename = path.join(self.outdir, os_path(docname) + self.out_suffix)
+        outfilename = path.join(
+            self.outdir, os_path(docname) + self.out_suffix)
         ensuredir(path.dirname(outfilename))
         try:
             with codecs.open(outfilename, 'w', 'utf-8') as f:  # type: ignore
