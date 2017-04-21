@@ -249,39 +249,25 @@ class TestCaseDoc(object):
         return False
 
 
-class RstTestCaseDoc(TestCaseDoc):
+class TestCaseDocWithContent(TestCaseDoc):
     """
-    Pylatest test case document in ReStructuredText format.
-
-    This class handles content as well, not just a document structure.
-
-    The content is stored in rst string fragmens which could contain either:
-
-    * one (or more) sections (eg. Description, Setup, Test Steps, Teardown)
-    * one (or more) pylatest actions (test_step or test_result directives)
-
-    Those two fragment sets are then combined to produce the rst string version
-    of the document.
+    Base class of pylatest test case document with content.
     """
 
     def __init__(self):
         self._test_actions = TestActions()
         # dictionary: Section -> string with rst source of given section.
         self._section_dict = {}
-        # name of python source file from which this document was extracted
-        # TODO: set a proper value (lineno values are specified wrt this file)
-        self._source_file = None
 
     def __eq__(self, other):
         return (self._section_dict == other._section_dict and
                 self._test_actions == other._test_actions)
 
-    def add_section(self, section, content, lineno=None):
+    def add_section(self, section, content):
         """
         Add string fragment which contains given sections.
         """
         self._section_dict[section] = content
-        # TODO: process lineno
 
     def get_section(self, section):
         """
@@ -298,12 +284,11 @@ class RstTestCaseDoc(TestCaseDoc):
             raise PylatestDocumentError(msg.format(section))
         return content
 
-    def add_test_action(self, action_name, content, action_id, lineno=None):
+    def add_test_action(self, action_name, content, action_id):
         """
         Add docstring which contains some test step or result directives.
         """
         self._test_actions.add(action_name, content, action_id)
-        # TODO: process lineno
 
     def is_empty(self):
         """
@@ -336,6 +321,43 @@ class RstTestCaseDoc(TestCaseDoc):
                 continue
             missing_list.append(section)
         return missing_list
+
+
+class RstTestCaseDoc(TestCaseDocWithContent):
+    """
+    Pylatest test case document in ReStructuredText format.
+
+    This class handles content as well, not just a document structure.
+
+    The content is stored in rst string fragmens which could contain either:
+
+    * one (or more) sections (eg. Description, Setup, Test Steps, Teardown)
+    * one (or more) pylatest actions (test_step or test_result directives)
+
+    Those two fragment sets are then combined to produce the rst string version
+    of the document.
+    """
+
+    def __init__(self):
+        super(RstTestCaseDoc, self).__init__()
+        # name of python source file from which this document was extracted
+        # TODO: set a proper value (lineno values are specified wrt this file)
+        self._source_file = None
+
+    def add_section(self, section, content, lineno=None):
+        """
+        Add string fragment which contains given sections.
+        """
+        super(RstTestCaseDoc, self).add_section(section, content)
+        # TODO: process lineno
+
+    def add_test_action(self, action_name, content, action_id, lineno=None):
+        """
+        Add docstring which contains some test step or result directives.
+        """
+        super(RstTestCaseDoc, self).add_test_action(
+            action_name, content, action_id)
+        # TODO: process lineno
 
     def build_rst(self):
         """
