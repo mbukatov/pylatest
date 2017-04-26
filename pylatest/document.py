@@ -23,6 +23,9 @@ types (eg. list of section titles) and other general functions.
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
+from lxml import etree
+
+
 class PylatestDocumentError(Exception):
     pass
 
@@ -418,3 +421,63 @@ class XmlExportTestCaseDoc(TestCaseDocWithContent):
         Add test case metadata entry into xml export document.
         """
         self.metadata[attr_name] = content
+
+    def build_element_tree(self):
+        """
+        Generate element tree representation of xml document.
+        """
+        # TODO: add mandatory 'project-id' attribute
+        xml_tree = etree.Element('testcases')
+        # TODO: check if we need to use these 'properties' for something here
+        # resp_properties = etree.SubElement(xml_tree, 'response-properties')
+        # properties = etree.SubElement(xml_tree, 'properties')
+        testcase = etree.SubElement(xml_tree, 'testcase')
+        # set tile
+        if self.title is not None:
+            title = etree.SubElement(testcase, 'title')
+            title.text = self.title
+        # set description
+        if self.DESCR in self.sections:
+            description = etree.SubElement(testcase, 'description')
+            description.append(self.get_section(self.DESCR))
+        # set test actions
+        if len(self._test_actions) > 0:
+            actions = etree.SubElement(testcase, 'test-steps')
+        for action_id, step_html, result_html in self._test_actions:
+            action = etree.SubElement(actions, 'test-step')
+            if step_html is not None:
+                step = etree.SubElement(
+                    action,
+                    'test-step-column',
+                    attrib={'id': 'step'})
+                step.append(step_html)
+            if result_html is not None:
+                result = etree.SubElement(
+                    action,
+                    'test-step-column',
+                    attrib={'id': 'expectedResult'})
+                result.append(result_html)
+        # set metadata
+        if len(self.metadata) > 0:
+            custom_fields = etree.SubElement(testcase, 'custom-fields')
+        for attr_name, content in self.metadata.items():
+            etree.SubElement(
+                custom_fields,
+                'custom-field',
+                attrib={'id': attr_name, 'content': content})
+        # TODO: set setup and teardown
+        # TODO: implement linking
+        # linked_wis = etree.SubElement(xml_tree, 'linked-work-items')
+        return xml_tree
+
+    def build_xml_string(self):
+        """
+        Generate a string representation of xml document.
+        """
+        xml_tree = self.build_element_tree()
+        content_b = etree.tostring(
+            xml_tree,
+            xml_declaration=True,
+            encoding='utf-8',
+            pretty_print=True)
+        return content_b.decode('utf-8')

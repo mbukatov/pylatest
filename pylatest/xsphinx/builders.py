@@ -48,7 +48,6 @@
 from os import path
 import codecs
 import logging
-import textwrap
 
 from docutils.io import StringOutput
 from docutils.frontend import OptionParser
@@ -58,6 +57,7 @@ from sphinx.writers.html import HTMLWriter, HTMLTranslator
 from sphinx.highlighting import PygmentsBridge
 
 from pylatest.xdocutils.nodes import test_action_node
+from pylatest.export import build_xml_testcase_doc
 
 
 logger = logging.getLogger(__name__)
@@ -149,19 +149,15 @@ class XmlExportBuilder(Builder):
         if not is_testcase_doc:
             return
 
-        # TODO: produce actual content
-        template = textwrap.dedent('''\
-        <?xml version="1.0" encoding="utf-8" ?>
-        <xmlexport>
-        <!-- content of {0} test case -->
-        {1}
-        </xmlexport>
-        ''')
+        # generate html output from the doctree
         destination = StringOutput(encoding='utf-8')  # TODO: what is this?
         doctree.settings = self.settings
         self.current_docname = docname
         self.writer.write(doctree, destination)
-        output = template.format(docname, self.writer.output)
+
+        # generate content of target xml file based on html output
+        doc = build_xml_testcase_doc(self.writer.output)
+        content = doc.build_xml_string()
 
         # write content into file
         outfilename = path.join(
@@ -169,7 +165,7 @@ class XmlExportBuilder(Builder):
         ensuredir(path.dirname(outfilename))
         try:
             with codecs.open(outfilename, 'w', 'utf-8') as f:  # type: ignore
-                f.write(output)
+                f.write(content)
         except (IOError, OSError) as err:
             logger.warning("error writing file %s: %s", outfilename, err)
 
