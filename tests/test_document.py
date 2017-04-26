@@ -23,6 +23,7 @@ import os
 import pytest
 
 from pylatest.document import Section, TestCaseDoc, RstTestCaseDoc
+from pylatest.document import XmlExportTestCaseDoc
 import pylatest.document
 
 
@@ -604,3 +605,31 @@ class TestRstTestCaseDocBuild(unittest.TestCase):
         # and add test case section
         tc.add_section(TestCaseDoc.STEPS, section_content)
         assert tc.build_rst() == expected_rst
+
+
+class TestXmlExportTestCaseDoc(unittest.TestCase):
+
+    def test_xmltestcasedoc_sections(self):
+        for section in XmlExportTestCaseDoc.SECTIONS:
+            assert section.html_id is not None
+
+    def test_xmltestcasedoc_empty(self):
+        tc = XmlExportTestCaseDoc("Test Case Title Example")
+        assert tc.is_empty()
+        assert tc.sections == []
+        # TODO: when missing_sections is implemented for xml export doc
+        # assert tc.missing_sections == XmlExportTestCaseDoc.SECTIONS_ALL
+
+    def test_xmltestcasedoc_eq_empty(self):
+        tc1 = XmlExportTestCaseDoc(title="Example")
+        tc2 = XmlExportTestCaseDoc(title="Example")
+        assert tc1 == tc2
+
+    def test_xmltestcasedoc_add_metadata(self):
+        tc = XmlExportTestCaseDoc()
+        assert tc.is_empty()
+        assert len(tc.metadata) == 0
+        tc.add_metadata("importance", "critical")
+        assert not tc.is_empty()
+        assert len(tc.metadata) == 1
+        assert tc.metadata.get("importance") == "critical"

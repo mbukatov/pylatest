@@ -231,12 +231,6 @@ class TestCaseDoc(object):
     including HEADER pseudo section.
     """
 
-    # TODO: remove during further refactoring?
-    SECTIONS_PLAINHTML = [s.html_id for s in SECTIONS if s.html_id is not None]
-    """
-    List of ids of expected sections in plainhtml export of pylatest document.
-    """
-
     @classmethod
     def has_section(cls, title):
         """
@@ -387,3 +381,40 @@ class RstTestCaseDoc(TestCaseDocWithContent):
             elif content is not None:
                 result_list.append(content)
         return "\n".join(result_list)
+
+
+class XmlExportTestCaseDoc(TestCaseDocWithContent):
+    """
+    XML export document.
+    """
+
+    SECTIONS = [
+        TestCaseDocWithContent.DESCR,
+        TestCaseDocWithContent.SETUP,
+        TestCaseDocWithContent.TEARD]
+    """
+    List of sections expected in pylatest xml export document.
+    """
+
+    def __init__(self, title=None):
+        super(XmlExportTestCaseDoc, self).__init__()
+        self.metadata = {}
+        self.title = title
+
+    def __eq__(self, other):
+        return (super(XmlExportTestCaseDoc, self).__eq__(other) and
+                self.metadata == other.metadata and
+                self.title == other.title)
+
+    def is_empty(self):
+        """
+        Return True if the document is empty.
+        """
+        return (super(XmlExportTestCaseDoc, self).is_empty() and
+                len(self.metadata) == 0)
+
+    def add_metadata(self, attr_name, content):
+        """
+        Add test case metadata entry into xml export document.
+        """
+        self.metadata[attr_name] = content
