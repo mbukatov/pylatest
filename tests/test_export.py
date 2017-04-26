@@ -328,3 +328,123 @@ def test_get_title_empty(empty_html_tree):
 
 def test_get_title_fulltestcase(fulltestcase_html_tree):
     assert export.get_title(fulltestcase_html_tree) == "Hello World Test Case"
+
+
+# TODO: what should happen here? now it raises lxml.etree.XMLSyntaxError
+@pytest.mark.xfail
+def test_build_xml_testcase_doc_null():
+    assert export.build_xml_testcase_doc("") == XmlExportTestCaseDoc()
+
+
+def test_build_xml_testcase_doc_empty(empty_html_string):
+    assert export.build_xml_testcase_doc(empty_html_string) == XmlExportTestCaseDoc()
+
+
+def test_build_xml_testcase_doc_fulltestcase_title(fulltestcase_html_string):
+    doc = export.build_xml_testcase_doc(fulltestcase_html_string)
+    assert doc.title == "Hello World Test Case"
+
+
+def test_build_xml_testcase_doc_fulltestcase_metadata(fulltestcase_html_string):
+    doc = export.build_xml_testcase_doc(fulltestcase_html_string)
+    # check metadata
+    exp_metadata = {
+        'author': 'foo@example.com',
+        'date': '2015-11-06',
+        'comment': 'Some value here.',
+        'empty': '',
+        }
+    assert doc.metadata == exp_metadata
+
+
+def test_build_xml_testcase_doc_fulltestcase_sections(fulltestcase_html_string):
+    doc = export.build_xml_testcase_doc(fulltestcase_html_string)
+    # check state of the doc
+    assert not doc.is_empty()
+    assert XmlExportTestCaseDoc.DESCR in doc.sections
+    assert XmlExportTestCaseDoc.SETUP in doc.sections
+    assert XmlExportTestCaseDoc.TEARD in doc.sections
+    # check actual content
+    exp_descr_content = textwrap.dedent('''\
+    <div xmlns="http://www.w3.org/1999/xhtml" class="section" id="description">
+    <p>This is just demonstration of usage of pylatest rst directives and expected
+    structure of rst document.</p>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus.
+    Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec
+    consectetur ante hendrerit. Donec et mollis dolor. Praesent et diam eget libero
+    egestas mattis sit amet vitae augue.</p>
+    </div>
+    ''')
+    assert etree.tostring(doc.get_section(XmlExportTestCaseDoc.DESCR)).decode('utf-8') == exp_descr_content
+    exp_setup_content = textwrap.dedent('''\
+    <div xmlns="http://www.w3.org/1999/xhtml" class="section" id="setup">
+    <ol class="arabic">
+    <li><p class="first">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam
+    lectus. Sed sit amet ipsum mauris.</p>
+    </li>
+    <li><p class="first">Use lvm disk paritioning and Leave 10G free space in volume
+    called <code class="docutils literal"><span class="pre">lv_helloword</span></code>.</p>
+    </li>
+    <li><p class="first">When the system is installed, format <code class="docutils literal"><span class="pre">lv_helloword</span></code> volume with
+    brtfs using <code class="docutils literal"><span class="pre">--super</span> <span class="pre">--special</span> <span class="pre">--options</span></code>.</p>
+    </li>
+    <li><p class="first">Mount it on a client:</p>
+    <div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># mount -t btrfs /dev/mapper/vg_fedora/lv_helloword /mnt/helloworld</span>
+    </pre></div>
+    </div>
+    </li>
+    <li><p class="first">Ceterum censeo, lorem ipsum:</p>
+    <div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># dnf install foobar</span>
+    <span class="c1"># systemctl enable foobard</span>
+    </pre></div>
+    </div>
+    </li>
+    </ol>
+    </div>
+    ''')
+    assert etree.tostring(doc.get_section(XmlExportTestCaseDoc.SETUP)).decode('utf-8') == exp_setup_content
+    exp_teard_content = textwrap.dedent('''\
+    <div xmlns="http://www.w3.org/1999/xhtml" class="section" id="teardown">
+    <ol class="arabic simple">
+    <li>Lorem ipsum dolor sit amet: <code class="docutils literal"><span class="pre">rm</span> <span class="pre">-rf</span> <span class="pre">/mnt/helloworld</span></code>.</li>
+    <li>Umount and remove <code class="docutils literal"><span class="pre">lv_helloword</span></code> volume.</li>
+    <li>The end.</li>
+    </ol>
+    </div>
+    ''')
+    assert etree.tostring(doc.get_section(XmlExportTestCaseDoc.TEARD)).decode('utf-8') == exp_teard_content
+
+
+def test_build_xml_testcase_doc_fulltestcase_actions(fulltestcase_html_string):
+    doc = export.build_xml_testcase_doc(fulltestcase_html_string)
+    # check state of the doc
+    assert len(doc._test_actions) == 4
+    # get iterator for all test actions
+    actions_i = iter(doc._test_actions)
+    # check content of 1st action
+    exp_step_content = textwrap.dedent('''\
+    <div xmlns="http://www.w3.org/1999/xhtml" action_id="1" action_name="test_step" class="pylatest_action">
+    List files in the volume: <code class="docutils literal"><span class="pre">ls</span> <span class="pre">-a</span> <span class="pre">/mnt/helloworld</span></code>
+    </div>
+    ''')
+    exp_result_content = textwrap.dedent('''\
+    <div xmlns="http://www.w3.org/1999/xhtml" action_id="1" action_name="test_result" class="pylatest_action">
+    There are no files, output should be empty.
+    </div>
+    ''')
+    action_id, step_el, result_el = next(actions_i)
+    assert action_id == 1
+    assert etree.tostring(step_el).decode('utf-8') == exp_step_content
+    assert etree.tostring(result_el).decode('utf-8') == exp_result_content
+    # ignoring 2nd action
+    next(actions_i)
+    # check content of 3th action
+    exp_step_content = textwrap.dedent('''\
+    <div xmlns="http://www.w3.org/1999/xhtml" action_id="3" action_name="test_step" class="pylatest_action">
+    This one has no matching test result.
+    </div>
+    ''')
+    action_id, step_el, result_el = next(actions_i)
+    assert action_id == 3
+    assert etree.tostring(step_el).decode('utf-8') == exp_step_content
+    assert result_el == None

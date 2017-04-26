@@ -24,11 +24,11 @@ docutils rendered html representation of all sections of a test case document.
 
 from lxml import etree
 
-from pylatest.document import TestActions, XmlExportTestCaseDoc
+from pylatest.document import XmlExportTestCaseDoc
 
 
 # xml namespaces
-NS = {'html':'http://www.w3.org/1999/xhtml'}
+NS = {'html': 'http://www.w3.org/1999/xhtml'}
 
 # HTML namespace URI in lxml notation, see:
 # http://lxml.de/tutorial.html#namespaces
@@ -40,7 +40,8 @@ def get_actions(tree):
     Extracts pylatest actions from given html tree.
     """
     actions = []
-    for div_el in tree.xpath('//html:div[@class="pylatest_action"]', namespaces=NS):
+    for div_el in tree.xpath(
+            '//html:div[@class="pylatest_action"]', namespaces=NS):
         action_id = int(div_el.get("action_id"))
         action_name = div_el.get("action_name")
         actions.append((action_id, action_name, div_el))
@@ -58,10 +59,11 @@ def get_metadata(tree):
         namespaces=NS)
     if len(fl_tables) == 0:
         return metadata
-    # we process only 1st field list we find, assuming it's the one with metadata
-    # we also assume that sphinx disables docinfo transform
+    # we process only 1st field list we find, assuming it's the one with
+    # metadata, we also assume that sphinx disables docinfo transform
     fl_el = fl_tables[0]
-    for f_el in fl_el.xpath('//html:tr[contains(@class, "field")]', namespaces=NS):
+    for f_el in fl_el.xpath(
+            '//html:tr[contains(@class, "field")]', namespaces=NS):
         name = f_el.xpath('./html:th[@class="field-name"]', namespaces=NS)[0]
         body = f_el.xpath('./html:td[@class="field-body"]', namespaces=NS)[0]
         # polish field name value, we expect that name element looks like this:
@@ -101,3 +103,30 @@ def get_title(tree):
         return None
     # return text value of the element with title
     return el_list[0].text
+
+
+def build_xml_testcase_doc(html_source):
+    """
+    Create xml export document (instance of XmlExportTestCaseDoc) for given
+    test case html source string.
+    """
+    html_tree = etree.fromstring(html_source.encode("utf8"))
+    title = get_title(html_tree)
+    doc = XmlExportTestCaseDoc(title)
+
+    # extract metadata from html_tree
+    for attr_name, content in get_metadata(html_tree):
+        doc.add_metadata(attr_name, content)
+
+    # extract sections from html_tree
+    for section in XmlExportTestCaseDoc.SECTIONS:
+        content = get_section(html_tree, section.html_id)
+        if content is None:
+            continue
+        doc.add_section(section, content)
+
+    # check all pylatest action div elements
+    for action_id, action_name, el in get_actions(html_tree):
+        doc.add_test_action(action_name, el, action_id)
+
+    return doc
