@@ -330,8 +330,6 @@ def test_get_title_fulltestcase(fulltestcase_html_tree):
     assert export.get_title(fulltestcase_html_tree) == "Hello World Test Case"
 
 
-# TODO: what should happen here? now it raises lxml.etree.XMLSyntaxError
-@pytest.mark.xfail
 def test_build_xml_testcase_doc_null():
     assert export.build_xml_testcase_doc("") == XmlExportTestCaseDoc()
 

@@ -110,6 +110,10 @@ def build_xml_testcase_doc(html_source):
     Create xml export document (instance of XmlExportTestCaseDoc) for given
     test case html source string.
     """
+    # return empty doc for empty input string
+    if len(html_source) == 0:
+        return XmlExportTestCaseDoc()
+
     html_tree = etree.fromstring(html_source.encode("utf8"))
     title = get_title(html_tree)
     doc = XmlExportTestCaseDoc(title)
