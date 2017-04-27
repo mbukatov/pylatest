@@ -23,6 +23,9 @@ types (eg. list of section titles) and other general functions.
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
+from lxml import etree
+
+
 class PylatestDocumentError(Exception):
     pass
 
@@ -231,12 +234,6 @@ class TestCaseDoc(object):
     including HEADER pseudo section.
     """
 
-    # TODO: remove during further refactoring?
-    SECTIONS_PLAINHTML = [s.html_id for s in SECTIONS if s.html_id is not None]
-    """
-    List of ids of expected sections in plainhtml export of pylatest document.
-    """
-
     @classmethod
     def has_section(cls, title):
         """
@@ -249,39 +246,25 @@ class TestCaseDoc(object):
         return False
 
 
-class RstTestCaseDoc(TestCaseDoc):
+class TestCaseDocWithContent(TestCaseDoc):
     """
-    Pylatest test case document in ReStructuredText format.
-
-    This class handles content as well, not just a document structure.
-
-    The content is stored in rst string fragmens which could contain either:
-
-    * one (or more) sections (eg. Description, Setup, Test Steps, Teardown)
-    * one (or more) pylatest actions (test_step or test_result directives)
-
-    Those two fragment sets are then combined to produce the rst string version
-    of the document.
+    Base class of pylatest test case document with content.
     """
 
     def __init__(self):
         self._test_actions = TestActions()
         # dictionary: Section -> string with rst source of given section.
         self._section_dict = {}
-        # name of python source file from which this document was extracted
-        # TODO: set a proper value (lineno values are specified wrt this file)
-        self._source_file = None
 
     def __eq__(self, other):
         return (self._section_dict == other._section_dict and
                 self._test_actions == other._test_actions)
 
-    def add_section(self, section, content, lineno=None):
+    def add_section(self, section, content):
         """
         Add string fragment which contains given sections.
         """
         self._section_dict[section] = content
-        # TODO: process lineno
 
     def get_section(self, section):
         """
@@ -298,12 +281,11 @@ class RstTestCaseDoc(TestCaseDoc):
             raise PylatestDocumentError(msg.format(section))
         return content
 
-    def add_test_action(self, action_name, content, action_id, lineno=None):
+    def add_test_action(self, action_name, content, action_id):
         """
         Add docstring which contains some test step or result directives.
         """
         self._test_actions.add(action_name, content, action_id)
-        # TODO: process lineno
 
     def is_empty(self):
         """
@@ -337,6 +319,43 @@ class RstTestCaseDoc(TestCaseDoc):
             missing_list.append(section)
         return missing_list
 
+
+class RstTestCaseDoc(TestCaseDocWithContent):
+    """
+    Pylatest test case document in ReStructuredText format.
+
+    This class handles content as well, not just a document structure.
+
+    The content is stored in rst string fragmens which could contain either:
+
+    * one (or more) sections (eg. Description, Setup, Test Steps, Teardown)
+    * one (or more) pylatest actions (test_step or test_result directives)
+
+    Those two fragment sets are then combined to produce the rst string version
+    of the document.
+    """
+
+    def __init__(self):
+        super(RstTestCaseDoc, self).__init__()
+        # name of python source file from which this document was extracted
+        # TODO: set a proper value (lineno values are specified wrt this file)
+        self._source_file = None
+
+    def add_section(self, section, content, lineno=None):
+        """
+        Add string fragment which contains given sections.
+        """
+        super(RstTestCaseDoc, self).add_section(section, content)
+        # TODO: process lineno
+
+    def add_test_action(self, action_name, content, action_id, lineno=None):
+        """
+        Add docstring which contains some test step or result directives.
+        """
+        super(RstTestCaseDoc, self).add_test_action(
+            action_name, content, action_id)
+        # TODO: process lineno
+
     def build_rst(self):
         """
         Generate rst document.
@@ -365,3 +384,100 @@ class RstTestCaseDoc(TestCaseDoc):
             elif content is not None:
                 result_list.append(content)
         return "\n".join(result_list)
+
+
+class XmlExportTestCaseDoc(TestCaseDocWithContent):
+    """
+    XML export document.
+    """
+
+    SECTIONS = [
+        TestCaseDocWithContent.DESCR,
+        TestCaseDocWithContent.SETUP,
+        TestCaseDocWithContent.TEARD]
+    """
+    List of sections expected in pylatest xml export document.
+    """
+
+    def __init__(self, title=None):
+        super(XmlExportTestCaseDoc, self).__init__()
+        self.metadata = {}
+        self.title = title
+
+    def __eq__(self, other):
+        return (super(XmlExportTestCaseDoc, self).__eq__(other) and
+                self.metadata == other.metadata and
+                self.title == other.title)
+
+    def is_empty(self):
+        """
+        Return True if the document is empty.
+        """
+        return (super(XmlExportTestCaseDoc, self).is_empty() and
+                len(self.metadata) == 0)
+
+    def add_metadata(self, attr_name, content):
+        """
+        Add test case metadata entry into xml export document.
+        """
+        self.metadata[attr_name] = content
+
+    def build_element_tree(self):
+        """
+        Generate element tree representation of xml document.
+        """
+        # TODO: add mandatory 'project-id' attribute
+        xml_tree = etree.Element('testcases')
+        # TODO: check if we need to use these 'properties' for something here
+        # resp_properties = etree.SubElement(xml_tree, 'response-properties')
+        # properties = etree.SubElement(xml_tree, 'properties')
+        testcase = etree.SubElement(xml_tree, 'testcase')
+        # set tile
+        if self.title is not None:
+            title = etree.SubElement(testcase, 'title')
+            title.text = self.title
+        # set description
+        if self.DESCR in self.sections:
+            description = etree.SubElement(testcase, 'description')
+            description.append(self.get_section(self.DESCR))
+        # set test actions
+        if len(self._test_actions) > 0:
+            actions = etree.SubElement(testcase, 'test-steps')
+        for action_id, step_html, result_html in self._test_actions:
+            action = etree.SubElement(actions, 'test-step')
+            if step_html is not None:
+                step = etree.SubElement(
+                    action,
+                    'test-step-column',
+                    attrib={'id': 'step'})
+                step.append(step_html)
+            if result_html is not None:
+                result = etree.SubElement(
+                    action,
+                    'test-step-column',
+                    attrib={'id': 'expectedResult'})
+                result.append(result_html)
+        # set metadata
+        if len(self.metadata) > 0:
+            custom_fields = etree.SubElement(testcase, 'custom-fields')
+        for attr_name, content in self.metadata.items():
+            etree.SubElement(
+                custom_fields,
+                'custom-field',
+                attrib={'id': attr_name, 'content': content})
+        # TODO: set setup and teardown
+        # TODO: implement linking
+        # linked_wis = etree.SubElement(xml_tree, 'linked-work-items')
+        return xml_tree
+
+    def build_xml_string(self):
+        """
+        Generate a string representation of xml document.
+        """
+        xml_tree = self.build_element_tree()
+        content_b = etree.tostring(
+            xml_tree,
+            xml_declaration=True,
+            encoding='utf-8',
+            pretty_print=True)
+        return content_b.decode('utf-8')

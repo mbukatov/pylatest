@@ -1,9 +1,9 @@
 # -*- coding: utf8 -*-
 
 """
-Pylatest export module translates a test case description from a rst file into
-xml document, which contains all metadata and docutils rendered html
-representation of all sections of a test case document.
+Pylatest export module translates a test case description from a plain html
+source string into XmlExportTestCaseDoc object, which contains all metadata and
+docutils rendered html representation of all sections of a test case document.
 """
 
 # Copyright (C) 2016 mbukatov@redhat.com
@@ -22,126 +22,115 @@ representation of all sections of a test case document.
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-from __future__ import print_function
-import argparse
-
 from lxml import etree
 
-from pylatest.document import TestActions, TestCaseDoc
-from pylatest.xdocutils.core import pylatest_publish_parts
+from pylatest.document import XmlExportTestCaseDoc
 
 
-class XmlExportDoc(object):
-    """
-    Pylatest XML export format.
-    """
-    # TODO: fill the blanks, this is just an idea of how export may look like
-    # TODO: proper design
-    # TODO: add namespaces
+# xml namespaces
+NS = {'html': 'http://www.w3.org/1999/xhtml'}
 
-    def __init__(self):
-        """
-        Generate empty skeleton of an export XML document.
-        """
-        self.xmltree = etree.Element('pylatest')
-        self.metadata = etree.SubElement(self.xmltree, 'metadata')
-        self.teststeps = etree.SubElement(self.xmltree, 'teststeps')
-
-    def add_metadata(self, name, value):
-        """
-        Add metadata entry into xml export document.
-        """
-        # TODO
-
-    def add_section(self, section, content):
-        """
-        Add pylatest section into xml export document.
-        """
-        section_el = etree.SubElement(self.xmltree, section)
-        section_el.append(content)
-
-    def add_action(self, action_id, action_name, content):
-        """
-        Add pylatest action into xml export document.
-        """
-        # TODO
-
-    def tostring(self):
-        """
-        Generate a string representation of xml document.
-        """
-        return etree.tostring(self.xmltree)
+# HTML namespace URI in lxml notation, see:
+# http://lxml.de/tutorial.html#namespaces
+HTML = "{%s}" % NS['html']
 
 
 def get_actions(tree):
     """
     Extracts pylatest actions from given html tree.
     """
-    actions = TestActions()
-    # check all pylatest action div elements
-    for div_el in tree.xpath('//div[@class="pylatest_action"]'):
+    actions = []
+    for div_el in tree.xpath(
+            '//html:div[@class="pylatest_action"]', namespaces=NS):
         action_id = int(div_el.get("action_id"))
         action_name = div_el.get("action_name")
-        content = etree.tostring(div_el, method='html')
-        actions.add(action_name, content, action_id)
+        actions.append((action_id, action_name, div_el))
     return actions
+
+
+def get_metadata(tree):
+    """
+    Extracts test case metadata from given html tree.
+    """
+    metadata = []
+    # find all field lists in the tree
+    fl_tables = tree.xpath(
+        '//html:table[contains(@class, "field-list")]',
+        namespaces=NS)
+    if len(fl_tables) == 0:
+        return metadata
+    # we process only 1st field list we find, assuming it's the one with
+    # metadata, we also assume that sphinx disables docinfo transform
+    fl_el = fl_tables[0]
+    for f_el in fl_el.xpath(
+            '//html:tr[contains(@class, "field")]', namespaces=NS):
+        name = f_el.xpath('./html:th[@class="field-name"]', namespaces=NS)[0]
+        body = f_el.xpath('./html:td[@class="field-body"]', namespaces=NS)[0]
+        # polish field name value, we expect that name element looks like this:
+        # <th class="field-name">date:</th>
+        name_value = name.text[:-1]
+        # get body value
+        body_tostr = etree.tostring(body, method="text")
+        body_value = body_tostr.decode('utf-8').strip()
+        metadata.append((name_value, body_value))
+    return metadata
+
 
 def get_section(tree, section_id):
     """
     Extracts given pylatest section from given html tree.
     """
     # selecting particular section via docutils div elements
-    xpath = '//div[@class="section" and @id="{0}"]'.format(section_id)
-    elem_list = tree.xpath(xpath)
+    xpath = '//html:div[@class="section" and @id="{0}"]'.format(section_id)
+    elem_list = tree.xpath(xpath, namespaces=NS)
     if len(elem_list) == 0:
         # this will effectivelly clean given section
         return None
     section = elem_list[0]
     # remove header element
-    if section[0].tag.startswith('h'):
+    if section[0].tag.startswith(HTML + 'h'):
         del section[0]
     return section
 
-def export_plainhtml(body_tree):
+
+def get_title(tree):
     """
-    Translate given rst document into xml.
+    Extracts test case title from given html tree.
     """
-    xml_export = XmlExportDoc()
-    actions = get_actions(body_tree)
-    for action_id, action_name, content in actions.iter_action():
-        xml_export.add_action(action_id, action_name, content)
-    for section in TestCaseDoc.SECTIONS_PLAINHTML:
-        content = get_section(body_tree, section)
+    # we have to use h1 element, '/html:html/html:head/html:title' is empty
+    el_list = tree.xpath('//html:h1', namespaces=NS)
+    if len(el_list) == 0:
+        return None
+    # return text value of the element with title
+    return el_list[0].text
+
+
+def build_xml_testcase_doc(html_source):
+    """
+    Create xml export document (instance of XmlExportTestCaseDoc) for given
+    test case html source string.
+    """
+    # return empty doc for empty input string
+    if len(html_source) == 0:
+        return XmlExportTestCaseDoc()
+
+    html_tree = etree.fromstring(html_source.encode("utf8"))
+    title = get_title(html_tree)
+    doc = XmlExportTestCaseDoc(title)
+
+    # extract metadata from html_tree
+    for attr_name, content in get_metadata(html_tree):
+        doc.add_metadata(attr_name, content)
+
+    # extract sections from html_tree
+    for section in XmlExportTestCaseDoc.SECTIONS:
+        content = get_section(html_tree, section.html_id)
         if content is None:
             continue
-        xml_export.add_section(section, content)
-    # TODO: process test metadata, also use local configuration of defaults
-    return xml_export
+        doc.add_section(section, content)
 
-def rst2htmlbodytree(rst_content):
-    """
-    Translate given string which contains a content of rst file into processing
-    friendly "pylatest plain html" xml tree.
-    """
-    parts = pylatest_publish_parts(
-        rst_content, writer_name='html', use_plain=True)
-    htmlbody_tree = etree.fromstring(parts['html_body'])
-    return htmlbody_tree
+    # check all pylatest action div elements
+    for action_id, action_name, el in get_actions(html_tree):
+        doc.add_test_action(action_name, el, action_id)
 
-def main():
-    """
-    Main method of ``pylatest-export`` command line tool.
-    """
-    parser = argparse.ArgumentParser(description='pylatest xml export tool')
-    # TODO: automatic output xml filename based on input filename
-    parser.add_argument(
-        "rstfile",
-        help="filename of testcase to be exported into xml form")
-    args = parser.parse_args()
-
-    # TODO: except IOError
-    with open(args.rstfile, 'r') as src_file:
-        rst_content = src_file.read()
-        htmlbody_tree = rst2htmlbodytree(rst_content)
-        xml_export = export_plainhtml(htmlbody_tree)
-        print(xml_export.tostring())
+    return doc

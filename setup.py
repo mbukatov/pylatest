@@ -59,7 +59,6 @@ setup(
     entry_points={
         'console_scripts': [
             'pylatest-template=pylatest.template:main',
-            'pylatest-export=pylatest.export:main',
             'py2pylatest=pylatest.pysource:main',
             'pylatest-rst2html=pylatest.main:pylatest2html',
             'pylatest-rst2htmlplain=pylatest.main:pylatest2htmlplain',

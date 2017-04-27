@@ -21,8 +21,10 @@ import textwrap
 import os
 
 import pytest
+from lxml import etree
 
 from pylatest.document import Section, TestCaseDoc, RstTestCaseDoc
+from pylatest.document import XmlExportTestCaseDoc
 import pylatest.document
 
 
@@ -604,3 +606,117 @@ class TestRstTestCaseDocBuild(unittest.TestCase):
         # and add test case section
         tc.add_section(TestCaseDoc.STEPS, section_content)
         assert tc.build_rst() == expected_rst
+
+
+class TestXmlExportTestCaseDoc(unittest.TestCase):
+
+    def test_xmltestcasedoc_sections(self):
+        for section in XmlExportTestCaseDoc.SECTIONS:
+            assert section.html_id is not None
+
+    def test_xmltestcasedoc_empty(self):
+        tc = XmlExportTestCaseDoc("Test Case Title Example")
+        assert tc.is_empty()
+        assert tc.sections == []
+        # TODO: when missing_sections is implemented for xml export doc
+        # assert tc.missing_sections == XmlExportTestCaseDoc.SECTIONS_ALL
+
+    def test_xmltestcasedoc_eq_empty(self):
+        tc1 = XmlExportTestCaseDoc(title="Example")
+        tc2 = XmlExportTestCaseDoc(title="Example")
+        assert tc1 == tc2
+
+    def test_xmltestcasedoc_add_metadata(self):
+        tc = XmlExportTestCaseDoc()
+        assert tc.is_empty()
+        assert len(tc.metadata) == 0
+        tc.add_metadata("importance", "critical")
+        assert not tc.is_empty()
+        assert len(tc.metadata) == 1
+        assert tc.metadata.get("importance") == "critical"
+
+
+class TestXmlExportTestCaseDocBuild(unittest.TestCase):
+
+    def test_xmltestcasedoc_build_xml_empty(self):
+        tc = XmlExportTestCaseDoc()
+        empty_xml = textwrap.dedent('''\
+        <?xml version='1.0' encoding='utf-8'?>
+        <testcases>
+          <testcase/>
+        </testcases>
+        ''')
+        assert tc.build_xml_string() == empty_xml
+
+    def test_xmltestcasedoc_build_xml_title(self):
+        tc = XmlExportTestCaseDoc(title="Foo Bar Test")
+        exp_xml = textwrap.dedent('''\
+        <?xml version='1.0' encoding='utf-8'?>
+        <testcases>
+          <testcase>
+            <title>Foo Bar Test</title>
+          </testcase>
+        </testcases>
+        ''')
+        assert tc.build_xml_string() == exp_xml
+
+    def test_xmltestcasedoc_build_xml_meta(self):
+        tc = XmlExportTestCaseDoc()
+        tc.add_metadata("testtype", "functional")
+        exp_xml = textwrap.dedent('''\
+        <?xml version='1.0' encoding='utf-8'?>
+        <testcases>
+          <testcase>
+            <custom-fields>
+              <custom-field content="functional" id="testtype"/>
+            </custom-fields>
+          </testcase>
+        </testcases>
+        ''')
+        assert tc.build_xml_string() == exp_xml
+
+    def test_xmltestcasedoc_build_xml_description(self):
+        tc = XmlExportTestCaseDoc()
+        tc.add_section(
+            XmlExportTestCaseDoc.DESCR,
+            etree.fromstring('<p xmlns="http://www.w3.org/1999/xhtml">This is a description</p>'))
+        exp_xml = textwrap.dedent('''\
+        <?xml version='1.0' encoding='utf-8'?>
+        <testcases>
+          <testcase>
+            <description>
+              <p xmlns="http://www.w3.org/1999/xhtml">This is a description</p>
+            </description>
+          </testcase>
+        </testcases>
+        ''')
+        assert tc.build_xml_string() == exp_xml
+
+    def test_xmltestcasedoc_build_xml_action(self):
+        tc = XmlExportTestCaseDoc()
+        tc.add_test_action(
+            "test_step",
+            etree.fromstring('<p xmlns="http://www.w3.org/1999/xhtml">Step.</p>'),
+            1)
+        tc.add_test_action(
+            "test_result",
+            etree.fromstring('<p xmlns="http://www.w3.org/1999/xhtml">Nothing happens.</p>'),
+            1)
+        exp_xml = textwrap.dedent('''\
+        <?xml version='1.0' encoding='utf-8'?>
+        <testcases>
+          <testcase>
+            <test-steps>
+              <test-step>
+                <test-step-column id="step">
+                  <p xmlns="http://www.w3.org/1999/xhtml">Step.</p>
+                </test-step-column>
+                <test-step-column id="expectedResult">
+                  <p xmlns="http://www.w3.org/1999/xhtml">Nothing happens.</p>
+                </test-step-column>
+              </test-step>
+            </test-steps>
+          </testcase>
+        </testcases>
+        ''')
+        assert tc.build_xml_string() == exp_xml
