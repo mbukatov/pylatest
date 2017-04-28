@@ -1,5 +1,10 @@
-This section shows how to install latest development version directly from
-the source code.
+=========
+ Hacking
+=========
+
+This section shows how to run unit tests and how to install latest development
+version directly from the source code.
+
 
 Unit tests
 ==========
@@ -47,22 +52,23 @@ Very useful is to drop into pdb shell when a test case fails::
 
     $ tox --sitepackages -e py35 -- --pdb tests/test_rstsource.py
 
-Installation into virtualenv
-============================
+
+Development Installation
+========================
 
 Create new virtualenv environment in root directory of pylatest project (use
 path you cloned pylatest git repository into)::
 
-    cd ~/projects/pylatest
-    virtualenv .env
+    $ cd ~/projects/pylatest
+    $ virtualenv-3.5 --system-site-packages .env
 
 Activate the enviroment::
 
-    source .env/bin/activate
+    $ source .env/bin/activate
 
-And finally, install pylatest::
+And finally, install pylatest in `development mode`_::
 
-    python setup.py install
+    $ pip install -e .
 
 This way, you will have pylatest installed in local virtualenv without messing
 with global system or user environment::
@@ -70,17 +76,36 @@ with global system or user environment::
     $ cd /tmp
     $ which python
     ~/projects/pylatest/.env/bin/python
-    $ which pylatest2html 
-    ~/projects/pylatest/.env/bin/pylatest2htm
+    $ which pylatest-rst2html
+    ~/projects/pylatest/.env/bin/pylatest-rst2html
+
+Moreover using `development mode`_ allows you to edit files in git repository
+and check how it work without reinstallation::
+
     $ python
-    Python 2.7.10 (default, Sep 24 2015, 17:49:29) 
-    [GCC 5.1.1 20150618 (Red Hat 5.1.1-4)] on linux2
+    Python 3.5.3 (default, Mar 21 2017, 17:21:33)
+    [GCC 6.3.1 20161221 (Red Hat 6.3.1-1)] on linux
     Type "help", "copyright", "credits" or "license" for more information.
     >>> import pylatest
     >>> pylatest.__file__
-    '/home/martin/projects/pylatest/.env/lib/python2.7/site-packages/pylatest-0.1-py2.7.egg/pylatest/__init__.pyc'
+    '/home/martin/projects/pylatest/pylatest/__init__.py'
+
+If you need to test pylatest installed in development mode with Sphinx, you
+need to add the following code into ``conf.py`` of sphinx project::
+
+    # If extensions (or modules to document with autodoc) are in another directory,
+    # add these directories to sys.path here. If the directory is relative to the
+    # documentation root, use os.path.abspath to make it absolute, like shown here.
+
+    import os
+    import sys
+    sys.path.insert(0, os.path.abspath('/home/martin/projects/pylatest'))
+
+It would work as long as all pylatest dependencies are already installed in
+system site packages via distribution packages (rpm, deb ...).
 
 
 .. _unittest: https://docs.python.org/3.5/library/unittest.html
 .. _pytest: http://docs.pytest.org/en/latest/
 .. _tox: https://tox.readthedocs.io/en/latest/
+.. _`development mode`: https://packaging.python.org/distributing/#working-in-development-mode
