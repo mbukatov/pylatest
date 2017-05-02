@@ -157,6 +157,8 @@ class XmlExportBuilder(Builder):
 
         # generate content of target xml file based on html output
         doc = build_xml_testcase_doc(self.writer.output)
+        if self.app.config.pylatest_project_id is not None:
+            doc.project_id = self.app.config.pylatest_project_id
         content = doc.build_xml_string()
 
         # write content into file

@@ -399,10 +399,11 @@ class XmlExportTestCaseDoc(TestCaseDocWithContent):
     List of sections expected in pylatest xml export document.
     """
 
-    def __init__(self, title=None):
+    def __init__(self, title=None, project_id=None):
         super(XmlExportTestCaseDoc, self).__init__()
         self.metadata = {}
         self.title = title
+        self.project_id = project_id
 
     def __eq__(self, other):
         return (super(XmlExportTestCaseDoc, self).__eq__(other) and
@@ -426,8 +427,9 @@ class XmlExportTestCaseDoc(TestCaseDocWithContent):
         """
         Generate element tree representation of xml document.
         """
-        # TODO: add mandatory 'project-id' attribute
         xml_tree = etree.Element('testcases')
+        if self.project_id is not None:
+            xml_tree.attrib["project-id"] = self.project_id
         # TODO: check if we need to use these 'properties' for something here
         # resp_properties = etree.SubElement(xml_tree, 'response-properties')
         # properties = etree.SubElement(xml_tree, 'properties')

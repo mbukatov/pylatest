@@ -69,5 +69,8 @@ def setup(app):
     # builder for xmlexport output
     app.add_builder(builders.XmlExportBuilder)
 
+    # pylatest configuration
+    app.add_config_value('pylatest_project_id', default=None, rebuild='html')
+
     # sphinx plugin metadata
     return {'version': '0.0.5'}
