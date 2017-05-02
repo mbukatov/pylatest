@@ -51,13 +51,14 @@ import logging
 
 from docutils.io import StringOutput
 from docutils.frontend import OptionParser
+from lxml import etree
 from sphinx.builders import Builder
 from sphinx.util.osutil import ensuredir, os_path
 from sphinx.writers.html import HTMLWriter, HTMLTranslator
 from sphinx.highlighting import PygmentsBridge
 
 from pylatest.xdocutils.nodes import test_action_node
-from pylatest.export import build_xml_testcase_doc
+from pylatest.export import build_xml_testcase_doc, build_xml_export_doc
 
 
 logger = logging.getLogger(__name__)
@@ -156,10 +157,19 @@ class XmlExportBuilder(Builder):
         self.writer.write(doctree, destination)
 
         # generate content of target xml file based on html output
-        doc = build_xml_testcase_doc(self.writer.output)
-        if self.app.config.pylatest_project_id is not None:
-            doc.project_id = self.app.config.pylatest_project_id
-        content = doc.build_xml_string()
+        tc_doc = build_xml_testcase_doc(self.writer.output)
+
+        # create xml export document with single test case
+        export_doc = build_xml_export_doc(
+            project_id=self.app.config.pylatest_project_id,
+            testcases=[tc_doc.build_element_tree()],
+            )
+        content_b = etree.tostring(
+            export_doc,
+            xml_declaration=True,
+            encoding='utf-8',
+            pretty_print=True)
+        content = content_b.decode('utf-8')
 
         # write content into file
         outfilename = path.join(

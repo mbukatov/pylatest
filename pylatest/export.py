@@ -134,3 +134,20 @@ def build_xml_testcase_doc(html_source):
         doc.add_test_action(action_name, el, action_id)
 
     return doc
+
+
+def build_xml_export_doc(project_id=None, testcases=None):
+    """
+    Create xml export document for given testcases.
+    """
+    xml_tree = etree.Element('testcases')
+    if project_id is not None:
+        xml_tree.attrib["project-id"] = project_id
+    # TODO: check if we need to use these 'properties' for something here
+    # resp_properties = etree.SubElement(xml_tree, 'response-properties')
+    # properties = etree.SubElement(xml_tree, 'properties')
+    if testcases is None:
+        return xml_tree
+    for tc in testcases:
+        xml_tree.append(tc)
+    return xml_tree

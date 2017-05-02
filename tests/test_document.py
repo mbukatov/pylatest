@@ -642,9 +642,7 @@ class TestXmlExportTestCaseDocBuild(unittest.TestCase):
         tc = XmlExportTestCaseDoc()
         empty_xml = textwrap.dedent('''\
         <?xml version='1.0' encoding='utf-8'?>
-        <testcases>
-          <testcase/>
-        </testcases>
+        <testcase/>
         ''')
         assert tc.build_xml_string() == empty_xml
 
@@ -652,11 +650,9 @@ class TestXmlExportTestCaseDocBuild(unittest.TestCase):
         tc = XmlExportTestCaseDoc(title="Foo Bar Test")
         exp_xml = textwrap.dedent('''\
         <?xml version='1.0' encoding='utf-8'?>
-        <testcases>
-          <testcase>
-            <title>Foo Bar Test</title>
-          </testcase>
-        </testcases>
+        <testcase>
+          <title>Foo Bar Test</title>
+        </testcase>
         ''')
         assert tc.build_xml_string() == exp_xml
 
@@ -665,13 +661,11 @@ class TestXmlExportTestCaseDocBuild(unittest.TestCase):
         tc.add_metadata("testtype", "functional")
         exp_xml = textwrap.dedent('''\
         <?xml version='1.0' encoding='utf-8'?>
-        <testcases>
-          <testcase>
-            <custom-fields>
-              <custom-field content="functional" id="testtype"/>
-            </custom-fields>
-          </testcase>
-        </testcases>
+        <testcase>
+          <custom-fields>
+            <custom-field content="functional" id="testtype"/>
+          </custom-fields>
+        </testcase>
         ''')
         assert tc.build_xml_string() == exp_xml
 
@@ -682,13 +676,11 @@ class TestXmlExportTestCaseDocBuild(unittest.TestCase):
             etree.fromstring('<p xmlns="http://www.w3.org/1999/xhtml">This is a description</p>'))
         exp_xml = textwrap.dedent('''\
         <?xml version='1.0' encoding='utf-8'?>
-        <testcases>
-          <testcase>
-            <description>
-              <p xmlns="http://www.w3.org/1999/xhtml">This is a description</p>
-            </description>
-          </testcase>
-        </testcases>
+        <testcase>
+          <description>
+            <p xmlns="http://www.w3.org/1999/xhtml">This is a description</p>
+          </description>
+        </testcase>
         ''')
         assert tc.build_xml_string() == exp_xml
 
@@ -704,19 +696,17 @@ class TestXmlExportTestCaseDocBuild(unittest.TestCase):
             1)
         exp_xml = textwrap.dedent('''\
         <?xml version='1.0' encoding='utf-8'?>
-        <testcases>
-          <testcase>
-            <test-steps>
-              <test-step>
-                <test-step-column id="step">
-                  <p xmlns="http://www.w3.org/1999/xhtml">Step.</p>
-                </test-step-column>
-                <test-step-column id="expectedResult">
-                  <p xmlns="http://www.w3.org/1999/xhtml">Nothing happens.</p>
-                </test-step-column>
-              </test-step>
-            </test-steps>
-          </testcase>
-        </testcases>
+        <testcase>
+          <test-steps>
+            <test-step>
+              <test-step-column id="step">
+                <p xmlns="http://www.w3.org/1999/xhtml">Step.</p>
+              </test-step-column>
+              <test-step-column id="expectedResult">
+                <p xmlns="http://www.w3.org/1999/xhtml">Nothing happens.</p>
+              </test-step-column>
+            </test-step>
+          </test-steps>
+        </testcase>
         ''')
         assert tc.build_xml_string() == exp_xml

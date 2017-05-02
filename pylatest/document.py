@@ -399,11 +399,10 @@ class XmlExportTestCaseDoc(TestCaseDocWithContent):
     List of sections expected in pylatest xml export document.
     """
 
-    def __init__(self, title=None, project_id=None):
+    def __init__(self, title=None):
         super(XmlExportTestCaseDoc, self).__init__()
         self.metadata = {}
         self.title = title
-        self.project_id = project_id
 
     def __eq__(self, other):
         return (super(XmlExportTestCaseDoc, self).__eq__(other) and
@@ -427,13 +426,7 @@ class XmlExportTestCaseDoc(TestCaseDocWithContent):
         """
         Generate element tree representation of xml document.
         """
-        xml_tree = etree.Element('testcases')
-        if self.project_id is not None:
-            xml_tree.attrib["project-id"] = self.project_id
-        # TODO: check if we need to use these 'properties' for something here
-        # resp_properties = etree.SubElement(xml_tree, 'response-properties')
-        # properties = etree.SubElement(xml_tree, 'properties')
-        testcase = etree.SubElement(xml_tree, 'testcase')
+        testcase = etree.Element('testcase')
         # set tile
         if self.title is not None:
             title = etree.SubElement(testcase, 'title')
@@ -469,8 +462,8 @@ class XmlExportTestCaseDoc(TestCaseDocWithContent):
                 attrib={'id': attr_name, 'content': content})
         # TODO: set setup and teardown
         # TODO: implement linking
-        # linked_wis = etree.SubElement(xml_tree, 'linked-work-items')
-        return xml_tree
+        # linked_wis = etree.SubElement(testcase, 'linked-work-items')
+        return testcase
 
     def build_xml_string(self):
         """
