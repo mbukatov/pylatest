@@ -159,6 +159,12 @@ class XmlExportBuilder(Builder):
         # generate content of target xml file based on html output
         tc_doc = build_xml_testcase_doc(self.writer.output)
 
+        # validate and drop invalid metadata if needed
+        if len(self.app.config.pylatest_valid_export_metadata) > 0:
+            for name in list(tc_doc.metadata.keys()):
+                if name not in self.app.config.pylatest_valid_export_metadata:
+                    del tc_doc.metadata[name]
+
         # create xml export document with single test case
         export_doc = build_xml_export_doc(
             project_id=self.app.config.pylatest_project_id,
