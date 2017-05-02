@@ -157,7 +157,10 @@ class XmlExportBuilder(Builder):
         self.writer.write(doctree, destination)
 
         # generate content of target xml file based on html output
-        tc_doc = build_xml_testcase_doc(self.writer.output)
+        tc_doc = build_xml_testcase_doc(
+            html_source=self.writer.output,
+            mixedcontent=self.app.config.pylatest_export_mixedcontent,
+            )
 
         # validate and drop invalid metadata if needed
         if len(self.app.config.pylatest_valid_export_metadata) > 0:

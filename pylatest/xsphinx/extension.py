@@ -72,6 +72,7 @@ def setup(app):
     # pylatest configuration
     app.add_config_value('pylatest_project_id', default=None, rebuild='html')
     app.add_config_value('pylatest_valid_export_metadata', [], 'env')
+    app.add_config_value('pylatest_export_mixedcontent', True, 'html')
 
     # sphinx plugin metadata
     return {'version': '0.0.5'}
