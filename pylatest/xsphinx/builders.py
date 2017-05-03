@@ -177,7 +177,7 @@ class XmlExportBuilder(Builder):
             export_doc,
             xml_declaration=True,
             encoding='utf-8',
-            pretty_print=True)
+            pretty_print=self.app.config.pylatest_export_pretty_print)
         content = content_b.decode('utf-8')
 
         # write content into file
