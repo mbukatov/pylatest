@@ -461,15 +461,28 @@ class XmlExportTestCaseDoc(TestCaseDocWithContent):
                     'test-step-column',
                     attrib={'id': 'expectedResult'})
                 self._set_content(result, result_html)
-        # set metadata
-        if len(self.metadata) > 0:
+        # custom-fields contain metadata and setup and teardown (sic)
+        if (len(self.metadata) > 0
+                or self.SETUP in self.sections
+                or self.TEARD in self.sections):
             custom_fields = etree.SubElement(testcase, 'custom-fields')
+        # set metadata
         for attr_name, content in self.metadata.items():
             etree.SubElement(
                 custom_fields,
                 'custom-field',
                 attrib={'id': attr_name, 'content': content})
-        # TODO: set setup and teardown
+        # set setup and teardown
+        # TODO: add as mixed content instead when export xml schema is changed
+        for section in (self.SETUP, self.TEARD):
+            if section in self.sections:
+                html_content = self.get_section(section)
+                content_b = etree.tostring(html_content, method="text")
+                content = content_b.decode('utf-8').strip()
+                etree.SubElement(
+                    custom_fields,
+                    'custom-field',
+                    attrib={'id': section.html_id, 'content': content})
         # TODO: implement linking
         # linked_wis = etree.SubElement(testcase, 'linked-work-items')
         return testcase

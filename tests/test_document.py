@@ -669,6 +669,43 @@ class TestXmlExportTestCaseDocBuild(unittest.TestCase):
         ''')
         assert tc.build_xml_string() == exp_xml
 
+    # TODO: paramatrize
+    def test_xmltestcasedoc_build_xml_setup(self):
+        tc = XmlExportTestCaseDoc()
+        tc.add_section(
+            XmlExportTestCaseDoc.SETUP,
+            etree.fromstring('<p xmlns="http://www.w3.org/1999/xhtml">This is setup.</p>'))
+        exp_xml = textwrap.dedent('''\
+        <?xml version='1.0' encoding='utf-8'?>
+        <testcase>
+          <custom-fields>
+            <custom-field content="This is setup." id="{}"/>
+          </custom-fields>
+        </testcase>
+        ''').format(XmlExportTestCaseDoc.SETUP.html_id)
+        assert tc.build_xml_string() == exp_xml
+
+    def test_xmltestcasedoc_build_xml_setup_teardown(self):
+        tc = XmlExportTestCaseDoc()
+        tc.add_section(
+            XmlExportTestCaseDoc.SETUP,
+            etree.fromstring('<p xmlns="http://www.w3.org/1999/xhtml">This is setup.</p>'))
+        tc.add_section(
+            XmlExportTestCaseDoc.TEARD,
+            etree.fromstring('<p xmlns="http://www.w3.org/1999/xhtml">This is teardown.</p>'))
+        exp_xml = textwrap.dedent('''\
+        <?xml version='1.0' encoding='utf-8'?>
+        <testcase>
+          <custom-fields>
+            <custom-field content="This is setup." id="{}"/>
+            <custom-field content="This is teardown." id="{}"/>
+          </custom-fields>
+        </testcase>
+        ''').format(
+            XmlExportTestCaseDoc.SETUP.html_id,
+            XmlExportTestCaseDoc.TEARD.html_id)
+        assert tc.build_xml_string() == exp_xml
+
     def test_xmltestcasedoc_build_xml_description(self):
         tc = XmlExportTestCaseDoc()
         tc.add_section(
