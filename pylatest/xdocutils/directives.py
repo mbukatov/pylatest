@@ -24,6 +24,7 @@ module.
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
+import os.path
 import time
 
 from docutils import nodes
@@ -156,3 +157,47 @@ class RequirementDirective(rst.Directive):
             node.attributes['priority'] = self.options['priority']
         self.state.nested_parse(self.content, self.content_offset, node)
         return [node]
+
+
+class TestDefaultsDirective(rst.Directive):
+    """
+    Implementation of ``test_defaults`` rst directive.
+
+    Using this directive, one can define default metadata values for all rst
+    test case documents which belongs the same directory.
+
+    Since this directive uses sphinx.environment.BuildEnvironment instance,
+    it works within Sphinx only.
+    """
+
+    required_arguments = 0
+    optional_arguments = 0
+    has_content = True
+
+    def run(self):
+        # sphinx build enviroment instance
+        env = self.state.document.settings.env
+        # check if env has the defaults already defined
+        if not hasattr(env, 'pylatest_defaults'):
+            env.pylatest_defaults = {}
+        # prepare dict for default values defined in this directive into the
+        # env, identified by directory in which document with this directive is
+        # located
+        dirname = os.path.dirname(env.docname)
+        env.pylatest_defaults[dirname] = {}
+        # parse text content of this directive into anonymous node element
+        # (which can't be used directly in the tree)
+        content_node = nodes.Element()
+        self.state.nested_parse(
+            self.content, self.content_offset, content_node)
+        # search for field nodes in parsed content to get the defaults
+        for field in content_node.traverse(nodes.field):
+            # make clear my intentions here (in case something changes later)
+            assert field[0].tagname == "field_name"
+            assert field[1].tagname == "field_body"
+            # store the defaults
+            field_name_value = field[0][0]  # text node
+            field_body_node = field[1]
+            env.pylatest_defaults[dirname][field_name_value] = field_body_node
+        # but don't do anything else
+        return []
