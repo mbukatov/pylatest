@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Sphinx test suite utilities, copied without modifications (with exception of
-this docstring and copying notice) from ``tests/util.py`` file of Sphinx
+Sphinx test suite utilities, copied from ``tests/util.py`` file of Sphinx
 project, commit 139e09d12023a255b206c1158487d215217be920.
+
+Some code from ``run.py`` file has been included here so that the tests
+are executable via plain pytest.
 
 Done as a workaround for: https://github.com/sphinx-doc/sphinx/issues/3458
 """
@@ -80,8 +82,22 @@ __all__ = [
 ]
 
 
+# code from run.py
+testroot = os.path.dirname(__file__) or '.'
+# find a temp dir for testing and clean it up now
+os.environ['SPHINX_TEST_TEMPDIR'] = \
+    os.path.abspath(os.path.join(testroot, 'build')) \
+    if 'SPHINX_TEST_TEMPDIR' not in os.environ \
+    else os.path.abspath(os.environ['SPHINX_TEST_TEMPDIR'])
+
 rootdir = path(os.path.dirname(__file__) or '.').abspath()
 tempdir = path(os.environ['SPHINX_TEST_TEMPDIR']).abspath()
+
+# code from run.py
+print('Temporary files will be placed in %s.' % tempdir)
+if tempdir.exists():
+    tempdir.rmtree()
+tempdir.makedirs()
 
 
 def assert_re_search(regex, text, flags=0):
