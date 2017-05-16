@@ -196,8 +196,8 @@ class TestDefaultsDirective(rst.Directive):
             assert field[0].tagname == "field_name"
             assert field[1].tagname == "field_body"
             # store the defaults
-            field_name_value = field[0][0]  # text node
-            field_body_node = field[1]
+            field_name_value = field[0][0].astext()
+            field_body_node = field[1].astext()
             env.pylatest_defaults[dirname][field_name_value] = field_body_node
         # but don't do anything else
         return []

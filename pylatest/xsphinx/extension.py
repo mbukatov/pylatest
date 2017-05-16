@@ -16,6 +16,10 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
+import os.path
+
+import docutils.nodes
+
 from pylatest.xdocutils import directives
 from pylatest.xdocutils import htmltranslator
 from pylatest.xdocutils import nodes
@@ -45,6 +49,55 @@ def pylatest_transform_handler(app):
         app.add_transform(transforms.RequirementSectionTransform)
 
 
+def pylatest_resolve_defaults(app, doctree):
+    """
+    Propagate values from test_defautls directive into test cases.
+    """
+    # First, check few assumptions about expected doctree structure:
+    #
+    # <document ...>
+    #     <section>
+    #         <title>
+    #             Title of the test case
+    #         <field_list>
+    #             <field>
+    #                 <field_name>
+    #                     author
+    #                 <field_body>
+    #                     <paragraph>
+    #                         foo@example.com
+    if doctree.tagname != 'document':
+        return
+    if len(doctree) == 0:
+        return
+    if doctree[0].tagname != 'section':
+        return
+    if len(doctree[0]) <= 1:
+        return
+    if doctree[0][0].tagname != 'title':
+        return
+    if doctree[0][1].tagname != 'field_list':
+        return
+    field_list = doctree[0][1]
+
+    env = app.builder.env
+    # get doc name of current source rst file
+    doc_name = env.path2doc(field_list.source)
+    dir_name = os.path.dirname(doc_name)
+    # push default values (if any) into field_list
+    if dir_name in env.pylatest_defaults:
+        for name, body in env.pylatest_defaults[dir_name].items():
+            # create field entry structure
+            field_name = docutils.nodes.field_name(text=name)
+            field_body = docutils.nodes.field_body()
+            field_body += docutils.nodes.paragraph(text=body)
+            field = docutils.nodes.field()
+            field += field_name
+            field += field_body
+            # append the entry into field list
+            field_list += field
+
+
 def setup(app):
     # pylatest roles
     app.add_role("rhbz", roles.redhat_bugzilla_role)
@@ -66,6 +119,9 @@ def setup(app):
 
     # pylatest transforms are added based on app.builder value
     app.connect('builder-inited', pylatest_transform_handler)
+
+    # propagate values from test_defautls directive
+    app.connect('doctree-read', pylatest_resolve_defaults)
 
     # builder for xmlexport output
     app.add_builder(builders.XmlExportBuilder)

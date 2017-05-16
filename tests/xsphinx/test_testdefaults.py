@@ -57,7 +57,7 @@ def test_testcasemetadata_html_flat(app, status, warning):
     # check metadata added by testdefaults directive (in index.rst file)
     assert ('component', 'foobar') in foo_meta
     assert ('importance', 'high') in foo_meta
-    assert ('component', 'barbar') in bar_meta
+    assert ('component', 'foobar') in bar_meta
     assert ('importance', 'high') in bar_meta
     # there are no other metadata
     assert len(foo_meta) == 3
