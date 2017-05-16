@@ -91,16 +91,27 @@ def pylatest_resolve_defaults(app, doctree):
     dir_name = os.path.dirname(doc_name)
     # push default values (if any) into field_list
     if dir_name in env.pylatest_defaults:
+        # get field list items, which are already directly present in test case
+        field_list_tc = {}  # field_name string -> field_body node
+        for field in field_list.traverse(docutils.nodes.field):
+            name = field[0].astext()
+            field_list_tc[name] = field[1]
         for name, body in env.pylatest_defaults[dir_name].items():
-            # create field entry structure
-            field_name = docutils.nodes.field_name(text=name)
-            field_body = docutils.nodes.field_body()
-            field_body += docutils.nodes.paragraph(text=body)
-            field = docutils.nodes.field()
-            field += field_name
-            field += field_body
-            # append the entry into field list
-            field_list += field
+            # check if such field list entry is not already defined in the test
+            # case document
+            if name in field_list_tc:
+                # override value of already defined field list item
+                field_list_tc[name][0] = docutils.nodes.paragraph(text=body)
+            else:
+                # create new field entry structure
+                field_name = docutils.nodes.field_name(text=name)
+                field_body = docutils.nodes.field_body()
+                field_body += docutils.nodes.paragraph(text=body)
+                field = docutils.nodes.field()
+                field += field_name
+                field += field_body
+                # append the entry into field list
+                field_list += field
 
 
 def setup(app):

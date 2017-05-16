@@ -72,6 +72,24 @@ def test_testcasemetadata_html_flat(app, status, warning):
     assert len(bar_meta) == 3
 
 
+@pytest.mark.sphinx('html', testroot='testdefaults-flat-override')
+def test_testcasemetadata_html_flat_override(app, status, warning):
+    """
+    Check that values from test_defaults directive can override
+    values specified directly in a test case.
+    """
+    app.builder.build_all()
+    # get metadata
+    foo_meta = get_metadata(xmlparse_html_testcase(app.outdir, "test_foo.html"))
+    bar_meta = get_metadata(xmlparse_html_testcase(app.outdir, "test_bar.html"))
+    # check metadata overriden by testdefaults directive,
+    # in index.rst file, we set/override 'component' to value 'actium'
+    for meta in foo_meta, bar_meta:
+        comp_list = [val for (key, val) in meta if key == 'component']
+        assert len(comp_list) == 1
+        assert comp_list[0] == 'actium'
+
+
 @pytest.mark.sphinx('html', testroot='testdefaults-nested')
 def test_testcasemetadata_html_nested(app, status, warning):
     """
