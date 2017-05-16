@@ -22,6 +22,14 @@ def xmlparse_html_testcase(outdir, filename):
     return xml_tree
 
 
+@pytest.mark.sphinx('html', testroot='testdefaults-not-used')
+def test_directive_not_used(app, status, warning):
+    """
+    Check that build doesn't fail without the feature.
+    """
+    app.builder.build_all()
+
+
 @pytest.mark.sphinx('html', testroot='testdefaults-flat')
 def test_directive_html_content(app, status, warning):
     """

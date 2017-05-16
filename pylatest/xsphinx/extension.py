@@ -53,7 +53,13 @@ def pylatest_resolve_defaults(app, doctree):
     """
     Propagate values from test_defautls directive into test cases.
     """
-    # First, check few assumptions about expected doctree structure:
+    # First, check if there are no test_defautls directives, it would mean no
+    # values to push into test cases.
+    env = app.builder.env
+    if not hasattr(env, "pylatest_defaults"):
+        return
+
+    # Check few assumptions about expected doctree structure:
     #
     # <document ...>
     #     <section>
@@ -80,7 +86,6 @@ def pylatest_resolve_defaults(app, doctree):
         return
     field_list = doctree[0][1]
 
-    env = app.builder.env
     # get doc name of current source rst file
     doc_name = env.path2doc(field_list.source)
     dir_name = os.path.dirname(doc_name)
