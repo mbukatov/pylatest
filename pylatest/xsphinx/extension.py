@@ -49,7 +49,7 @@ def pylatest_transform_handler(app):
         app.add_transform(transforms.RequirementSectionTransform)
 
 
-def pylatest_resolve_defaults(app, doctree):
+def pylatest_resolve_defaults(app, doctree, docname):
     """
     Propagate values from test_defautls directive into test cases.
     """
@@ -86,11 +86,25 @@ def pylatest_resolve_defaults(app, doctree):
         return
     field_list = doctree[0][1]
 
-    # get doc name of current source rst file
-    doc_name = env.path2doc(field_list.source)
-    dir_name = os.path.dirname(doc_name)
+    # get dir name part of current source rst file's docname
+    dirname = os.path.dirname(docname)
+
+    # check which defaults are applicable
+    tmp_dir_names = []
+    for name in env.pylatest_defaults.keys():
+        if os.path.commonpath([dirname, name]) == name:
+            if name == '':
+                level = 0
+            else:
+                level = len(list(name.split('/')))
+            tmp_dir_names.append((level, name))
+    # and sort dir names by level: defaults nested deep in the tree are used
+    # first so that the top level defautls override the nested ones
+    def_dir_names = [
+        v for l, v in sorted(tmp_dir_names, key=lambda x: x[0], reverse=True)]
+
     # push default values (if any) into field_list
-    if dir_name in env.pylatest_defaults:
+    for dir_name in def_dir_names:
         # get field list items, which are already directly present in test case
         field_list_tc = {}  # field_name string -> field_body node
         for field in field_list.traverse(docutils.nodes.field):
@@ -137,7 +151,7 @@ def setup(app):
     app.connect('builder-inited', pylatest_transform_handler)
 
     # propagate values from test_defautls directive
-    app.connect('doctree-read', pylatest_resolve_defaults)
+    app.connect('doctree-resolved', pylatest_resolve_defaults)
 
     # builder for xmlexport output
     app.add_builder(builders.XmlExportBuilder)

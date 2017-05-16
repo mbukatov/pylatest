@@ -62,7 +62,7 @@ def test_testcasemetadata_html_flat(app, status, warning):
     # check metadata directly included in the files
     assert ('author', 'joe.foo@example.com') in foo_meta
     assert ('author', 'joe.bar@example.com') in bar_meta
-    # check metadata added by testdefaults directive (in index.rst file)
+    # check metadata added by test_defaults directive (in index.rst file)
     assert ('component', 'foobar') in foo_meta
     assert ('importance', 'high') in foo_meta
     assert ('component', 'foobar') in bar_meta
@@ -106,3 +106,41 @@ def test_testcasemetadata_html_nested(app, status, warning):
         meta = get_metadata(xmlparse_html_testcase(app.outdir, tc_name))
         component = tc_name.split("/")[0]
         assert ("component", component) in meta
+
+
+@pytest.mark.sphinx('html', testroot='testdefaults-nested-multiple')
+def test_testcasemetadata_html_nested_multiple(app, status, warning):
+    app.builder.build_all()
+    # get metadata
+    one_meta = get_metadata(xmlparse_html_testcase(app.outdir, "foo/test_one.html"))
+    ten_meta = get_metadata(xmlparse_html_testcase(app.outdir, "foo/bar/test_ten.html"))
+    # check metadata defined in test_defaults of root index.rst file
+    assert ('note', 'test') in one_meta
+    assert ('note', 'test') in ten_meta
+    # check metadata defined in test_defaults of foo/index.rst file
+    assert ('component', 'foo') in one_meta
+    assert ('component', 'foo') in ten_meta
+    # check metadata defined in test_defaults of foo/bar/index.rst file
+    assert ('subcomponent', 'bar') in ten_meta
+
+
+@pytest.mark.sphinx('html', testroot='testdefaults-nested-multiple')
+def test_testcasemetadata_html_nested_multiple_override(app, status, warning):
+    app.builder.build_all()
+    # get metadata
+    two_meta = get_metadata(xmlparse_html_testcase(
+        app.outdir, "foo/test_two.html"))
+    ten_meta = get_metadata(xmlparse_html_testcase(
+        app.outdir, "foo/bar/test_ten.html"))
+    elewen_meta = get_metadata(xmlparse_html_testcase(
+        app.outdir, "foo/bar/test_elewen.html"))
+    # check metadata defined both in test_defaults of root index.rst file and
+    # the test case itself, default value should be used
+    assert ('note', 'test') in two_meta
+    # check metadata defined both in test_defaults of bar's index.rst file and
+    # the test case itself, default value should be used
+    assert ('subcomponent', 'bar') in elewen_meta
+    # check metadata defined both in test_defaults of bar's and foo's index.rst file
+    # default value from foo's index.rst file should be used
+    assert ('type', 'functional') in ten_meta
+    assert ('type', 'functional') in elewen_meta
