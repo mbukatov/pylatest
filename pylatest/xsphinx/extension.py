@@ -92,7 +92,7 @@ def pylatest_resolve_defaults(app, doctree, docname):
     # check which defaults are applicable
     tmp_dir_names = []
     for name in env.pylatest_defaults.keys():
-        if os.path.commonpath([dirname, name]) == name:
+        if os.path.commonprefix([dirname, name]) == name:
             if name == '':
                 level = 0
             else:
