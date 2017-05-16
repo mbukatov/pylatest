@@ -462,9 +462,9 @@ class XmlExportTestCaseDoc(TestCaseDocWithContent):
                     attrib={'id': 'expectedResult'})
                 self._set_content(result, result_html)
         # custom-fields contain metadata and setup and teardown (sic)
-        if (len(self.metadata) > 0
-                or self.SETUP in self.sections
-                or self.TEARD in self.sections):
+        if (len(self.metadata) > 0 or
+                self.SETUP in self.sections or
+                self.TEARD in self.sections):
             custom_fields = etree.SubElement(testcase, 'custom-fields')
         # set metadata
         for attr_name, content in self.metadata.items():
