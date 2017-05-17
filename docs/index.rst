@@ -7,8 +7,8 @@
  Pylatest
 ==========
 
-Pylatest project consists of set of Docutils_/Sphinx_ extensions and `related
-command line tools`_ which allows you to:
+Pylatest project consists of set of Docutils_/Sphinx_ extensions and related
+command line tools which allows you to:
 
 * Write a description of a test case using `reStructuredText syntax`_.
 * Maintain test case descriptions as Sphinx project.
@@ -27,6 +27,7 @@ low in the long term.
 
    quickstart.rst
    documents.rst
+   restructuredtext.rst
    cli.rst
    xmlexport.rst
    pysource.rst
@@ -53,7 +54,6 @@ Related Projects
 
 
 .. _`reStructuredText syntax`: http://www.sphinx-doc.org/en/stable/rest.html
-.. _`related command line tools`: TODO
 .. _`GNU GPL v3.0`: http://www.gnu.org/licenses/gpl-3.0.txt
 .. _Docutils: http://docutils.sourceforge.net/
 .. _Sphinx: http://www.sphinx-doc.org/en/stable/index.html

@@ -64,16 +64,6 @@ rst file, you should not describe multiple test cases in single file. Other
 aspects of structure of pylatest/sphinx project is completelly up to you
 though.
 
-Pylatest test case document should follow this structure:
-
-* Document tile is a title of the test case.
-* Just after document title, there are `docutils field lists`_ with test case
-  metadata.
-* There are four sections in document: *Description*, *Setup*, *Test Steps*
-  and *Teardown* - of which only *Test Steps* is mandatory.
-* Section *Test Steps* contains custom pylatest syntax for test steps, we
-  will discuss this in more detail shortly.
-
 Here is an example of a test case document following expected structure:
 
 .. code-block:: rst
@@ -108,33 +98,6 @@ Here is an example of a test case document following expected structure:
        :result: There are no files, output should be empty.
 
     .. test_action::
-       :step: Another test step.
-       :result: Yet another expected result.
-
-    Teardown
-    ========
-
-    #. Description of the cleanup.
-
-    #. There is another one, again.
-
-
-As you can see from the example above, Pylatest defines custom `docutils
-directive`_ named ``test_action`` for writing down a test step action (which
-includes step itself and expected result):
-
-.. code-block:: rst
-
-    .. test_action::
-       :step: Here goes what should be done.
-       :result: Here is the expected result of previous action.
-
-Note that when the description of a test step is long and/or complicated, you
-can use multiple paragraphs to describe it:
-
-.. code-block:: rst
-
-    .. test_action::
        :step:
            Run the following commands::
 
@@ -146,6 +109,22 @@ can use multiple paragraphs to describe it:
        :result:
            Maecenas congue ligula ac quam viverra nec
            consectetur ante hendrerit.
+
+    Teardown
+    ========
+
+    #. Description of the cleanup.
+
+    #. There is another one, again.
+
+
+As you can see from the example above, Pylatest defines custom `docutils
+directive`_ named :rst:dir:`test_action` for writing down a test step action (which
+includes step itself and expected result). Also note that when the description
+of a test step is long and/or complicated, you can use multiple paragraphs to
+describe it as shown in the example.
+
+For more details, see description of :ref:`document_type_testcase` structure.
 
 
 HTML output
