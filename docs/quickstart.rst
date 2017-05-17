@@ -11,7 +11,9 @@ you are not familiar with sphinx.
 Installation
 ============
 
-You can install latest stable Pylatest release from PyPI via pip::
+You can install latest stable Pylatest release from PyPI via pip:
+
+.. code-block:: sh
 
     $ pip install pylatest
 
@@ -29,7 +31,9 @@ You can install latest stable Pylatest release from PyPI via pip::
 Create new Sphinx/Pylatest Project
 ==================================
 
-You can start a new Sphinx/Pylatest project using the quickstart script::
+You can start a new Sphinx/Pylatest project using the quickstart script:
+
+.. code-block:: sh
 
     $ pylatest-quickstart
 
@@ -42,7 +46,9 @@ Adding Pylatest to Existing Project
 ===================================
 
 To use Pylatest with your existing Sphinx project, add ``pylatest``
-module into list of extensions in ``conf.py`` of the project::
+module into list of extensions in ``conf.py`` of the project:
+
+.. code-block:: python
 
     extensions = [
         'pylatest',
@@ -68,7 +74,9 @@ Pylatest test case document should follow this structure:
 * Section *Test Steps* contains custom pylatest syntax for test steps, we
   will discuss this in more detail shortly.
 
-Here is an example of a test case document following expected structure::
+Here is an example of a test case document following expected structure:
+
+.. code-block:: rst
 
     Test Case Title
     ***************
@@ -113,14 +121,18 @@ Here is an example of a test case document following expected structure::
 
 As you can see from the example above, Pylatest defines custom `docutils
 directive`_ named ``test_action`` for writing down a test step action (which
-includes step itself and expected result)::
+includes step itself and expected result):
+
+.. code-block:: rst
 
     .. test_action::
        :step: Here goes what should be done.
        :result: Here is the expected result of previous action.
 
 Note that when the description of a test step is long and/or complicated, you
-can use multiple paragraphs to describe it::
+can use multiple paragraphs to describe it:
+
+.. code-block:: rst
 
     .. test_action::
        :step:
@@ -146,7 +158,9 @@ Note that default pylatest html builder produces human readable representation
 of a test case, which generates table from all ``test_action`` directives from
 *Test Steps* section.
 
-For example, following rst source::
+For example, following rst source:
+
+.. code-block:: rst
 
     .. test_action::
        :step: Foo Step.
