@@ -131,7 +131,6 @@ def pylatest_resolve_defaults(app, doctree, docname):
 def setup(app):
     # pylatest roles
     app.add_role("rhbz", roles.redhat_bugzilla_role)
-    app.add_role("pylaref", roles.pylaref_html_role)
 
     # pylatest directives
     app.add_directive("test_step", directives.OldTestActionDirective)

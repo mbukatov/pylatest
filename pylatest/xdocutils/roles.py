@@ -22,8 +22,6 @@ See: http://docutils.sourceforge.net/docs/howto/rst-roles.html
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-import os
-
 from docutils import nodes
 from docutils import utils
 from docutils.parsers.rst import roles
@@ -53,27 +51,4 @@ def redhat_bugzilla_role(role, rawtext, text, lineno, inliner,
     roles.set_classes(options)
     node = nodes.reference(
         rawtext, 'RHBZ ' + utils.unescape(text), refuri=ref, **options)
-    return [node], []
-
-def pylaref_html_role(role, rawtext, text, lineno, inliner,
-                      options={}, content=[]):
-    """
-    Implementation of pylatest reference role for html output.
-
-    Usage::
-
-        See :pylaref:`foobar` for more information.
-
-    Where ``foobar`` is a pylatest document id.
-    """
-    doc_id = text
-    # make the target path relative
-    comp_num = len(doc_id.split("/"))
-    relpath_list = ['..' for _ in range(comp_num - 1)]
-    relpath_list.append(doc_id)
-    relative_path = "{0:s}.html".format(os.path.join(*relpath_list))
-    # create result
-    roles.set_classes(options)
-    node = nodes.reference(
-        rawtext, utils.unescape(text), refuri=relative_path, **options)
     return [node], []

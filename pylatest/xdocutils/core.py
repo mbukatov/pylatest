@@ -45,7 +45,6 @@ from pylatest.xdocutils.directives import RequirementDirective
 from pylatest.xdocutils.directives import OldTestActionDirective
 from pylatest.xdocutils.directives import TestActionDirective
 from pylatest.xdocutils.readers import NoPlainReader, PlainReader
-from pylatest.xdocutils.roles import pylaref_html_role
 from pylatest.xdocutils.roles import redhat_bugzilla_role
 import pylatest.xdocutils.htmltranslator
 import pylatest.xdocutils.nodes
@@ -83,7 +82,6 @@ def register_pylatest_roles():
     Register custom pylatest roles.
     """
     rst.roles.register_local_role("rhbz", redhat_bugzilla_role)
-    rst.roles.register_local_role("pylaref", pylaref_html_role)
 
 
 def register_pylatest_directives():

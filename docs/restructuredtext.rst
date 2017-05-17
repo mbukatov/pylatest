@@ -92,10 +92,12 @@ Roles
 
 .. rst:role:: pylaref
 
-    Don't use this role, `it's broken right now
-    <https://gitlab.com/mbukatov/pylatest/issues/24>`_.  Moreover it may be
-    removed entirely in the future.
+    This role has been removed and is no longer available.
+
+    To create a reference to a test case, use `doc role`_ with absolute
+    document name of the test case instead.
 
 
 .. _`Red Hat Bugzilla`: https://bugzilla.redhat.com/
 .. _`field list`: http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html#field-lists
+.. _`doc role`: http://www.sphinx-doc.org/en/stable/markup/inline.html#role-doc

@@ -13,7 +13,7 @@ check:
 In addition to that, you can use the following syntax to reference:
 
 * redhat bugzilla: see :RHBZ:`439858` (it will create proper link)
-* pylatest test cases: see :pylaref:`pylatest_testcase_id`
+* pylatest test cases: see :doc:`/pylatest_testcase_id`
 
 .. requirement:: TODO-01
     :priority: TODO:write-a-priority-here
@@ -24,9 +24,9 @@ In addition to that, you can use the following syntax to reference:
     The only mandatory information is the list of test cases related to this
     requirement (if such test cases exist):
 
-    * :pylaref:`testcase_something`
-    * :pylaref:`testcase_something_else`
-    * :pylaref:`testcase_yet_another_one`
+    * :doc:`/testcase_something`
+    * :doc:`/testcase_something_else`
+    * :doc:`/testcase_yet_another_one`
 
 .. requirement:: TODO-02
     :priority: low
