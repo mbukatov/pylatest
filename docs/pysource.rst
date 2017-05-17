@@ -4,7 +4,6 @@
  Extracting Test Cases from Python Source Code
 ===============================================
 
-.. note::
-
-    Extraction of test case rst files from python source code via
-    ``py2pylatest`` tool requires now deprecated pylatest custom directive.
+Extraction of test case rst files from python source code via ``py2pylatest``
+command line tool requires now deprecated directives :rst:dir:`test_step` and
+:rst:dir:`test_result`.

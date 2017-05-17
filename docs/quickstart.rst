@@ -4,14 +4,16 @@
  Getting started with Pylatest
 ===============================
 
-Pylatest is mainly a Sphinx_ extension, so check `Sphinx Tutorial`_ first if
-you are not familiar with sphinx.
+First of all, Pylatest is a Sphinx_ extension, so check `Sphinx Tutorial`_
+first if you are not familiar with Sphinx.
 
 
 Installation
 ============
 
-You can install latest stable Pylatest release from PyPI via pip::
+You can install latest stable Pylatest release from PyPI via pip:
+
+.. code-block:: sh
 
     $ pip install pylatest
 
@@ -29,7 +31,9 @@ You can install latest stable Pylatest release from PyPI via pip::
 Create new Sphinx/Pylatest Project
 ==================================
 
-You can start a new Sphinx/Pylatest project using the quickstart script::
+You can start a new Sphinx/Pylatest project using the quickstart script:
+
+.. code-block:: sh
 
     $ pylatest-quickstart
 
@@ -42,7 +46,9 @@ Adding Pylatest to Existing Project
 ===================================
 
 To use Pylatest with your existing Sphinx project, add ``pylatest``
-module into list of extensions in ``conf.py`` of the project::
+module into list of extensions in ``conf.py`` of the project:
+
+.. code-block:: python
 
     extensions = [
         'pylatest',
@@ -58,17 +64,9 @@ rst file, you should not describe multiple test cases in single file. Other
 aspects of structure of pylatest/sphinx project is completelly up to you
 though.
 
-Pylatest test case document should follow this structure:
+Here is an example of a test case document following expected structure:
 
-* Document tile is a title of the test case.
-* Just after document title, there are `docutils field lists`_ with test case
-  metadata.
-* There are four sections in document: *Description*, *Setup*, *Test Steps*
-  and *Teardown* - of which only *Test Steps* is mandatory.
-* Section *Test Steps* contains custom pylatest syntax for test steps, we
-  will discuss this in more detail shortly.
-
-Here is an example of a test case document following expected structure::
+.. code-block:: rst
 
     Test Case Title
     ***************
@@ -100,29 +98,6 @@ Here is an example of a test case document following expected structure::
        :result: There are no files, output should be empty.
 
     .. test_action::
-       :step: Another test step.
-       :result: Yet another expected result.
-
-    Teardown
-    ========
-
-    #. Description of the cleanup.
-
-    #. There is another one, again.
-
-
-As you can see from the example above, Pylatest defines custom `docutils
-directive`_ named ``test_action`` for writing down a test step action (which
-includes step itself and expected result)::
-
-    .. test_action::
-       :step: Here goes what should be done.
-       :result: Here is the expected result of previous action.
-
-Note that when the description of a test step is long and/or complicated, you
-can use multiple paragraphs to describe it::
-
-    .. test_action::
        :step:
            Run the following commands::
 
@@ -135,6 +110,22 @@ can use multiple paragraphs to describe it::
            Maecenas congue ligula ac quam viverra nec
            consectetur ante hendrerit.
 
+    Teardown
+    ========
+
+    #. Description of the cleanup.
+
+    #. There is another one, again.
+
+
+As you can see from the example above, Pylatest defines custom `docutils
+directive`_ named :rst:dir:`test_action` for writing down a test step action (which
+includes step itself and expected result). Also note that when the description
+of a test step is long and/or complicated, you can use multiple paragraphs to
+describe it as shown in the example.
+
+For more details, see description of :ref:`document_type_testcase` structure.
+
 
 HTML output
 ===========
@@ -146,7 +137,9 @@ Note that default pylatest html builder produces human readable representation
 of a test case, which generates table from all ``test_action`` directives from
 *Test Steps* section.
 
-For example, following rst source::
+For example, following rst source:
+
+.. code-block:: rst
 
     .. test_action::
        :step: Foo Step.

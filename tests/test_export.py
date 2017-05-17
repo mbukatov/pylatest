@@ -226,6 +226,15 @@ def add_section_div(elem, section_id):
     p_el.text = "Content of the section"
     return div_el
 
+
+def xmltostring(xml_tree):
+    content_b = etree.tostring(
+        xml_tree,
+        xml_declaration=False,
+        encoding='utf-8',
+        pretty_print=True)
+    return content_b.decode('utf-8')
+
 #
 # Test Cases
 #
@@ -446,3 +455,47 @@ def test_build_xml_testcase_doc_fulltestcase_actions(fulltestcase_html_string):
     assert action_id == 3
     assert etree.tostring(step_el).decode('utf-8') == exp_step_content
     assert result_el == None
+
+
+def test_build_xml_export_doc_empty():
+    export_doc = export.build_xml_export_doc()
+    exp_xml = textwrap.dedent('''\
+    <testcases/>
+    ''')
+    assert xmltostring(export_doc) == exp_xml
+
+
+def test_build_xml_export_doc_project_id():
+    export_doc = export.build_xml_export_doc(project_id="FOOBAR")
+    exp_xml = textwrap.dedent('''\
+    <testcases project-id="FOOBAR"/>
+    ''')
+    assert xmltostring(export_doc) == exp_xml
+
+
+def test_build_xml_export_doc_testcases_single():
+    tc_doc = etree.Element("testcase")
+    export_doc = export.build_xml_export_doc(testcases=[tc_doc])
+    exp_xml = textwrap.dedent('''\
+    <testcases>
+      <testcase/>
+    </testcases>
+    ''')
+    assert xmltostring(export_doc) == exp_xml
+
+
+def test_build_xml_export_doc_testcases_many():
+    testcases = [
+        etree.Element("testcase"),
+        etree.Element("testcase"),
+        etree.Element("testcase"),
+        ]
+    export_doc = export.build_xml_export_doc(testcases=testcases)
+    exp_xml = textwrap.dedent('''\
+    <testcases>
+      <testcase/>
+      <testcase/>
+      <testcase/>
+    </testcases>
+    ''')
+    assert xmltostring(export_doc) == exp_xml

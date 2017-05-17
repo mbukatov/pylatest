@@ -399,15 +399,23 @@ class XmlExportTestCaseDoc(TestCaseDocWithContent):
     List of sections expected in pylatest xml export document.
     """
 
-    def __init__(self, title=None):
+    def __init__(self, title=None, use_mixedcontent=True):
         super(XmlExportTestCaseDoc, self).__init__()
         self.metadata = {}
         self.title = title
+        self.use_mixedcontent = use_mixedcontent
 
     def __eq__(self, other):
         return (super(XmlExportTestCaseDoc, self).__eq__(other) and
                 self.metadata == other.metadata and
                 self.title == other.title)
+
+    def _set_content(self, xml_node, html_node):
+        if self.use_mixedcontent:
+            xml_node.append(html_node)
+        else:
+            xml_node.text = etree.tostring(
+                html_node, method="text").decode('utf-8')
 
     def is_empty(self):
         """
@@ -426,12 +434,7 @@ class XmlExportTestCaseDoc(TestCaseDocWithContent):
         """
         Generate element tree representation of xml document.
         """
-        # TODO: add mandatory 'project-id' attribute
-        xml_tree = etree.Element('testcases')
-        # TODO: check if we need to use these 'properties' for something here
-        # resp_properties = etree.SubElement(xml_tree, 'response-properties')
-        # properties = etree.SubElement(xml_tree, 'properties')
-        testcase = etree.SubElement(xml_tree, 'testcase')
+        testcase = etree.Element('testcase')
         # set tile
         if self.title is not None:
             title = etree.SubElement(testcase, 'title')
@@ -439,7 +442,8 @@ class XmlExportTestCaseDoc(TestCaseDocWithContent):
         # set description
         if self.DESCR in self.sections:
             description = etree.SubElement(testcase, 'description')
-            description.append(self.get_section(self.DESCR))
+            html_content = self.get_section(self.DESCR)
+            self._set_content(description, html_content)
         # set test actions
         if len(self._test_actions) > 0:
             actions = etree.SubElement(testcase, 'test-steps')
@@ -450,25 +454,38 @@ class XmlExportTestCaseDoc(TestCaseDocWithContent):
                     action,
                     'test-step-column',
                     attrib={'id': 'step'})
-                step.append(step_html)
+                self._set_content(step, step_html)
             if result_html is not None:
                 result = etree.SubElement(
                     action,
                     'test-step-column',
                     attrib={'id': 'expectedResult'})
-                result.append(result_html)
-        # set metadata
-        if len(self.metadata) > 0:
+                self._set_content(result, result_html)
+        # custom-fields contain metadata and setup and teardown (sic)
+        if (len(self.metadata) > 0 or
+                self.SETUP in self.sections or
+                self.TEARD in self.sections):
             custom_fields = etree.SubElement(testcase, 'custom-fields')
+        # set metadata
         for attr_name, content in self.metadata.items():
             etree.SubElement(
                 custom_fields,
                 'custom-field',
                 attrib={'id': attr_name, 'content': content})
-        # TODO: set setup and teardown
+        # set setup and teardown
+        # TODO: add as mixed content instead when export xml schema is changed
+        for section in (self.SETUP, self.TEARD):
+            if section in self.sections:
+                html_content = self.get_section(section)
+                content_b = etree.tostring(html_content, method="text")
+                content = content_b.decode('utf-8').strip()
+                etree.SubElement(
+                    custom_fields,
+                    'custom-field',
+                    attrib={'id': section.html_id, 'content': content})
         # TODO: implement linking
-        # linked_wis = etree.SubElement(xml_tree, 'linked-work-items')
-        return xml_tree
+        # linked_wis = etree.SubElement(testcase, 'linked-work-items')
+        return testcase
 
     def build_xml_string(self):
         """
