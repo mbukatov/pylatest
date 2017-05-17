@@ -4,8 +4,8 @@
  Getting started with Pylatest
 ===============================
 
-Pylatest is mainly a Sphinx_ extension, so check `Sphinx Tutorial`_ first if
-you are not familiar with sphinx.
+First of all, Pylatest is a Sphinx_ extension, so check `Sphinx Tutorial`_
+first if you are not familiar with Sphinx.
 
 
 Installation
