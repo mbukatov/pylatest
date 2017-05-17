@@ -17,15 +17,7 @@ You can install latest stable Pylatest release from PyPI via pip:
 
     $ pip install pylatest
 
-.. note::
-
-    This doesn't work right now because no stable release has been published
-    on PyPI yet, see HACKING.rst file for instructions how to install from
-    source code in the mean time.
-
-.. note:: TODO
-
-    Link to rpm copr builds for Fedora and RHEL when available.
+.. TODO: Link to rpm copr builds for Fedora and RHEL when available.
 
 
 Create new Sphinx/Pylatest Project
