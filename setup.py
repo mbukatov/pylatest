@@ -36,7 +36,7 @@ setup(
     version='0.1.0',
     description='Testcase description management tools.',
     long_description=long_description,
-    url='http://github.com/mbukatov/pylatest/',
+    url='http://gitlab.com/mbukatov/pylatest/',
     author='Martin Bukatovič',
     author_email='mbukatov@redhat.com',
     license='GPLv3',
