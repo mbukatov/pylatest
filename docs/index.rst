@@ -26,9 +26,10 @@ low in the long term.
    :caption: Contents:
 
    quickstart.rst
+   documents.rst
    cli.rst
-   pysource.rst
    xmlexport.rst
+   pysource.rst
 
 
 License
