@@ -162,4 +162,4 @@ def setup(app):
     app.add_config_value('pylatest_export_pretty_print', True, 'html')
 
     # sphinx plugin metadata
-    return {'version': '0.0.5'}
+    return {'version': '0.1.0'}
