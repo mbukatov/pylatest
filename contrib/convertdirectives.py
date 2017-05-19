@@ -56,12 +56,18 @@ with open(args.rstfile, "w") as rstfile:
         print(".. test_action::", file=rstfile)
         print("   :step:", file=rstfile)
         for linenum in range(test_step.start_line + 1, test_step.end_line):
-            print("   " + rstcontent[linenum], file=rstfile)
+            if len(rstcontent[linenum]) > 0:
+                print("   " + rstcontent[linenum], file=rstfile)
+            else:
+                print(file=rstfile)
         next_line_number = test_step.end_line
         if test_result is not None:
             print("   :result:", file=rstfile)
             for linenum in range(test_result.start_line + 1, test_result.end_line):
-                print("   " + rstcontent[linenum], file=rstfile)
+                if len(rstcontent[linenum]) > 0:
+                    print("   " + rstcontent[linenum], file=rstfile)
+                else:
+                    print(file=rstfile)
             next_line_number = test_result.end_line
     # ok, and now print the rest of the file
     for line in rstcontent[next_line_number:]:
