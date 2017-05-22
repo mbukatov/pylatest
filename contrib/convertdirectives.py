@@ -12,10 +12,8 @@ functionality, so here it is.
 
 
 import argparse
-import sys
 
 from pylatest.document import TestActions
-from pylatest.pysource import extract_content
 from pylatest.rstsource import find_actions
 from pylatest.xdocutils.core import register_all
 
