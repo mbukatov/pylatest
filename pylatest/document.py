@@ -68,7 +68,7 @@ class TestActions(object):
     note: htmlplain div element uses just 'step' and 'result' - TODO: refactor?
     """
 
-    MIN_AUTO_ID = 1000000
+    MIN_AUTO_ID = 1000000000
     """
     Minimal value of action id for which new id should be assigned.
     """

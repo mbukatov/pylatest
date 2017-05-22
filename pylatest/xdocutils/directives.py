@@ -105,7 +105,7 @@ class TestActionDirective(rst.Directive):
         #                   Output should be empty.
 
         # HACK: generate action id
-        action_id = int(time.time() * 1000)
+        action_id = int(time.time() * 1000000)
         assert TestActions.MIN_AUTO_ID < action_id
 
         # TODO: report error for unknown field_name (neither step nor result)
