@@ -8,6 +8,11 @@ directives ``test_step`` and ``test_result`` into ``test_action``.
 It's a best effort hack, not an official part of pylatest (-: I realized that
 such tool could be quite straighforward given already implemented pylatest
 functionality, so here it is.
+
+There are multiple edge cases when this doesn't work, such as:
+
+* empty directives
+* directives with content which doesn't start with text paragraph
 """
 
 
