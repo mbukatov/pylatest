@@ -40,6 +40,14 @@ Distributed under the terms of the `GNU GPL v3.0`_ license,
 Pylatest is free and open source software.
 
 
+Development and Source Code
+===========================
+
+To report a bug in Pylatest or to clone git repository with Pylatest source
+code, see `Pylatest project on gitlab.com`_. Additional details are available
+in ``HACKING.rst`` and ``CONTRIBUTING.rst`` files in the repository.
+
+
 Related Projects
 ================
 
@@ -57,6 +65,7 @@ Related Projects
 .. _`GNU GPL v3.0`: http://www.gnu.org/licenses/gpl-3.0.txt
 .. _Docutils: http://docutils.sourceforge.net/
 .. _Sphinx: http://www.sphinx-doc.org/en/stable/index.html
+.. _`Pylatest project on gitlab.com`: https://gitlab.com/mbukatov/pylatest/
 .. _Betelgeuse: https://betelgeuse.readthedocs.io/en/latest/
 .. _Testimony: https://testimony-qe.readthedocs.io/en/stable/
 .. _Polarize: https://github.com/RedHatQE/polarize
