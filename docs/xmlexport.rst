@@ -127,8 +127,8 @@ One can further tweak xml export behaviour by setting following options in
 .. confval:: pylatest_export_mixedcontent
 
     If False, xml export file will not contain mixed xhtml content for test
-    case sections such as *Description* and *Test Steps*, plain text version
-    will be used instead. Default is True.
+    case sections (such as *Description*, *Setup*, *Test Steps* and
+    *Teardown*), plain text version will be used instead. Default is True.
 
 .. confval:: pylatest_export_pretty_print
 

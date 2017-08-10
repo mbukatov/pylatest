@@ -679,7 +679,9 @@ class TestXmlExportTestCaseDocBuild(unittest.TestCase):
         <?xml version='1.0' encoding='utf-8'?>
         <testcase>
           <custom-fields>
-            <custom-field content="This is setup." id="{}"/>
+            <custom-field id="{}">
+              <p xmlns="http://www.w3.org/1999/xhtml">This is setup.</p>
+            </custom-field>
           </custom-fields>
         </testcase>
         ''').format(XmlExportTestCaseDoc.SETUP.html_id)
@@ -697,8 +699,12 @@ class TestXmlExportTestCaseDocBuild(unittest.TestCase):
         <?xml version='1.0' encoding='utf-8'?>
         <testcase>
           <custom-fields>
-            <custom-field content="This is setup." id="{}"/>
-            <custom-field content="This is teardown." id="{}"/>
+            <custom-field id="{}">
+              <p xmlns="http://www.w3.org/1999/xhtml">This is setup.</p>
+            </custom-field>
+            <custom-field id="{}">
+              <p xmlns="http://www.w3.org/1999/xhtml">This is teardown.</p>
+            </custom-field>
           </custom-fields>
         </testcase>
         ''').format(
