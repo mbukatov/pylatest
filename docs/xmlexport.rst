@@ -124,11 +124,27 @@ One can further tweak xml export behaviour by setting following options in
     export file, even though that author is specified in rst file of the test
     case and it would be present in standard html output.
 
-.. confval:: pylatest_export_mixedcontent
+.. confval:: pylatest_export_content_type
 
-    If False, xml export file will not contain mixed xhtml content for test
-    case sections (such as *Description*, *Setup*, *Test Steps* and
-    *Teardown*), plain text version will be used instead. Default is True.
+    Specifies how text content is included into xml elements of test case
+    sections (*Description*, *Setup*, *Test Steps* and *Teardown*) in xml
+    export file.
+
+    Supported content types are:
+
+    * ``mixedcontent``: content included as xhtml with proper xml namespace
+      (aka *mixed xhtml content*) generated from rst source text of
+      the section, see previous section for an example
+
+    * ``CDATA``: content included as html code inside `CDATA section`_ (this
+      is ugly hack and you should not use it)
+
+    * ``plaintext``: plain text without any markup
+
+    When not specified, ``mixedcontent`` is used.
+
+    If you are not sure whether you should use ``CDATA`` option, use
+    ``mixedcontent`` instead.
 
 .. confval:: pylatest_export_pretty_print
 
@@ -141,3 +157,4 @@ One can further tweak xml export behaviour by setting following options in
 
 .. _`Sphinx builder`: http://www.sphinx-doc.org/en/stable/builders.html
 .. _`conf.py build configuration file`: http://www.sphinx-doc.org/en/stable/config.html
+.. _`CDATA section`: https://en.wikipedia.org/wiki/CDATA

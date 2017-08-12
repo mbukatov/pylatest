@@ -635,6 +635,11 @@ class TestXmlExportTestCaseDoc(unittest.TestCase):
         assert len(tc.metadata) == 1
         assert tc.metadata.get("importance") == "critical"
 
+    def test_xmltestcasedoc_bad_contenttype(self):
+        assert "foo" not in XmlExportTestCaseDoc.CONTENT_TYPES
+        with pytest.raises(pylatest.document.PylatestDocumentError):
+            tc = XmlExportTestCaseDoc(content_type="foo")
+
 
 class TestXmlExportTestCaseDocBuild(unittest.TestCase):
 
@@ -687,6 +692,16 @@ class TestXmlExportTestCaseDocBuild(unittest.TestCase):
         ''').format(XmlExportTestCaseDoc.SETUP.html_id)
         assert tc.build_xml_string() == exp_xml
 
+    def test_xmltestcasedoc_build_xml_setup_bad_contenttype(self):
+        tc = XmlExportTestCaseDoc()
+        tc.add_section(
+            XmlExportTestCaseDoc.SETUP,
+            etree.fromstring('<p xmlns="http://www.w3.org/1999/xhtml">This is setup.</p>'))
+        assert "foo" not in XmlExportTestCaseDoc.CONTENT_TYPES
+        tc.content_type = "foo"
+        with pytest.raises(pylatest.document.PylatestDocumentError):
+            tc.build_xml_string()
+
     def test_xmltestcasedoc_build_xml_setup_teardown(self):
         tc = XmlExportTestCaseDoc()
         tc.add_section(
@@ -727,8 +742,21 @@ class TestXmlExportTestCaseDocBuild(unittest.TestCase):
         ''')
         assert tc.build_xml_string() == exp_xml
 
-    def test_xmltestcasedoc_build_xml_description_nomixedcontent(self):
-        tc = XmlExportTestCaseDoc(use_mixedcontent=False)
+    def test_xmltestcasedoc_build_xml_description_cdata(self):
+        tc = XmlExportTestCaseDoc(content_type=XmlExportTestCaseDoc.CDATA)
+        tc.add_section(
+            XmlExportTestCaseDoc.DESCR,
+            etree.fromstring('<p xmlns="http://www.w3.org/1999/xhtml">This is a description</p>'))
+        exp_xml = textwrap.dedent('''\
+        <?xml version='1.0' encoding='utf-8'?>
+        <testcase>
+          <description><![CDATA[<p>This is a description</p>]]></description>
+        </testcase>
+        ''')
+        assert tc.build_xml_string() == exp_xml
+
+    def test_xmltestcasedoc_build_xml_description_plaintext(self):
+        tc = XmlExportTestCaseDoc(content_type=XmlExportTestCaseDoc.PLAINTEXT)
         tc.add_section(
             XmlExportTestCaseDoc.DESCR,
             etree.fromstring('<p xmlns="http://www.w3.org/1999/xhtml">This is a description</p>'))
@@ -767,8 +795,31 @@ class TestXmlExportTestCaseDocBuild(unittest.TestCase):
         ''')
         assert tc.build_xml_string() == exp_xml
 
-    def test_xmltestcasedoc_build_xml_action_nomixedcontent(self):
-        tc = XmlExportTestCaseDoc(use_mixedcontent=False)
+    def test_xmltestcasedoc_build_xml_action_cdata(self):
+        tc = XmlExportTestCaseDoc(content_type=XmlExportTestCaseDoc.CDATA)
+        tc.add_test_action(
+            "test_step",
+            etree.fromstring('<p xmlns="http://www.w3.org/1999/xhtml">Step.</p>'),
+            1)
+        tc.add_test_action(
+            "test_result",
+            etree.fromstring('<p xmlns="http://www.w3.org/1999/xhtml">Nothing happens.</p>'),
+            1)
+        exp_xml = textwrap.dedent('''\
+        <?xml version='1.0' encoding='utf-8'?>
+        <testcase>
+          <test-steps>
+            <test-step>
+              <test-step-column id="step"><![CDATA[<p>Step.</p>]]></test-step-column>
+              <test-step-column id="expectedResult"><![CDATA[<p>Nothing happens.</p>]]></test-step-column>
+            </test-step>
+          </test-steps>
+        </testcase>
+        ''')
+        assert tc.build_xml_string() == exp_xml
+
+    def test_xmltestcasedoc_build_xml_action_plaintext(self):
+        tc = XmlExportTestCaseDoc(content_type=XmlExportTestCaseDoc.PLAINTEXT)
         tc.add_test_action(
             "test_step",
             etree.fromstring('<p xmlns="http://www.w3.org/1999/xhtml">Step.</p>'),
