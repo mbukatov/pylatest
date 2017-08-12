@@ -105,7 +105,7 @@ def get_title(tree):
     return el_list[0].text
 
 
-def build_xml_testcase_doc(html_source, mixedcontent=True):
+def build_xml_testcase_doc(html_source, content_type=None):
     """
     Create xml export document (instance of XmlExportTestCaseDoc) for given
     test case html source string.
@@ -116,7 +116,7 @@ def build_xml_testcase_doc(html_source, mixedcontent=True):
 
     html_tree = etree.fromstring(html_source.encode("utf8"))
     title = get_title(html_tree)
-    doc = XmlExportTestCaseDoc(title, use_mixedcontent=mixedcontent)
+    doc = XmlExportTestCaseDoc(title, content_type)
 
     # extract metadata from html_tree
     for attr_name, content in get_metadata(html_tree):

@@ -399,11 +399,28 @@ class XmlExportTestCaseDoc(TestCaseDocWithContent):
     List of sections expected in pylatest xml export document.
     """
 
-    def __init__(self, title=None, use_mixedcontent=True):
+    MIXEDCONTENT = "mixedcontent"
+    PLAINTEXT = "plaintext"
+    CONTENT_TYPES = (
+        MIXEDCONTENT,
+        PLAINTEXT,
+        )
+    """
+    List of supported ways to include content in xml export file.
+    """
+
+    def __init__(self, title=None, content_type=None):
         super(XmlExportTestCaseDoc, self).__init__()
         self.metadata = {}
         self.title = title
-        self.use_mixedcontent = use_mixedcontent
+        if content_type is None:
+            # use mixed content as the default
+            self.content_type = self.MIXEDCONTENT
+        elif content_type in self.CONTENT_TYPES:
+            self.content_type = content_type
+        else:
+            msg = "unknown content type '{}'".format(content_type)
+            raise PylatestDocumentError(msg)
 
     def __eq__(self, other):
         return (super(XmlExportTestCaseDoc, self).__eq__(other) and
@@ -411,11 +428,14 @@ class XmlExportTestCaseDoc(TestCaseDocWithContent):
                 self.title == other.title)
 
     def _set_content(self, xml_node, html_node):
-        if self.use_mixedcontent:
+        if self.content_type == self.MIXEDCONTENT:
             xml_node.append(html_node)
-        else:
+        elif self.content_type == self.PLAINTEXT:
             xml_node.text = etree.tostring(
                 html_node, method="text").decode('utf-8')
+        else:
+            msg = "unknown content type '{}'".format(self.content_type)
+            raise PylatestDocumentError(msg)
 
     def is_empty(self):
         """
