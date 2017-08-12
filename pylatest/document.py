@@ -400,9 +400,11 @@ class XmlExportTestCaseDoc(TestCaseDocWithContent):
     """
 
     MIXEDCONTENT = "mixedcontent"
+    CDATA = "CDATA"
     PLAINTEXT = "plaintext"
     CONTENT_TYPES = (
         MIXEDCONTENT,
+        CDATA,
         PLAINTEXT,
         )
     """
@@ -430,6 +432,22 @@ class XmlExportTestCaseDoc(TestCaseDocWithContent):
     def _set_content(self, xml_node, html_node):
         if self.content_type == self.MIXEDCONTENT:
             xml_node.append(html_node)
+        elif self.content_type == self.CDATA:
+            # HACK: drop all namespaces
+            # based on https://stackoverflow.com/questions/30232031/
+            query = "descendant-or-self::*[namespace-uri()!='']"
+            for element in html_node.xpath(query):
+                element.tag = etree.QName(element).localname
+            etree.cleanup_namespaces(html_node)
+            # convert xhtml tree into string (now without xhtml namespace)
+            content_b = etree.tostring(
+                html_node,
+                xml_declaration=False,
+                encoding='utf-8',
+                pretty_print=False)
+            content_str = content_b.decode('utf-8')
+            # and finally include this html string as a CDATA section
+            xml_node.text = etree.CDATA(content_str)
         elif self.content_type == self.PLAINTEXT:
             xml_node.text = etree.tostring(
                 html_node, method="text").decode('utf-8')

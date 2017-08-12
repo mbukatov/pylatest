@@ -136,9 +136,15 @@ One can further tweak xml export behaviour by setting following options in
       (aka *mixed xhtml content*) generated from rst source text of
       the section, see previous section for an example
 
+    * ``CDATA``: content included as html code inside `CDATA section`_ (this
+      is ugly hack and you should not use it)
+
     * ``plaintext``: plain text without any markup
 
     When not specified, ``mixedcontent`` is used.
+
+    If you are not sure whether you should use ``CDATA`` option, use
+    ``mixedcontent`` instead.
 
 .. confval:: pylatest_export_pretty_print
 
@@ -151,3 +157,4 @@ One can further tweak xml export behaviour by setting following options in
 
 .. _`Sphinx builder`: http://www.sphinx-doc.org/en/stable/builders.html
 .. _`conf.py build configuration file`: http://www.sphinx-doc.org/en/stable/config.html
+.. _`CDATA section`: https://en.wikipedia.org/wiki/CDATA
