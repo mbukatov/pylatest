@@ -1,0 +1,11 @@
+===========
+ Changelog
+===========
+
+v0.1.1
+------
+- increase MIN_AUTO_ID (https://gitlab.com/mbukatov/pylatest/issues/34)
+
+v0.1.0
+------
+- first official public release
