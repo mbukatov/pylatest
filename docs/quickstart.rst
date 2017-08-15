@@ -11,13 +11,37 @@ first if you are not familiar with Sphinx.
 Installation
 ============
 
-You can install latest stable Pylatest release from PyPI via pip:
+You can install `latest stable Pylatest release from PyPI`_ via pip:
 
-.. code-block:: sh
+.. code-block:: console
 
-    $ pip install pylatest
+    # pip install pylatest
 
-.. TODO: Link to rpm copr builds for Fedora and RHEL when available.
+
+Installation on Fedora
+----------------------
+
+If you use Fedora, you can install rpm packages from `marbu/pylatest copr`_:
+
+.. code-block:: console
+
+    # dnf copr enable marbu/pylatest
+    # dnf install python3-pylatest
+
+
+Installation on RHEL 7
+----------------------
+
+If you use RHEL 7 (or other operating system based on RHEL such as CentOS),
+install at least ``python-lxml`` package from system repositories and then
+install pylatest via pip under normal (non root) user account under which you
+are going to use it:
+
+.. code-block:: console
+
+    # yum install python-lxml python-docutils python-pip
+    # su - pylatestuser
+    $ pip install --user pylatest
 
 
 Create new Sphinx/Pylatest Project
@@ -156,3 +180,5 @@ Would be represented in the following way in html output:
 .. _`Sphinx Tutorial`: http://www.sphinx-doc.org/en/stable/tutorial.html
 .. _`docutils field lists`: http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html#field-lists
 .. _`docutils directive`: http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html#directives
+.. _`latest stable Pylatest release from PyPI`: https://pypi.python.org/pypi/pylatest/
+.. _`marbu/pylatest copr`: https://copr.fedorainfracloud.org/coprs/marbu/pylatest/
