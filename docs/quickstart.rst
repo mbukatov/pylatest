@@ -33,13 +33,15 @@ Installation on RHEL 7
 ----------------------
 
 If you use RHEL 7 (or other operating system based on RHEL such as CentOS),
-install at least ``python-lxml`` package from system repositories and then
+install at least ``python-lxml`` package from system repositories,
+``python-pip`` from Epel_ and then
 install pylatest via pip under normal (non root) user account under which you
 are going to use it:
 
 .. code-block:: console
 
-    # yum install python-lxml python-docutils python-pip
+    # yum install python-lxml python-docutils
+    # yum --enablerepo=epel install python-pip
     # su - pylatestuser
     $ pip install --user pylatest
 
@@ -182,3 +184,4 @@ Would be represented in the following way in html output:
 .. _`docutils directive`: http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html#directives
 .. _`latest stable Pylatest release from PyPI`: https://pypi.python.org/pypi/pylatest/
 .. _`marbu/pylatest copr`: https://copr.fedorainfracloud.org/coprs/marbu/pylatest/
+.. _Epel: https://fedoraproject.org/wiki/EPEL
