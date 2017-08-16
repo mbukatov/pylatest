@@ -51,7 +51,7 @@ Create new Sphinx/Pylatest Project
 
 You can start a new Sphinx/Pylatest project using the quickstart script:
 
-.. code-block:: sh
+.. code-block:: console
 
     $ pylatest-quickstart
 
