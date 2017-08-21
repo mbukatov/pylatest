@@ -2,6 +2,15 @@
  Changelog
 ===========
 
+upcoming v0.1.2
+---------------
+- move to python 3.6 as tested/supported release of python3
+- xml export: change content represenation in custom-field element for setup
+  and teardown sections (https://gitlab.com/mbukatov/pylatest/issues/37)
+- xml export: confval pylatest_export_mixedcontent replaced with more general
+  pylatest_export_content_type, addng new CDATA export content type
+  (https://gitlab.com/mbukatov/pylatest/issues/38)
+
 v0.1.1
 ------
 - increase MIN_AUTO_ID (https://gitlab.com/mbukatov/pylatest/issues/34)
