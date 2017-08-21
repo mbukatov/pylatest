@@ -31,6 +31,7 @@ low in the long term.
    cli.rst
    xmlexport.rst
    pysource.rst
+   changelog.rst
 
 
 License
