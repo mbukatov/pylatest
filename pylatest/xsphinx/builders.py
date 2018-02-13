@@ -86,6 +86,8 @@ class XmlExportBuilder(Builder):
     link_suffix = '.xml'
     supported_image_types = []
     add_permalinks = False
+    # docutils translator
+    default_translator_class = HTMLTranslator
 
     def init(self):
         # writer object is initialized in prepare_writing method
@@ -96,8 +98,6 @@ class XmlExportBuilder(Builder):
         self.fignumbers = {}
         # currently written docname
         self.current_docname = None  # type: unicode
-        # docutils translator
-        self.translator_class = HTMLTranslator
         # sphinx highlighter, from StandaloneHTMLBuilder.init_highlighter()
         self.highlighter = PygmentsBridge(
             'html',

@@ -51,7 +51,7 @@ setup(
         'Programming Language :: Python :: 3.6',
         ],
     packages=find_packages(exclude=['doc', 'tests']),
-    install_requires=['docutils', 'lxml', 'sphinx>=1.4.6'],
+    install_requires=['docutils', 'lxml', 'sphinx>=1.6.0'],
     # TODO: make this work with git (and remove MANIFEST.in?)
     # setup_requires=['setuptools_scm'],
     # use_scm_version=True,
