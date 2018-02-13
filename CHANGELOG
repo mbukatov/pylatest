@@ -6,6 +6,8 @@ upcoming v0.1.2 (unreleased)
 - xml export: confval pylatest_export_mixedcontent replaced with more general
   pylatest_export_content_type, adding new CDATA export content type
   (https://gitlab.com/mbukatov/pylatest/issues/38)
+- bugfix: update for changes in sphinx >= 1.6.1
+  (https://gitlab.com/mbukatov/pylatest/issues/41)
 
 v0.1.1 (2017-05-22)
 -------------------
