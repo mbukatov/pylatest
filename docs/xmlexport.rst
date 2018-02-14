@@ -15,7 +15,8 @@ root directory of a Sphinx/Pylatest project.
 .. note:: Workaround is required
 
     Executing ``make clean`` before running ``make xmlexport`` is needed
-    because of known problem with Pylatest xml export builder, which produces
+    because of `known problem with Pylatest xml export builder
+    <https://gitlab.com/mbukatov/pylatest/issues/43>`_, which produces
     different doctree compared to standard html builder.
 
     For the same reason, one have to run ``make clean`` again before building
