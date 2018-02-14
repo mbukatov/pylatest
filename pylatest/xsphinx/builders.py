@@ -136,6 +136,9 @@ class XmlExportBuilder(Builder):
             components=(self.writer,),
             read_config_files=True).get_default_values()
         self.settings.compact_lists = bool(self.config.html_compact_lists)
+        # disable splitting field list table rows with too long field names,
+        # fixing https://gitlab.com/mbukatov/pylatest/issues/44
+        self.settings.field_name_limit = 0
 
     def write_doc(self, docname, doctree):
         # type: (unicode, nodes.Node) -> None

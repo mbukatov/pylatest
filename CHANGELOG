@@ -8,6 +8,8 @@ upcoming v0.1.2 (unreleased)
   (https://gitlab.com/mbukatov/pylatest/issues/38)
 - bugfix: update for changes in sphinx >= 1.6.1
   (https://gitlab.com/mbukatov/pylatest/issues/41)
+- bugfix: prevent xmlexport build crash caused by long field names in metadata
+  (https://gitlab.com/mbukatov/pylatest/issues/44)
 
 v0.1.1 (2017-05-22)
 -------------------
