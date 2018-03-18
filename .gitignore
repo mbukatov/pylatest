@@ -10,3 +10,4 @@ tmp
 examples/*.html
 .tox
 .cache
+.pytest_cache
