@@ -163,6 +163,7 @@ class XmlExportBuilder(Builder):
         tc_doc = build_xml_testcase_doc(
             html_source=self.writer.output,
             content_type=self.app.config.pylatest_export_content_type,
+            testcase_id="/" + docname,
             )
 
         # validate and drop invalid metadata if needed
