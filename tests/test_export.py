@@ -460,7 +460,11 @@ def test_build_xml_testcase_doc_fulltestcase_actions(fulltestcase_html_string):
 def test_build_xml_export_doc_empty():
     export_doc = export.build_xml_export_doc()
     exp_xml = textwrap.dedent('''\
-    <testcases/>
+    <testcases>
+      <properties>
+        <property name="lookup-method" value="custom"/>
+      </properties>
+    </testcases>
     ''')
     assert xmltostring(export_doc) == exp_xml
 
@@ -468,7 +472,11 @@ def test_build_xml_export_doc_empty():
 def test_build_xml_export_doc_project_id():
     export_doc = export.build_xml_export_doc(project_id="FOOBAR")
     exp_xml = textwrap.dedent('''\
-    <testcases project-id="FOOBAR"/>
+    <testcases project-id="FOOBAR">
+      <properties>
+        <property name="lookup-method" value="custom"/>
+      </properties>
+    </testcases>
     ''')
     assert xmltostring(export_doc) == exp_xml
 
@@ -478,6 +486,9 @@ def test_build_xml_export_doc_testcases_single():
     export_doc = export.build_xml_export_doc(testcases=[tc_doc])
     exp_xml = textwrap.dedent('''\
     <testcases>
+      <properties>
+        <property name="lookup-method" value="custom"/>
+      </properties>
       <testcase/>
     </testcases>
     ''')
@@ -493,6 +504,9 @@ def test_build_xml_export_doc_testcases_many():
     export_doc = export.build_xml_export_doc(testcases=testcases)
     exp_xml = textwrap.dedent('''\
     <testcases>
+      <properties>
+        <property name="lookup-method" value="custom"/>
+      </properties>
       <testcase/>
       <testcase/>
       <testcase/>

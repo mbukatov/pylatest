@@ -145,7 +145,12 @@ def build_xml_export_doc(project_id=None, testcases=None):
         xml_tree.attrib["project-id"] = project_id
     # TODO: check if we need to use these 'properties' for something here
     # resp_properties = etree.SubElement(xml_tree, 'response-properties')
-    # properties = etree.SubElement(xml_tree, 'properties')
+    properties = etree.SubElement(xml_tree, 'properties')
+    # use custom method for id lookup by default
+    # TODO: make configurable (it is hardcoded for now)
+    etree.SubElement(properties, 'property', attrib={
+        'name': 'lookup-method',
+        'value': 'custom'})
     if testcases is None:
         return xml_tree
     for tc in testcases:
