@@ -651,11 +651,29 @@ class TestXmlExportTestCaseDocBuild(unittest.TestCase):
         ''')
         assert tc.build_xml_string() == empty_xml
 
+    def test_xmltestcasedoc_build_xml_empty_withid(self):
+        tc = XmlExportTestCaseDoc(testcase_id="123")
+        empty_xml = textwrap.dedent('''\
+        <?xml version='1.0' encoding='utf-8'?>
+        <testcase id="123"/>
+        ''')
+        assert tc.build_xml_string() == empty_xml
+
     def test_xmltestcasedoc_build_xml_title(self):
         tc = XmlExportTestCaseDoc(title="Foo Bar Test")
         exp_xml = textwrap.dedent('''\
         <?xml version='1.0' encoding='utf-8'?>
         <testcase>
+          <title>Foo Bar Test</title>
+        </testcase>
+        ''')
+        assert tc.build_xml_string() == exp_xml
+
+    def test_xmltestcasedoc_build_xml_title_withid(self):
+        tc = XmlExportTestCaseDoc(title="Foo Bar Test", testcase_id="113")
+        exp_xml = textwrap.dedent('''\
+        <?xml version='1.0' encoding='utf-8'?>
+        <testcase id="113">
           <title>Foo Bar Test</title>
         </testcase>
         ''')
