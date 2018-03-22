@@ -22,8 +22,11 @@ def xmlparse_html_testcase(outdir, filename):
     return xml_tree
 
 
-@pytest.mark.sphinx('html', testroot='testdefaults-not-used')
-def test_directive_not_used(app, status, warning):
+@pytest.mark.parametrize("builder", [
+    pytest.mark.sphinx('html', 'html', testroot='testdefaults-not-used'),
+    pytest.mark.sphinx('xmlexport', 'xmlexport', testroot='testdefaults-not-used'),
+    ])
+def test_directive_not_used(app, status, warning, builder):
     """
     Check that build doesn't fail without the feature.
     """
