@@ -57,6 +57,7 @@ import subprocess
 from collections import namedtuple
 
 import pytest
+from _pytest.mark import MarkDecorator, MarkInfo
 from six import StringIO, string_types
 
 import util
@@ -74,6 +75,10 @@ def app_params(request, test_params, shared_result):
     markers = request.node.get_marker("sphinx")
     pargs = {}
     kwargs = {}
+
+    # HACK: this makes parametrized markers work
+    if isinstance(markers, MarkDecorator):
+        markers = [markers]
 
     if markers is not None:
         # to avoid stacking positional args

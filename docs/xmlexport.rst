@@ -12,16 +12,6 @@ To generate xml export files, run ``make xmlexport`` (which runs
 ``$(SPHINXBUILD) -b xmlexport $(ALLSPHINXOPTS) $(BUILDDIR)/xmlexport``) in the
 root directory of a Sphinx/Pylatest project.
 
-.. note:: Workaround is required
-
-    Executing ``make clean`` before running ``make xmlexport`` is needed
-    because of `known problem with Pylatest xml export builder
-    <https://gitlab.com/mbukatov/pylatest/issues/43>`_, which produces
-    different doctree compared to standard html builder.
-
-    For the same reason, one have to run ``make clean`` again before building
-    html (or any other than ``xmlexport``) output.
-
 XML Export file format
 ======================
 
