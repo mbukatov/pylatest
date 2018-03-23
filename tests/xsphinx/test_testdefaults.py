@@ -7,19 +7,44 @@ import pytest
 from pylatest.export import NS, get_metadata
 
 
-def xmlparse_html_testcase(outdir, filename):
+def xmlparse_testcase(outdir, doc_name, builder):
     """
     Parse html testcase file via etree xml parser, so that
     functions from pylatest.export module can be used on the
     result.
     """
-    html_str = (outdir / filename).text()
-    # remove html specific entities so that we can use xml parser
-    html_str = html_str.replace('&nbsp;', '')
-    html_str = html_str.replace('&copy;', '')
+    builder2ext = {
+        "html": ".html",
+        "xmlexport": ".xml",
+        }
+    html_str = (outdir / (doc_name + builder2ext[builder])).text()
+    if builder == "html":
+        # remove html specific entities so that we can use xml parser
+        html_str = html_str.replace('&nbsp;', '')
+        html_str = html_str.replace('&copy;', '')
     # parse the source
     xml_tree = etree.fromstring(html_str.encode("utf8"))
     return xml_tree
+
+
+def get_metadata_from_build(tree, builder):
+    """
+    Extracts test case metadata from given xmlexport tree.
+    """
+    metadata = []
+    if builder == "html":
+        metadata = get_metadata(tree)
+    elif builder == "xmlexport":
+        # asking for list of elements maching given xpath query
+        el_list = tree.xpath('/testcases/testcase/custom-fields')
+        # if there is no such element
+        if len(el_list) == 0:
+            return metadata
+        for field in el_list[0]:
+            id_value = field.get('id')
+            content_value = field.get('content')
+            metadata.append((id_value, content_value))
+    return metadata
 
 
 @pytest.mark.parametrize("builder", [
@@ -53,15 +78,18 @@ def test_directive_html_content(app, status, warning):
     assert div_str == u"Test of pylatest_defaults¶"
 
 
-@pytest.mark.sphinx('html', testroot='testdefaults-flat')
-def test_testcasemetadata_html_flat(app, status, warning):
+@pytest.mark.parametrize("builder", [
+    pytest.mark.sphinx('html', 'html', testroot='testdefaults-flat'),
+    pytest.mark.sphinx('xmlexport', 'xmlexport', testroot='testdefaults-flat'),
+    ])
+def test_testcasemetadata_html_flat(app, status, warning, builder):
     app.builder.build_all()
-    # parse test case document html builds
-    foo_html_tree = xmlparse_html_testcase(app.outdir, "test_foo.html")
-    bar_html_tree = xmlparse_html_testcase(app.outdir, "test_bar.html")
+    # parse test case document builds
+    foo_tree = xmlparse_testcase(app.outdir, "test_foo", builder)
+    bar_tree = xmlparse_testcase(app.outdir, "test_bar", builder)
     # get metadata
-    foo_meta = get_metadata(foo_html_tree)
-    bar_meta = get_metadata(bar_html_tree)
+    foo_meta = get_metadata_from_build(foo_tree, builder)
+    bar_meta = get_metadata_from_build(bar_tree, builder)
     # check metadata directly included in the files
     assert ('author', 'joe.foo@example.com') in foo_meta
     assert ('author', 'joe.bar@example.com') in bar_meta
@@ -75,16 +103,23 @@ def test_testcasemetadata_html_flat(app, status, warning):
     assert len(bar_meta) == 3
 
 
-@pytest.mark.sphinx('html', testroot='testdefaults-flat-override')
-def test_testcasemetadata_html_flat_override(app, status, warning):
+@pytest.mark.parametrize("builder", [
+    pytest.mark.sphinx('html', 'html', testroot='testdefaults-flat-override'),
+    pytest.mark.sphinx('xmlexport', 'xmlexport', testroot='testdefaults-flat-override'),
+    ])
+def test_testcasemetadata_html_flat_override(app, status, warning, builder):
     """
     Check that values from test_defaults directive can override
     values specified directly in a test case.
     """
     app.builder.build_all()
     # get metadata
-    foo_meta = get_metadata(xmlparse_html_testcase(app.outdir, "test_foo.html"))
-    bar_meta = get_metadata(xmlparse_html_testcase(app.outdir, "test_bar.html"))
+    foo_meta = get_metadata_from_build(
+        xmlparse_testcase(app.outdir, "test_foo", builder),
+        builder)
+    bar_meta = get_metadata_from_build(
+        xmlparse_testcase(app.outdir, "test_bar", builder),
+        builder)
     # check metadata overriden by testdefaults directive,
     # in index.rst file, we set/override 'component' to value 'actium'
     for meta in foo_meta, bar_meta:
@@ -93,8 +128,11 @@ def test_testcasemetadata_html_flat_override(app, status, warning):
         assert comp_list[0] == 'actium'
 
 
-@pytest.mark.sphinx('html', testroot='testdefaults-nested')
-def test_testcasemetadata_html_nested(app, status, warning):
+@pytest.mark.parametrize("builder", [
+    pytest.mark.sphinx('html', 'html', testroot='testdefaults-nested'),
+    pytest.mark.sphinx('xmlexport', 'xmlexport', testroot='testdefaults-nested'),
+    ])
+def test_testcasemetadata_html_nested(app, status, warning, builder):
     """
     Given 2 directories with test cases (foo and bar), check that
     all test cases inside has component metadata value set properly,
@@ -102,21 +140,30 @@ def test_testcasemetadata_html_nested(app, status, warning):
     """
     app.builder.build_all()
     for tc_name in (
-            "foo/test_one.html",
-            "foo/test_two.html",
-            "bar/test_ten.html",
-            "bar/test_elewen.html"):
-        meta = get_metadata(xmlparse_html_testcase(app.outdir, tc_name))
+            "foo/test_one",
+            "foo/test_two",
+            "bar/test_ten",
+            "bar/test_elewen"):
+        meta = get_metadata_from_build(
+            xmlparse_testcase(app.outdir, tc_name, builder),
+            builder)
         component = tc_name.split("/")[0]
         assert ("component", component) in meta
 
 
-@pytest.mark.sphinx('html', testroot='testdefaults-nested-multiple')
-def test_testcasemetadata_html_nested_multiple(app, status, warning):
+@pytest.mark.parametrize("builder", [
+    pytest.mark.sphinx('html', 'html', testroot='testdefaults-nested-multiple'),
+    pytest.mark.sphinx('xmlexport', 'xmlexport', testroot='testdefaults-nested-multiple'),
+    ])
+def test_testcasemetadata_html_nested_multiple(app, status, warning, builder):
     app.builder.build_all()
     # get metadata
-    one_meta = get_metadata(xmlparse_html_testcase(app.outdir, "foo/test_one.html"))
-    ten_meta = get_metadata(xmlparse_html_testcase(app.outdir, "foo/bar/test_ten.html"))
+    one_meta = get_metadata_from_build(
+        xmlparse_testcase(app.outdir, "foo/test_one", builder),
+        builder)
+    ten_meta = get_metadata_from_build(
+        xmlparse_testcase(app.outdir, "foo/bar/test_ten", builder),
+        builder)
     # check metadata defined in test_defaults of root index.rst file
     assert ('note', 'test') in one_meta
     assert ('note', 'test') in ten_meta
@@ -127,23 +174,29 @@ def test_testcasemetadata_html_nested_multiple(app, status, warning):
     assert ('subcomponent', 'bar') in ten_meta
 
 
-@pytest.mark.sphinx('html', testroot='testdefaults-nested-multiple')
-def test_testcasemetadata_html_nested_multiple_override(app, status, warning):
+@pytest.mark.parametrize("builder", [
+    pytest.mark.sphinx('html', 'html', testroot='testdefaults-nested-multiple'),
+    pytest.mark.sphinx('xmlexport', 'xmlexport', testroot='testdefaults-nested-multiple'),
+    ])
+def test_testcasemetadata_html_nested_multiple_override(app, status, warning, builder):
     app.builder.build_all()
     # get metadata
-    two_meta = get_metadata(xmlparse_html_testcase(
-        app.outdir, "foo/test_two.html"))
-    ten_meta = get_metadata(xmlparse_html_testcase(
-        app.outdir, "foo/bar/test_ten.html"))
-    elewen_meta = get_metadata(xmlparse_html_testcase(
-        app.outdir, "foo/bar/test_elewen.html"))
+    two_meta = get_metadata_from_build(
+        xmlparse_testcase(app.outdir, "foo/test_two", builder),
+        builder)
+    ten_meta = get_metadata_from_build(
+        xmlparse_testcase(app.outdir, "foo/bar/test_ten", builder),
+        builder)
+    elewen_meta = get_metadata_from_build(
+        xmlparse_testcase(app.outdir, "foo/bar/test_elewen", builder),
+        builder)
     # check metadata defined both in test_defaults of root index.rst file and
     # the test case itself, default value should be used
     assert ('note', 'test') in two_meta
     # check metadata defined both in test_defaults of bar's index.rst file and
     # the test case itself, default value should be used
     assert ('subcomponent', 'bar') in elewen_meta
-    # check metadata defined both in test_defaults of bar's and foo's index.rst file
-    # default value from foo's index.rst file should be used
+    # check metadata defined both in test_defaults of bar's and foo's index.rst
+    # file default value from foo's index.rst file should be used
     assert ('type', 'functional') in ten_meta
     assert ('type', 'functional') in elewen_meta
