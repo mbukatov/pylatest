@@ -136,21 +136,33 @@ def build_xml_testcase_doc(html_source, content_type=None, testcase_id=None):
     return doc
 
 
-def build_xml_export_doc(project_id=None, testcases=None):
+def add_properties(element, properties):
+    """
+    Add properties into given xml element.
+    """
+    for name, value in properties.items():
+        etree.SubElement(element, 'property', attrib={
+            'name': str(name),
+            'value': str(value)})
+
+
+def build_xml_export_doc(
+        project_id=None,
+        testcases=None,
+        properties=None,
+        response_properties=None):
     """
     Create xml export document for given testcases.
     """
     xml_tree = etree.Element('testcases')
     if project_id is not None:
         xml_tree.attrib["project-id"] = project_id
-    # TODO: check if we need to use these 'properties' for something here
-    # resp_properties = etree.SubElement(xml_tree, 'response-properties')
-    properties = etree.SubElement(xml_tree, 'properties')
-    # use custom method for id lookup by default
-    # TODO: make configurable (it is hardcoded for now)
-    etree.SubElement(properties, 'property', attrib={
-        'name': 'lookup-method',
-        'value': 'custom'})
+    if properties is not None:
+        properties_el = etree.SubElement(xml_tree, 'properties')
+        add_properties(properties_el, properties)
+    if response_properties is not None:
+        resp_properties_el = etree.SubElement(xml_tree, 'response-properties')
+        add_properties(resp_properties_el, response_properties)
     if testcases is None:
         return xml_tree
     for tc in testcases:

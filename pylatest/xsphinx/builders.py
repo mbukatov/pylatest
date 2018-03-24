@@ -176,6 +176,7 @@ class XmlExportBuilder(Builder):
         export_doc = build_xml_export_doc(
             project_id=self.app.config.pylatest_project_id,
             testcases=[tc_doc.build_element_tree()],
+            properties={'lookup-method': 'custom'},
             )
         content_b = etree.tostring(
             export_doc,
