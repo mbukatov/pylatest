@@ -474,6 +474,16 @@ def test_build_xml_export_doc_project_id():
     assert xmltostring(export_doc) == exp_xml
 
 
+def test_build_xml_export_doc_properties_null():
+    export_doc = export.build_xml_export_doc(
+        properties={},
+        response_properties={},)
+    exp_xml = textwrap.dedent('''\
+    <testcases/>
+    ''')
+    assert xmltostring(export_doc) == exp_xml
+
+
 def test_build_xml_export_doc_properties_single():
     prop_dict = {'lookup-method': 'custom'}
     export_doc = export.build_xml_export_doc(properties=prop_dict)

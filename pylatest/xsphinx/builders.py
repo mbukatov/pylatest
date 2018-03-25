@@ -159,11 +159,21 @@ class XmlExportBuilder(Builder):
         self.current_docname = docname
         self.writer.write(doctree, destination)
 
+        # initialize dict with properties for xml export file
+        properties = {}
+
+        # set test case id based on selected lookup method
+        if self.app.config.pylatest_export_lookup_method == "custom":
+            testcase_id = "/" + docname
+            properties['lookup-method'] = 'custom'
+        else:
+            testcase_id = None
+
         # generate content of target xml file based on html output
         tc_doc = build_xml_testcase_doc(
             html_source=self.writer.output,
             content_type=self.app.config.pylatest_export_content_type,
-            testcase_id="/" + docname,
+            testcase_id=testcase_id,
             )
 
         # validate and drop invalid metadata if needed
@@ -176,7 +186,7 @@ class XmlExportBuilder(Builder):
         export_doc = build_xml_export_doc(
             project_id=self.app.config.pylatest_project_id,
             testcases=[tc_doc.build_element_tree()],
-            properties={'lookup-method': 'custom'},
+            properties=properties,
             )
         content_b = etree.tostring(
             export_doc,

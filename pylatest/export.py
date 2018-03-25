@@ -157,10 +157,10 @@ def build_xml_export_doc(
     xml_tree = etree.Element('testcases')
     if project_id is not None:
         xml_tree.attrib["project-id"] = project_id
-    if properties is not None:
+    if properties is not None and len(properties) > 0:
         properties_el = etree.SubElement(xml_tree, 'properties')
         add_properties(properties_el, properties)
-    if response_properties is not None:
+    if response_properties is not None and len(response_properties) > 0:
         resp_properties_el = etree.SubElement(xml_tree, 'response-properties')
         add_properties(resp_properties_el, response_properties)
     if testcases is None:
