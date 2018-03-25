@@ -47,8 +47,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Pylatest'
-copyright = '2017, Martin Bukatovič'
-author = 'Martin Bukatovič'
+copyright = u'2017, Martin Bukatovič'
+author = u'Martin Bukatovič'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -128,7 +128,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'Pylatest.tex', 'Pylatest Documentation',
-     'Martin Bukatovič', 'manual'),
+     u'Martin Bukatovič', 'manual'),
 ]
 
 
