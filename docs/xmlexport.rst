@@ -145,6 +145,74 @@ One can further tweak xml export behaviour by setting following options in
     Note that xhtml mixed content sections (if enabled) are never indented, no
     matter how this option is set.
 
+.. confval:: pylatest_export_lookup_method
+
+    Controls how a test case is identified in xml export file.
+
+    Supported options are:
+
+    * ``custom``: test cases are identified by it's absolute *doc name* (path
+      of rst file within sphinx project, without extension).
+
+      For example, test case from file ``foo/test_bar.rst`` (file path within
+      sphinx/pylatest project) will have it's id specified in attribute of
+      test case element like this:
+
+      .. code-block:: xml
+
+          <testcase id="/foo/test_bar">
+
+      Note that xml export file also declares the lookup method in it's
+      properties:
+
+      .. code-block:: xml
+
+          <testcases>
+            <properties>
+              <property name="lookup-method" value="custom"/>
+
+    * ``id``: value explicitelly specified as a test case id in rst file is
+      directly used in it's xml export file. If a test case id is not provided
+      in rst file, the xml element for the test case will be missing ``id``
+      attribute.
+
+      To explicitelly specify id for a test case, add ``:id:`` field into
+      docutils field list with test case metadata:
+
+      .. code-block:: rst
+
+          Hello World
+          ***********
+
+          :id: FOO-123
+          :author: foo@example.com
+          :caseimportance: low
+          :casecomponent: foobar
+
+      Then the test case element in xml export file will just use this id:
+
+      .. code-block:: xml
+
+          <testcase id="FOO-123">
+
+      Note that xml export file also declares the lookup method in it's
+      properties:
+
+      .. code-block:: xml
+
+          <testcases>
+            <properties>
+              <property name="lookup-method" value="id"/>
+
+    * ``custom,id``: a hybrid mode of previous two. Custom id based on *doc
+      name* is used, unless explicit id is specified in the rst file.
+
+      The lookup method in property element of xml export file is set
+      accordingly for each test case.
+
+
+    When not specified, ``custom`` method is used.
+
 
 .. _`Sphinx builder`: http://www.sphinx-doc.org/en/stable/builders.html
 .. _`conf.py build configuration file`: http://www.sphinx-doc.org/en/stable/config.html
