@@ -56,6 +56,7 @@ from sphinx.builders import Builder
 from sphinx.util.osutil import ensuredir, os_path
 from sphinx.writers.html import HTMLWriter, HTMLTranslator
 from sphinx.highlighting import PygmentsBridge
+import docutils.nodes
 
 from pylatest.xdocutils.nodes import test_action_node
 from pylatest.export import build_xml_testcase_doc, build_xml_export_doc
@@ -153,12 +154,6 @@ class XmlExportBuilder(Builder):
         if not is_testcase_doc:
             return
 
-        # generate html output from the doctree
-        destination = StringOutput(encoding='utf-8')  # TODO: what is this?
-        doctree.settings = self.settings
-        self.current_docname = docname
-        self.writer.write(doctree, destination)
-
         # initialize dict with properties for xml export file
         properties = {}
 
@@ -166,8 +161,30 @@ class XmlExportBuilder(Builder):
         if self.app.config.pylatest_export_lookup_method == "custom":
             testcase_id = "/" + docname
             properties['lookup-method'] = 'custom'
+        elif self.app.config.pylatest_export_lookup_method == "id":
+            # get test case id from a field list
+            # if the id can't be found there, testcase id attribute is omitted
+            testcase_id = None
+            if (len(doctree) > 0 and
+                    len(doctree[0]) > 1 and
+                    doctree[0][1].tagname == 'field_list'):
+                field_list = doctree[0][1]
+                for field in field_list.traverse(docutils.nodes.field):
+                    field_name = field[0].astext()
+                    if field_name == "id":
+                        testcase_id = field[1][0].astext()
+                        # remove id field entry from the field list
+                        field.parent.remove(field)
+                        break
+            properties['lookup-method'] = 'id'
         else:
             testcase_id = None
+
+        # generate html output from the doctree
+        destination = StringOutput(encoding='utf-8')  # TODO: what is this?
+        doctree.settings = self.settings
+        self.current_docname = docname
+        self.writer.write(doctree, destination)
 
         # generate content of target xml file based on html output
         tc_doc = build_xml_testcase_doc(
