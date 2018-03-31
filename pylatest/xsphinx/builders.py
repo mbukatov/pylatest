@@ -178,7 +178,9 @@ class XmlExportBuilder(Builder):
                         break
             properties['lookup-method'] = 'id'
         else:
-            testcase_id = None
+            # TODO: report the error in a better way?
+            msg = "pylatest_export_lookup_method value is invalid"
+            raise Exception(msg)
 
         # generate html output from the doctree
         destination = StringOutput(encoding='utf-8')  # TODO: what is this?
