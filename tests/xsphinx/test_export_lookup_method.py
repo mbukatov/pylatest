@@ -5,8 +5,13 @@ import pytest
 from testutil import xmlparse_testcase, get_metadata_from_build
 
 
-@pytest.mark.sphinx('xmlexport', testroot='export_lookup_method-custom')
-def test_lookup_method_custom_id_value(app, status, warning):
+# parametrization checks whether custom lookup method is used as a default when
+# lookup method is not selected
+@pytest.mark.parametrize("testroot", [
+    pytest.mark.sphinx('xmlexport', 'custom', testroot='export_lookup_method-custom'),
+    pytest.mark.sphinx('xmlexport', 'default', testroot='export_lookup_method-default'),
+    ])
+def test_lookup_method_custom_id_value(app, status, warning, testroot):
     app.builder.build_all()
     # parse test case document builds
     foo_tree = xmlparse_testcase(app.outdir, "test_foo", "xmlexport")
@@ -20,8 +25,11 @@ def test_lookup_method_custom_id_value(app, status, warning):
     assert two_tree.xpath('/testcases/testcase/@id') == ["/foo/bar/test_two"]
 
 
-@pytest.mark.sphinx('xmlexport', testroot='export_lookup_method-custom')
-def test_lookup_method_custom_properties(app, status, warning):
+@pytest.mark.parametrize("testroot", [
+    pytest.mark.sphinx('xmlexport', 'custom', testroot='export_lookup_method-custom'),
+    pytest.mark.sphinx('xmlexport', 'default', testroot='export_lookup_method-default'),
+    ])
+def test_lookup_method_custom_properties(app, status, warning, testroot):
     app.builder.build_all()
     # parse test case document builds
     foo_tree = xmlparse_testcase(app.outdir, "test_foo", "xmlexport")
