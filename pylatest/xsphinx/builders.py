@@ -58,6 +58,7 @@ from sphinx.writers.html import HTMLWriter, HTMLTranslator
 from sphinx.highlighting import PygmentsBridge
 
 from pylatest.xdocutils.nodes import test_action_node
+from pylatest.xdocutils.utils import get_testcase_id
 from pylatest.export import build_xml_testcase_doc, build_xml_export_doc
 
 
@@ -153,6 +154,31 @@ class XmlExportBuilder(Builder):
         if not is_testcase_doc:
             return
 
+        # initialize dict with properties for xml export file
+        properties = {}
+
+        # set test case id based on selected lookup method
+        if self.app.config.pylatest_export_lookup_method == "custom":
+            testcase_id = "/" + docname
+            properties['lookup-method'] = 'custom'
+        elif self.app.config.pylatest_export_lookup_method == "id":
+            # get test case id from a field list
+            # if the id can't be found there, testcase id attribute is omitted
+            testcase_id = get_testcase_id(doctree)
+            properties['lookup-method'] = 'id'
+        elif self.app.config.pylatest_export_lookup_method == "id,custom":
+            # custom lookup method is used, unless explicit id is specified
+            # in the rst file
+            testcase_id = get_testcase_id(doctree)
+            properties['lookup-method'] = 'id'
+            if testcase_id is None:
+                testcase_id = "/" + docname
+                properties['lookup-method'] = 'custom'
+        else:
+            # TODO: report the error in a better way?
+            msg = "pylatest_export_lookup_method value is invalid"
+            raise Exception(msg)
+
         # generate html output from the doctree
         destination = StringOutput(encoding='utf-8')  # TODO: what is this?
         doctree.settings = self.settings
@@ -163,6 +189,7 @@ class XmlExportBuilder(Builder):
         tc_doc = build_xml_testcase_doc(
             html_source=self.writer.output,
             content_type=self.app.config.pylatest_export_content_type,
+            testcase_id=testcase_id,
             )
 
         # validate and drop invalid metadata if needed
@@ -175,6 +202,7 @@ class XmlExportBuilder(Builder):
         export_doc = build_xml_export_doc(
             project_id=self.app.config.pylatest_project_id,
             testcases=[tc_doc.build_element_tree()],
+            properties=properties,
             )
         content_b = etree.tostring(
             export_doc,

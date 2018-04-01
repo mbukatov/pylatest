@@ -105,7 +105,7 @@ def get_title(tree):
     return el_list[0].text
 
 
-def build_xml_testcase_doc(html_source, content_type=None):
+def build_xml_testcase_doc(html_source, content_type=None, testcase_id=None):
     """
     Create xml export document (instance of XmlExportTestCaseDoc) for given
     test case html source string.
@@ -116,7 +116,7 @@ def build_xml_testcase_doc(html_source, content_type=None):
 
     html_tree = etree.fromstring(html_source.encode("utf8"))
     title = get_title(html_tree)
-    doc = XmlExportTestCaseDoc(title, content_type)
+    doc = XmlExportTestCaseDoc(title, content_type, testcase_id)
 
     # extract metadata from html_tree
     for attr_name, content in get_metadata(html_tree):
@@ -136,16 +136,33 @@ def build_xml_testcase_doc(html_source, content_type=None):
     return doc
 
 
-def build_xml_export_doc(project_id=None, testcases=None):
+def add_properties(element, properties):
+    """
+    Add properties into given xml element.
+    """
+    for name, value in properties.items():
+        etree.SubElement(element, 'property', attrib={
+            'name': str(name),
+            'value': str(value)})
+
+
+def build_xml_export_doc(
+        project_id=None,
+        testcases=None,
+        properties=None,
+        response_properties=None):
     """
     Create xml export document for given testcases.
     """
     xml_tree = etree.Element('testcases')
     if project_id is not None:
         xml_tree.attrib["project-id"] = project_id
-    # TODO: check if we need to use these 'properties' for something here
-    # resp_properties = etree.SubElement(xml_tree, 'response-properties')
-    # properties = etree.SubElement(xml_tree, 'properties')
+    if properties is not None and len(properties) > 0:
+        properties_el = etree.SubElement(xml_tree, 'properties')
+        add_properties(properties_el, properties)
+    if response_properties is not None and len(response_properties) > 0:
+        resp_properties_el = etree.SubElement(xml_tree, 'response-properties')
+        add_properties(resp_properties_el, response_properties)
     if testcases is None:
         return xml_tree
     for tc in testcases:

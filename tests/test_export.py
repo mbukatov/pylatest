@@ -17,6 +17,7 @@
 
 
 import copy
+import sys
 import textwrap
 
 import pytest
@@ -469,6 +470,59 @@ def test_build_xml_export_doc_project_id():
     export_doc = export.build_xml_export_doc(project_id="FOOBAR")
     exp_xml = textwrap.dedent('''\
     <testcases project-id="FOOBAR"/>
+    ''')
+    assert xmltostring(export_doc) == exp_xml
+
+
+def test_build_xml_export_doc_properties_null():
+    export_doc = export.build_xml_export_doc(
+        properties={},
+        response_properties={},)
+    exp_xml = textwrap.dedent('''\
+    <testcases/>
+    ''')
+    assert xmltostring(export_doc) == exp_xml
+
+
+def test_build_xml_export_doc_properties_single():
+    prop_dict = {'lookup-method': 'custom'}
+    export_doc = export.build_xml_export_doc(properties=prop_dict)
+    exp_xml = textwrap.dedent('''\
+    <testcases>
+      <properties>
+        <property name="lookup-method" value="custom"/>
+      </properties>
+    </testcases>
+    ''')
+    assert xmltostring(export_doc) == exp_xml
+
+
+@pytest.mark.skipif(sys.version_info < (3, 6),
+                    reason="Requires order preserving dictionary.")
+def test_build_xml_export_doc_properties_many():
+    prop_dict = {
+        'foo': 'alpha',
+        'bar': 'beta',
+        }
+    resp_prop_dict = {
+        'foo': 'gama',
+        'bar': 'omega',
+        }
+    export_doc = export.build_xml_export_doc(
+        properties=prop_dict,
+        response_properties=resp_prop_dict,
+        )
+    exp_xml = textwrap.dedent('''\
+    <testcases>
+      <properties>
+        <property name="foo" value="alpha"/>
+        <property name="bar" value="beta"/>
+      </properties>
+      <response-properties>
+        <property name="foo" value="gama"/>
+        <property name="bar" value="omega"/>
+      </response-properties>
+    </testcases>
     ''')
     assert xmltostring(export_doc) == exp_xml
 

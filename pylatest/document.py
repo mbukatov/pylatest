@@ -411,10 +411,11 @@ class XmlExportTestCaseDoc(TestCaseDocWithContent):
     List of supported ways to include content in xml export file.
     """
 
-    def __init__(self, title=None, content_type=None):
+    def __init__(self, title=None, content_type=None, testcase_id=None):
         super(XmlExportTestCaseDoc, self).__init__()
         self.metadata = {}
         self.title = title
+        self.id = testcase_id
         if content_type is None:
             # use mixed content as the default
             self.content_type = self.MIXEDCONTENT
@@ -425,6 +426,7 @@ class XmlExportTestCaseDoc(TestCaseDocWithContent):
             raise PylatestDocumentError(msg)
 
     def __eq__(self, other):
+        # TODO: use testcase id here?
         return (super(XmlExportTestCaseDoc, self).__eq__(other) and
                 self.metadata == other.metadata and
                 self.title == other.title)
@@ -473,6 +475,9 @@ class XmlExportTestCaseDoc(TestCaseDocWithContent):
         Generate element tree representation of xml document.
         """
         testcase = etree.Element('testcase')
+        # set testcase id
+        if self.id is not None:
+            testcase.set("id", str(self.id))
         # set tile
         if self.title is not None:
             title = etree.SubElement(testcase, 'title')
