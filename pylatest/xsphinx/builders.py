@@ -56,9 +56,9 @@ from sphinx.builders import Builder
 from sphinx.util.osutil import ensuredir, os_path
 from sphinx.writers.html import HTMLWriter, HTMLTranslator
 from sphinx.highlighting import PygmentsBridge
-import docutils.nodes
 
 from pylatest.xdocutils.nodes import test_action_node
+from pylatest.xdocutils.utils import get_testcase_id
 from pylatest.export import build_xml_testcase_doc, build_xml_export_doc
 
 
@@ -164,19 +164,16 @@ class XmlExportBuilder(Builder):
         elif self.app.config.pylatest_export_lookup_method == "id":
             # get test case id from a field list
             # if the id can't be found there, testcase id attribute is omitted
-            testcase_id = None
-            if (len(doctree) > 0 and
-                    len(doctree[0]) > 1 and
-                    doctree[0][1].tagname == 'field_list'):
-                field_list = doctree[0][1]
-                for field in field_list.traverse(docutils.nodes.field):
-                    field_name = field[0].astext()
-                    if field_name == "id":
-                        testcase_id = field[1][0].astext()
-                        # remove id field entry from the field list
-                        field.parent.remove(field)
-                        break
+            testcase_id = get_testcase_id(doctree)
             properties['lookup-method'] = 'id'
+        elif self.app.config.pylatest_export_lookup_method == "id,custom":
+            # custom lookup method is used, unless explicit id is specified
+            # in the rst file
+            testcase_id = get_testcase_id(doctree)
+            properties['lookup-method'] = 'id'
+            if testcase_id is None:
+                testcase_id = "/" + docname
+                properties['lookup-method'] = 'custom'
         else:
             # TODO: report the error in a better way?
             msg = "pylatest_export_lookup_method value is invalid"

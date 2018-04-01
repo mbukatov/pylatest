@@ -88,3 +88,18 @@ def test_lookup_method_id_removal_of_id_field(app, status, warning):
     for tree in (one_tree, two_tree):
         val_xp = "/testcases/testcase/custom-fields/custom-field[@id='id']"
         assert tree.xpath(val_xp) == []
+
+
+@pytest.mark.sphinx('xmlexport', testroot='export_lookup_method-id_custom')
+def test_lookup_method_id_custom_hybrid(app, status, warning):
+    app.builder.build_all()
+    # parse test case document builds
+    one_tree = xmlparse_testcase(app.outdir, "test_0001", "xmlexport")
+    noid_tree = xmlparse_testcase(app.outdir, "test_noid", "xmlexport")
+    # check test case id values (generated based on doc name)
+    assert one_tree.xpath('/testcases/testcase/@id') == ["0001"]
+    assert noid_tree.xpath('/testcases/testcase/@id') == ["/test_noid"]
+    # check that properties are set as expected
+    val_xp = "/testcases/properties/property[@name='lookup-method']/@value"
+    assert one_tree.xpath(val_xp) == ["id"]
+    assert noid_tree.xpath(val_xp) == ["custom"]

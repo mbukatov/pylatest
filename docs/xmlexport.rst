@@ -204,12 +204,14 @@ One can further tweak xml export behaviour by setting following options in
             <properties>
               <property name="lookup-method" value="id"/>
 
-    * ``custom,id``: a hybrid mode of previous two. Custom id based on *doc
+    * ``id,custom``: a hybrid mode of the previous two. Custom id based on *doc
       name* is used, unless explicit id is specified in the rst file.
 
       The lookup method in property element of xml export file is set
       accordingly for each test case.
 
+      Note that this is experimental feature, and may be changed or even
+      removed in the future.
 
     When not specified, ``custom`` method is used.
 
