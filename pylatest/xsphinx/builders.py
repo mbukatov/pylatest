@@ -179,6 +179,10 @@ class XmlExportBuilder(Builder):
             msg = "pylatest_export_lookup_method value is invalid"
             raise Exception(msg)
 
+        # set test case id based on selected lookup method
+        if self.app.config.pylatest_export_dry_run:
+            properties['dry-run'] = 'true'
+
         # generate html output from the doctree
         destination = StringOutput(encoding='utf-8')  # TODO: what is this?
         doctree.settings = self.settings

@@ -215,6 +215,21 @@ One can further tweak xml export behaviour by setting following options in
 
     When not specified, ``custom`` method is used.
 
+.. confval:: pylatest_export_dry_run
+
+    If True, xml export files will contain ``dry-run`` property set to
+    ``true``:
+
+    .. code-block:: xml
+
+        <testcases>
+          <properties>
+            <property name="dry-run" value="true"/>
+
+    This ``dry-run`` property element will be completelly missing when
+    ``pylatest_export_dry_run`` is set to False.
+
+    The default value is False.
 
 .. _`Sphinx builder`: http://www.sphinx-doc.org/en/stable/builders.html
 .. _`conf.py build configuration file`: http://www.sphinx-doc.org/en/stable/config.html
