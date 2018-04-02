@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- DTD created at Mon Apr 18 08:57:20 EDT 2016 with EditiX XML Editor (http://www.editix.com). Please insert an encoding attribute header for converting any DTD -->
+<!--
+ The MIT License
+
+ Copyright (c) Red Hat, Inc.
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ THE SOFTWARE.
+-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:element name="testcases">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="response-properties"/>
+        <xs:element minOccurs="0" ref="properties"/>
+        <xs:element maxOccurs="unbounded" ref="testcase"/>
+      </xs:sequence>
+      <xs:attribute name="project-id" use="required"/>
+      <xs:attribute name="document-relative-path"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="testcase">
+    <xs:complexType>
+      <xs:all>
+        <xs:element ref="title" minOccurs="0"/>
+        <xs:element ref="description" minOccurs="0"/>
+        <xs:element ref="test-steps" minOccurs="0"/>
+        <xs:element ref="custom-fields" minOccurs="0"/>
+        <xs:element ref="linked-work-items" minOccurs="0"/>
+      </xs:all>
+      <xs:attribute name="id"/>
+      <xs:attribute name="assignee-id"/>
+      <xs:attribute name="approver-ids"/>
+      <xs:attribute name="status-id"/>
+      <xs:attribute name="due-date"/>
+      <xs:attribute name="initial-estimate"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="title" type="xs:string"/>
+  <xs:element name="description" type="xs:string"/>
+  <xs:element name="test-steps">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="test-step"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="test-step">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="unbounded" ref="test-step-column"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="test-step-column">
+    <xs:complexType mixed="true">
+	  <xs:sequence minOccurs="0" maxOccurs="unbounded">
+		<xs:element ref="parameter" />
+      </xs:sequence>
+      <xs:attribute name="id" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="parameter">
+    <xs:complexType>
+      <xs:attribute name="name" use="required"/>
+      <xs:attribute name="scope" default="local">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="local"/>
+            <xs:enumeration value="library"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="custom-fields">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="custom-field"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="custom-field">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="id" use="required"/>
+          <xs:attribute name="content"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="linked-work-items">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="linked-work-item"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="linked-work-item">
+    <xs:complexType>
+      <xs:attribute name="lookup-method" default="id"/>
+      <xs:attribute name="workitem-id" use="required"/>
+	  <xs:attribute name="role-id" use="required"/>
+	  <xs:attribute name="suspect" default="false"/>
+	  <xs:attribute name="revision"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="response-properties">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="response-property"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="response-property">
+    <xs:complexType>
+      <xs:attribute name="name" use="required"/>
+      <xs:attribute name="value" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="properties">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="property"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="property">
+    <xs:complexType>
+      <xs:attribute name="name" use="required"/>
+      <xs:attribute name="value" use="required"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
