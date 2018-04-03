@@ -30,6 +30,7 @@ low in the long term.
    restructuredtext.rst
    cli.rst
    xmlexport.rst
+   faq.rst
    pysource.rst
    changelog.rst
 
