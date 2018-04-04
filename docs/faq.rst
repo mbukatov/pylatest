@@ -17,6 +17,11 @@ ci-ops-tools xml importer, you will need to use the following configuration in
     pylatest_export_content_type = "CDATA"
     pylatest_export_lookup_method = "custom"
 
+.. This particular combination of config options is tested during xml schema
+   validation test case ``tests/xsphinx/test_export_schema_validation.py``.
+   The values are specified in the following sphinx config file:
+   ``tests/xsphinx/roots/test-export_schema_validation/conf.py``
+
 Note that for ``pylatest_export_lookup_method`` you can use any valid method,
 as long as the importer is configured accordingly.
 
