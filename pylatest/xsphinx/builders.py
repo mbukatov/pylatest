@@ -207,6 +207,8 @@ class XmlExportBuilder(Builder):
             project_id=self.app.config.pylatest_project_id,
             testcases=[tc_doc.build_element_tree()],
             properties=properties,
+            response_properties=                                     # noqa
+                self.app.config.pylatest_export_response_properties, # noqa
             )
         content_b = etree.tostring(
             export_doc,

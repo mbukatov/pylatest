@@ -157,6 +157,7 @@ def setup(app):
     # TODO: see what to set for rebuild option
     app.add_config_value('pylatest_export_lookup_method', "custom", 'html')
     app.add_config_value('pylatest_export_dry_run', False, 'html')
+    app.add_config_value('pylatest_export_response_properties', None, 'html')
 
     # sphinx plugin metadata
     return {'version': '0.1.1'}

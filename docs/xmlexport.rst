@@ -231,6 +231,33 @@ One can further tweak xml export behaviour by setting following options in
 
     The default value is False.
 
+.. confval:: pylatest_export_response_properties
+
+    This config. option allows to specify a dict with properties to be included
+    in xml export files as so called response properties.
+
+    For example this dictionary:
+
+    .. code-block:: python
+
+        pylatest_export_response_properties = {
+            "foo": "bar",
+            "uuid": "5da60d66-916e-45fc-a6c6-edfba9444e54",
+            }
+
+    Will be represented as follows in xml export files:
+
+    .. code-block:: xml
+
+        <testcases>
+          <response-properties>
+            <response-property name="foo" value="bar"/>
+            <response-property name="uid" value="5da60d66-916e-45fc-a6c6-edfba9444e54"/>
+
+    This ``response-properties`` element won't be included in xml export files
+    when the option is undefined.
+
+
 .. _`Sphinx builder`: http://www.sphinx-doc.org/en/stable/builders.html
 .. _`conf.py build configuration file`: http://www.sphinx-doc.org/en/stable/config.html
 .. _`CDATA section`: https://en.wikipedia.org/wiki/CDATA
