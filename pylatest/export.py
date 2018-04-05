@@ -136,12 +136,13 @@ def build_xml_testcase_doc(html_source, content_type=None, testcase_id=None):
     return doc
 
 
-def add_properties(element, properties):
+def add_properties(element, properties, prop_el_name):
     """
-    Add properties into given xml element.
+    Add ``properties`` (represented by ``prop_el_name`` elements) into given
+    xml ``element``.
     """
     for name, value in properties.items():
-        etree.SubElement(element, 'property', attrib={
+        etree.SubElement(element, prop_el_name, attrib={
             'name': str(name),
             'value': str(value)})
 
@@ -157,12 +158,15 @@ def build_xml_export_doc(
     xml_tree = etree.Element('testcases')
     if project_id is not None:
         xml_tree.attrib["project-id"] = project_id
-    if properties is not None and len(properties) > 0:
-        properties_el = etree.SubElement(xml_tree, 'properties')
-        add_properties(properties_el, properties)
     if response_properties is not None and len(response_properties) > 0:
         resp_properties_el = etree.SubElement(xml_tree, 'response-properties')
-        add_properties(resp_properties_el, response_properties)
+        add_properties(
+            resp_properties_el,
+            response_properties,
+            prop_el_name='response-property')
+    if properties is not None and len(properties) > 0:
+        properties_el = etree.SubElement(xml_tree, 'properties')
+        add_properties(properties_el, properties, prop_el_name='property')
     if testcases is None:
         return xml_tree
     for tc in testcases:

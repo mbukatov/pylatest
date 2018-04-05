@@ -514,14 +514,14 @@ def test_build_xml_export_doc_properties_many():
         )
     exp_xml = textwrap.dedent('''\
     <testcases>
+      <response-properties>
+        <response-property name="foo" value="gama"/>
+        <response-property name="bar" value="omega"/>
+      </response-properties>
       <properties>
         <property name="foo" value="alpha"/>
         <property name="bar" value="beta"/>
       </properties>
-      <response-properties>
-        <property name="foo" value="gama"/>
-        <property name="bar" value="omega"/>
-      </response-properties>
     </testcases>
     ''')
     assert xmltostring(export_doc) == exp_xml

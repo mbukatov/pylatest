@@ -16,6 +16,8 @@ upcoming v0.1.2 (unreleased)
   (https://gitlab.com/mbukatov/pylatest/issues/40)
 - xml export: add confval pylatest_export_dry_run to toggle dry-run property
   (https://gitlab.com/mbukatov/pylatest/issues/47)
+- xml export: add confval pylatest_export_response_properties
+  (https://gitlab.com/mbukatov/pylatest/issues/48)
 
 v0.1.1 (2017-05-22)
 -------------------
