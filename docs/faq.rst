@@ -25,4 +25,9 @@ ci-ops-tools xml importer, you will need to use the following configuration in
 Note that for ``pylatest_export_lookup_method`` you can use any valid method,
 as long as the importer is configured accordingly.
 
+It's also a good idea to restrict test case metadata which will be included in
+the xml export file as ``custom-field`` elements by listing valid
+field/metadata names in ``pylatest_valid_export_metadata``. This list should
+contain only names which your ci-ops-tools xml importer accepts.
+
 For more details, see :ref:`xmlexport`.
