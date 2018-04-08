@@ -1,5 +1,6 @@
-upcoming v0.1.2 (unreleased)
-----------------------------
+v0.1.2 (2018-04-08)
+-------------------
+
 - move to python 3.6 as tested/supported python3 platform
 - xml export: change content representation in custom-field element for Setup
   and Teardown sections (https://gitlab.com/mbukatov/pylatest/issues/37)
@@ -21,8 +22,10 @@ upcoming v0.1.2 (unreleased)
 
 v0.1.1 (2017-05-22)
 -------------------
+
 - increase MIN_AUTO_ID fix/hack (https://gitlab.com/mbukatov/pylatest/issues/34)
 
 v0.1.0 (2017-05-17)
 -------------------
+
 - first official public release on PyPI

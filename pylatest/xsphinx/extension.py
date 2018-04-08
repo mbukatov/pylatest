@@ -160,4 +160,4 @@ def setup(app):
     app.add_config_value('pylatest_export_response_properties', None, 'html')
 
     # sphinx plugin metadata
-    return {'version': '0.1.1'}
+    return {'version': '0.1.2'}
