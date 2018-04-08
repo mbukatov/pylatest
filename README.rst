@@ -39,4 +39,4 @@ pylatest is free and open source software.
 .. _Docutils: http://docutils.sourceforge.net/
 .. _Sphinx: http://www.sphinx-doc.org/en/stable/index.html
 .. _`reStructuredText syntax`: http://www.sphinx-doc.org/en/stable/rest.html
-.. _`Pylatest Documentation`: https://pylatest.readthedocs.io/en/latest/
+.. _`Pylatest Documentation`: https://pylatest.readthedocs.io/en/stable/
