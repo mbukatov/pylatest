@@ -19,5 +19,5 @@ flake8:
   image: python:3.6
   stage: test
   script:
-    - pip install tox flake8
+    - pip install tox
     - tox -e flake8
