@@ -128,14 +128,11 @@ One can further tweak xml export behaviour by setting following options in
       the section, see previous section for an example
 
     * ``CDATA``: content included as html code inside `CDATA section`_ (this
-      is ugly hack and you should not use it)
+      is necessary for ci-ops-tools importer to accept html content)
 
     * ``plaintext``: plain text without any markup
 
     When not specified, ``mixedcontent`` is used.
-
-    If you are not sure whether you should use ``CDATA`` option, use
-    ``mixedcontent`` instead.
 
 .. confval:: pylatest_export_pretty_print
 
