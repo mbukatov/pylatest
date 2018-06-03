@@ -201,3 +201,16 @@ class TestDefaultsDirective(rst.Directive):
             env.pylatest_defaults[dirname][field_name_value] = field_body_node
         # but don't do anything else
         return []
+
+
+class RequirementListDirective(rst.Directive):
+    """
+    Requirement list directive generates list of requirements covered by all
+    test cases in the Sphinx/Pylatest project. See the TODO for actuall code
+    which generates the list.
+    """
+
+    def run(self):
+        # just return a placeholder node which will be replaced by actual
+        # content by TODO transform
+        return [pylatest.xdocutils.nodes.requirementlist_node()]

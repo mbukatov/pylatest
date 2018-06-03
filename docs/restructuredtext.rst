@@ -75,6 +75,17 @@ Directives
     ``foo`` directory tree, no matter if test cases there contain the metadata
     about component already or not.
 
+.. rst:directive:: requirementlist
+
+    This directive generates list of all requirements which are covered by
+    test cases in the Sphinx/Pylatest project, referencing test cases for each
+    requirement.
+
+    * TODO: describe how to specify requirement for a test case somewhere
+    * TODO: option to limit test cases it covers, by metadata or docname path
+    * TODO: option to cover only single requirement
+    * TODO: option to fetch RHBZ title
+    * TODO: option to toggle listing of test cases covering the requirement
 
 Roles
 =====
