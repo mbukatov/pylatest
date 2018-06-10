@@ -159,5 +159,8 @@ def setup(app):
     app.add_config_value('pylatest_export_dry_run', False, 'html')
     app.add_config_value('pylatest_export_response_properties', None, 'html')
 
+    # css tweaks
+    app.add_stylesheet('pylatest.css')
+
     # sphinx plugin metadata
     return {'version': '0.1.2'}
