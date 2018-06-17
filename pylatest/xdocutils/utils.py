@@ -39,12 +39,26 @@ def get_field_list(doctree):
                         ...
                     <field>
                         ...
+    Or::
+
+        <document ...>
+            <title>
+                Title of the test case
+            <field_list>
+                <field>
+                    ...
+                <field>
+                    ...
     """
-    if (len(doctree) <= 0 or
-            len(doctree[0]) <= 1 or
-            doctree[0][1].tagname != 'field_list'):
-        return None
-    field_list = doctree[0][1]
+    field_list = None
+    if len(doctree) <= 0:
+        return field_list
+    if doctree[0].tagname == 'section':
+        if len(doctree[0]) > 1 and doctree[0][1].tagname == 'field_list':
+            field_list = doctree[0][1]
+    else:
+        if len(doctree) > 1 and doctree[1].tagname == 'field_list':
+            field_list = doctree[1]
     return field_list
 
 
