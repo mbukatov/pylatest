@@ -93,3 +93,21 @@ def get_testcase_id(doctree):
             field.parent.remove(field)
             break
     return testcase_id
+
+
+def get_testcase_requirements(doctree):
+    """
+    Get requirement(s) of test case from a field list in given doctree.
+    """
+    requirements = []
+    field_list = get_field_list(doctree)
+    if field_list is None:
+        return requirements
+    for field in field_list.traverse(docutils.nodes.field):
+        field_name = field[0].astext()
+        if field_name == "requirement":
+            requirements.append(field[1][0].astext())
+        if field_name == "requirements":
+            for item in field[1][0]:
+                requirements.append(item.astext())
+    return requirements

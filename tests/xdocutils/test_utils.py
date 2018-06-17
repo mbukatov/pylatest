@@ -29,6 +29,7 @@ from pylatest.xdocutils.core import pylatest_publish_parts
 from pylatest.xdocutils.readers import NoDocInfoReader
 from pylatest.xdocutils.utils import get_field_list
 from pylatest.xdocutils.utils import get_testcase_id
+from pylatest.xdocutils.utils import get_testcase_requirements
 
 
 def _publish(source):
@@ -87,3 +88,63 @@ def test_get_testcase_id():
     :component: foo
     '''))
     assert get_testcase_id(doctree) == "FOO-122"
+
+
+def test_get_testcase_requirements_null(empty_doctree):
+    assert get_testcase_requirements(empty_doctree) == []
+
+
+def test_get_testcase_requirements_single():
+    doctree = _publish(textwrap.dedent('''\
+    Test Foo
+    ********
+
+    :author: joe.foo@example.com
+    :component: foo
+    :requirement: FOO-212
+    '''))
+    assert get_testcase_requirements(doctree) == ["FOO-212"]
+
+
+def test_get_testcase_requirements_many():
+    doctree = _publish(textwrap.dedent('''\
+    Test Foo
+    ********
+
+    :author: joe.foo@example.com
+    :requirement: FOO-212
+    :requirement: FOO-232
+    :component: foo
+    '''))
+    assert get_testcase_requirements(doctree) == ["FOO-212", "FOO-232"]
+
+
+def test_get_testcase_requirements_many_list():
+    doctree = _publish(textwrap.dedent('''\
+    Test Foo
+    ********
+
+    :author: joe.foo@example.com
+    :component: foo
+    :requirements:
+      - FOO-212
+      - FOO-232
+    '''))
+    assert get_testcase_requirements(doctree) == ["FOO-212", "FOO-232"]
+
+
+def test_get_testcase_requirements_many_mixed():
+    doctree = _publish(textwrap.dedent('''\
+    Test Foo
+    ********
+
+    :author: joe.foo@example.com
+    :component: foo
+    :requirement: FOO-012
+    :requirement: FOO-032
+    :requirements:
+      - FOO-212
+      - FOO-232
+    '''))
+    assert get_testcase_requirements(doctree) == [
+        "FOO-012", "FOO-032", "FOO-212", "FOO-232"]
