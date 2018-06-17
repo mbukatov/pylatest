@@ -23,12 +23,10 @@ Miscellaneous ReStructuredText and Docutils utilities for pylatest.
 import docutils.nodes
 
 
-def get_testcase_id(doctree):
+def get_field_list(doctree):
     """
-    Get test case id from a field list in given doctree. If the id can't be
-    found there, None is returned.
-
-    When the id is found, the id field is removed from the field list.
+    Find and get field list node in a doctree of a test case. Returns None
+    when the field list is not found.
 
     Few assumptions about expected doctree structure::
 
@@ -40,18 +38,39 @@ def get_testcase_id(doctree):
                     <field>
                         ...
                     <field>
-                        <field_name>
-                            id
-                        <field_body>
-                            <paragraph>
-                                FOOBAR-007
+                        ...
     """
-    testcase_id = None
     if (len(doctree) <= 0 or
             len(doctree[0]) <= 1 or
             doctree[0][1].tagname != 'field_list'):
-        return testcase_id
+        return None
     field_list = doctree[0][1]
+    return field_list
+
+
+def get_testcase_id(doctree):
+    """
+    Get test case id from a field list in given doctree. If the id can't be
+    found there, None is returned.
+
+    When the id is found, the id field is removed from the field list.
+
+    Few assumptions about expected doctree structure of a field list::
+
+        <field_list>
+            <field>
+                ...
+            <field>
+                <field_name>
+                    id
+                <field_body>
+                    <paragraph>
+                        FOOBAR-007
+    """
+    testcase_id = None
+    field_list = get_field_list(doctree)
+    if field_list is None:
+        return testcase_id
     for field in field_list.traverse(docutils.nodes.field):
         field_name = field[0].astext()
         if field_name == "id":
