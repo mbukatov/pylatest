@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 
-# Copyright (C) 2017 Martin Bukatovič <martin.bukatovic@gmail.com>
+# Copyright (C) 2017,2018 Martin Bukatovič <martin.bukatovic@gmail.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -41,6 +41,41 @@ def pylatest_transform_handler(app, doctree, docname):
         # translates pylatest nodes into nice sections or tables
         app.add_post_transform(transforms.TestActionsTableTransform)
         app.add_post_transform(transforms.RequirementSectionTransform)
+
+
+def pylatest_requirements_transform_handler(app):
+    """
+    Add transform which builds reversed index for test case requirements
+    in ``env.pylatest_requirements``.
+    """
+    app.add_transform(transforms.RequiremenIndexingTransform)
+
+
+def pylatest_resolve_requirements(app, doctree, docname):
+    """
+    Generate list of requirements (for each ``requirementlist`` directive)
+    based on reverse index of requirements as created by
+    RequiremenIndexingTransform.
+    """
+    env = app.builder.env
+
+    # check if there is no reversed index for requirements
+    if not hasattr(env, "pylatest_requirements"):
+        env.pylatest_requirements = {}
+
+    for node in doctree.traverse(nodes.requirementlist_node):
+        content_node = docutils.nodes.bullet_list()
+        for req, cases in env.pylatest_requirements.items():
+            req_item_node = docutils.nodes.list_item()
+            req_item_node += docutils.nodes.paragraph(text=req)
+            case_list_node = docutils.nodes.bullet_list()
+            for case in cases:
+                case_item_node = docutils.nodes.list_item()
+                case_item_node += docutils.nodes.paragraph(text=case)
+                case_list_node += case_item_node
+            req_item_node += case_list_node
+            content_node += req_item_node
+        node.replace_self(content_node)
 
 
 def pylatest_resolve_defaults(app, doctree, docname):
@@ -146,6 +181,10 @@ def setup(app):
 
     # propagate values from test_defautls directive
     app.connect('doctree-resolved', pylatest_resolve_defaults)
+
+    # transforms and handlers related to requirements processing
+    app.connect('builder-inited', pylatest_requirements_transform_handler)
+    app.connect('doctree-resolved', pylatest_resolve_requirements)
 
     # builder for xmlexport output
     app.add_builder(builders.XmlExportBuilder)

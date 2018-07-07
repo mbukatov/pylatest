@@ -3,13 +3,13 @@ Test Foo
 
 :author: joe.foo@example.com
 :requirements:
- - :rhbz:`439858`
- - :rhbz:`112321`
+ - FOO-ALL
+ - FOO-212
 
 Description
 ===========
 
-It's all about :rhbz:`439858` ...
+It's all about something else.
 
 Test Steps
 ==========

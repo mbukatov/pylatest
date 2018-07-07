@@ -2,7 +2,7 @@ Test Bar
 ********
 
 :author: joe.bar@example.com
-:requirement: :rhbz:`439858`
+:requirement: FOO-ALL
 
 Test Steps
 ==========

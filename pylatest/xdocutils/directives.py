@@ -206,11 +206,13 @@ class TestDefaultsDirective(rst.Directive):
 class RequirementListDirective(rst.Directive):
     """
     Requirement list directive generates list of requirements covered by all
-    test cases in the Sphinx/Pylatest project. See the TODO for actuall code
-    which generates the list.
+    test cases in the Sphinx/Pylatest project.
+
+    See pylatest_resolve_requirements handler (and RequiremenIndexingTransform
+    transform class) for actuall code which generates the list.
     """
 
     def run(self):
         # just return a placeholder node which will be replaced by actual
-        # content by TODO transform
+        # content later
         return [pylatest.xdocutils.nodes.requirementlist_node()]
