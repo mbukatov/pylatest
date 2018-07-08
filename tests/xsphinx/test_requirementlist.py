@@ -116,3 +116,21 @@ def test_requirementlist_caselinking_nested_html(app, status, warning):
     # of document with the requirementlist directive)
     case_ref = case_ref_list[0]
     assert case_ref.get('href') == "../baz/test_one.html"
+
+
+@pytest.mark.xfail
+@pytest.mark.sphinx('html', testroot='requirementlist-url-flat')
+def test_requirementlist_url_flat_html(app, status, warning):
+    """
+    Check that url or rhbz role can be used as a requirement.
+    """
+    app.builder.build_all()
+    # parse requirements overview document
+    doc_tree = xmlparse_testcase(app.outdir, "requirements", "html")
+    # get the requirement list (list of <li> elements)
+    req_list = get_requirements_from_build(doc_tree, "html")
+    # TODO: check that the requirements are represented via links
+    req_links = [i.xpath('h:a', namespaces=NS) for i in req_list]
+    assert len(req_links) == 2
+    assert len(req_links[0]) == 1
+    assert len(req_links[1]) == 1
