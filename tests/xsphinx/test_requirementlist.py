@@ -45,23 +45,27 @@ def test_requirementlist_present_nested_html(app, status, warning):
     doc_tree = xmlparse_testcase(app.outdir, "requirements", "html")
     # get the requirement list (list of <li> elements)
     req_list = get_requirements_from_build(doc_tree, "html")
-    # check that the list contains all requirements
-    assert len(req_list) == 4
+    # check that the list contains all requirements, in given order
     req_items = [i.text for i in req_list]
-    assert "FOO-ALL" in req_items
-    assert "FOO-111" in req_items
-    assert "FOO-112" in req_items
-    assert "FOO-212" in req_items
+    req_items_expected = sorted([
+        "FOO-ALL",
+        "FOO-111",
+        "FOO-112",
+        "FOO-212",
+        ])
+    assert req_items == req_items_expected
     # get test cases covering requirement FOO-ALL
     fooall_item = [i for i in req_list if i.text == "FOO-ALL"][0]
     fooall_case_list = fooall_item.xpath('h:ul/h:li', namespaces=NS)
-    # check that all test cases are listed under FOO-ALL
-    assert len(fooall_case_list) == 4
+    # check that all test cases are listed under FOO-ALL, in given order
     fooall_case_items = [''.join(i.itertext()) for i in fooall_case_list]
-    assert "/test_bar" in fooall_case_items
-    assert "/test_foo" in fooall_case_items
-    assert "/baz/test_one" in fooall_case_items
-    assert "/baz/test_two" in fooall_case_items
+    fooall_case_items_expected = sorted([
+        "/test_bar",
+        "/test_foo",
+        "/baz/test_one",
+        "/baz/test_two",
+        ])
+    assert fooall_case_items == fooall_case_items_expected
 
 
 @pytest.mark.sphinx('html', testroot='requirementlist-nested')

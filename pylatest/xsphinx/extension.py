@@ -65,11 +65,11 @@ def pylatest_resolve_requirements(app, doctree, docname):
 
     for node in doctree.traverse(nodes.requirementlist_node):
         content_node = docutils.nodes.bullet_list()
-        for req, cases in env.pylatest_requirements.items():
+        for req, cases in sorted(env.pylatest_requirements.items()):
             req_item_node = docutils.nodes.list_item()
             req_item_node += docutils.nodes.paragraph(text=req)
             case_list_node = docutils.nodes.bullet_list()
-            for case in cases:
+            for case in sorted(cases):
                 case_item_node = docutils.nodes.list_item()
                 par_node = docutils.nodes.paragraph()
                 # building reference to test case document manually, the link
