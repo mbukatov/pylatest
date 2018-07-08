@@ -71,7 +71,14 @@ def pylatest_resolve_requirements(app, doctree, docname):
             case_list_node = docutils.nodes.bullet_list()
             for case in cases:
                 case_item_node = docutils.nodes.list_item()
-                case_item_node += docutils.nodes.paragraph(text=case)
+                par_node = docutils.nodes.paragraph()
+                # HACK: this simple linking would work only in documents in
+                # root directory of the project
+                # TODO: replace this HACK with equvivalent of :doc:`/{case}`
+                ref_node = docutils.nodes.reference(
+                    '', "/" + case, internal=True, refuri=case + ".html")
+                par_node += ref_node
+                case_item_node += par_node
                 case_list_node += case_item_node
             req_item_node += case_list_node
             content_node += req_item_node
