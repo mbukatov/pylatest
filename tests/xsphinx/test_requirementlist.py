@@ -68,6 +68,37 @@ def test_requirementlist_present_nested_html(app, status, warning):
     assert fooall_case_items == fooall_case_items_expected
 
 
+@pytest.mark.xfail
+@pytest.mark.sphinx('html', testroot='requirementlist-testdefaults')
+def test_requirementlist_present_testdefaults_html(app, status, warning):
+    """
+    Check that all requirements can be specified via testdefaults directive.
+    """
+    app.builder.build_all()
+    # parse requirements overview document
+    doc_tree = xmlparse_testcase(app.outdir, "requirements", "html")
+    # get the requirement list (list of <li> elements)
+    req_list = get_requirements_from_build(doc_tree, "html")
+    # check that the list contains all requirements, in given order
+    req_items = [i.text for i in req_list]
+    req_items_expected = sorted([
+        "FOO-ALL",
+        "FOO-001",
+        "FOO-002",
+        ])
+    assert req_items == req_items_expected
+    # get test cases covering requirement FOO-ALL
+    fooall_item = [i for i in req_list if i.text == "FOO-ALL"][0]
+    fooall_case_list = fooall_item.xpath('h:ul/h:li', namespaces=NS)
+    # check that all test cases are listed under FOO-ALL, in given order
+    fooall_case_items = [''.join(i.itertext()) for i in fooall_case_list]
+    fooall_case_items_expected = sorted([
+        "/baz/test_one",
+        "/baz/test_two",
+        ])
+    assert fooall_case_items == fooall_case_items_expected
+
+
 @pytest.mark.sphinx('html', testroot='requirementlist-nested')
 def test_requirementlist_caselinking_nested_html(app, status, warning):
     app.builder.build_all()
