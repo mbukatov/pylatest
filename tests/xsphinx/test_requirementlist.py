@@ -19,12 +19,7 @@
 from lxml import etree
 import pytest
 
-
-from testutil import xmlparse_testcase
-
-
-# xml namespaces
-NS = {'h': 'http://www.w3.org/1999/xhtml'}
+from testutil import xmlparse_testcase, get_requirements_from_build, NS
 
 
 @pytest.mark.parametrize("builder", [
@@ -48,24 +43,41 @@ def test_requirementlist_present_nested_html(app, status, warning):
     app.builder.build_all()
     # parse requirements overview document
     doc_tree = xmlparse_testcase(app.outdir, "requirements", "html")
-    # find and check the requirement list
-    req_list = doc_tree.xpath(
-        '//h:div[@id="requirements"]/h:ul/h:li',
-        namespaces=NS)
-    assert len(req_list) == 4
+    # get the requirement list (list of <li> elements)
+    req_list = get_requirements_from_build(doc_tree, "html")
     # check that the list contains all requirements
+    assert len(req_list) == 4
     req_items = [i.text for i in req_list]
     assert "FOO-ALL" in req_items
     assert "FOO-111" in req_items
     assert "FOO-112" in req_items
     assert "FOO-212" in req_items
+    # get test cases covering requirement FOO-ALL
+    fooall_item = [i for i in req_list if i.text == "FOO-ALL"][0]
+    fooall_case_list = fooall_item.xpath('h:ul/h:li', namespaces=NS)
     # check that all test cases are listed under FOO-ALL
-    foo_all_case_list = doc_tree.xpath(
-        '//h:div[@id="requirements"]/h:ul/h:li[text()="FOO-ALL"]//h:li',
-        namespaces=NS)
-    assert len(foo_all_case_list) == 4
-    foo_all_case_items = [''.join(i.itertext()) for i in foo_all_case_list]
-    assert "/test_bar" in foo_all_case_items
-    assert "/test_foo" in foo_all_case_items
-    assert "/baz/test_one" in foo_all_case_items
-    assert "/baz/test_two" in foo_all_case_items
+    assert len(fooall_case_list) == 4
+    fooall_case_items = [''.join(i.itertext()) for i in fooall_case_list]
+    assert "/test_bar" in fooall_case_items
+    assert "/test_foo" in fooall_case_items
+    assert "/baz/test_one" in fooall_case_items
+    assert "/baz/test_two" in fooall_case_items
+
+
+@pytest.mark.sphinx('html', testroot='requirementlist-nested')
+def test_requirementlist_caselinking_nested_html(app, status, warning):
+    app.builder.build_all()
+    # parse requirements overview document
+    doc_tree = xmlparse_testcase(
+        app.outdir, "requirements/requirements", "html")
+    # get the requirement list
+    req_list = get_requirements_from_build(doc_tree, "html")
+    # get references/links of test cases covering requirement FOO-111
+    req_item = [i for i in req_list if i.text == "FOO-111"][0]
+    case_ref_list = req_item.xpath('h:ul/h:li/h:a', namespaces=NS)
+    # there should be just one such requirement
+    assert len(case_ref_list) == 1
+    # and it should link to /baz/test_one document correctly (wrt the location
+    # of document with the requirementlist directive)
+    case_ref = case_ref_list[0]
+    assert case_ref.get('href') == "../baz/test_one.html"
