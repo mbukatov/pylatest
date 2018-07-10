@@ -106,6 +106,18 @@ def test_get_testcase_requirements_single():
     assert get_testcase_requirements(doctree) == ["FOO-212"]
 
 
+def test_get_testcase_requirements_single_emptyitem():
+    doctree = _publish(textwrap.dedent('''\
+    Test Foo
+    ********
+
+    :author: joe.foo@example.com
+    :component: foo
+    :requirement:
+    '''))
+    assert get_testcase_requirements(doctree) == []
+
+
 def test_get_testcase_requirements_many():
     doctree = _publish(textwrap.dedent('''\
     Test Foo
@@ -117,6 +129,19 @@ def test_get_testcase_requirements_many():
     :component: foo
     '''))
     assert get_testcase_requirements(doctree) == ["FOO-212", "FOO-232"]
+
+
+def test_get_testcase_requirements_single_list():
+    doctree = _publish(textwrap.dedent('''\
+    Test Foo
+    ********
+
+    :author: joe.foo@example.com
+    :component: foo
+    :requirements:
+      - FOO-212
+    '''))
+    assert get_testcase_requirements(doctree) == ["FOO-212"]
 
 
 def test_get_testcase_requirements_many_list():
@@ -131,6 +156,48 @@ def test_get_testcase_requirements_many_list():
       - FOO-232
     '''))
     assert get_testcase_requirements(doctree) == ["FOO-212", "FOO-232"]
+
+
+def test_get_testcase_requirements_emptyitems_mixed_list():
+    doctree = _publish(textwrap.dedent('''\
+    Test Foo
+    ********
+
+    :author: joe.foo@example.com
+    :component: foo
+    :requirements:
+      -
+      - FOO-132
+      -
+    :requirement: FOO-130
+    '''))
+    assert get_testcase_requirements(doctree) == ["FOO-132", "FOO-130"]
+
+
+def test_get_testcase_requirements_emptyitems_list():
+    doctree = _publish(textwrap.dedent('''\
+    Test Foo
+    ********
+
+    :author: joe.foo@example.com
+    :component: foo
+    :requirements:
+      -
+      -
+    '''))
+    assert get_testcase_requirements(doctree) == []
+
+
+def test_get_testcase_requirements_many_list_err_single():
+    doctree = _publish(textwrap.dedent('''\
+    Test Foo
+    ********
+
+    :author: joe.foo@example.com
+    :component: foo
+    :requirements: FOO-212
+    '''))
+    assert get_testcase_requirements(doctree) == ["FOO-212"]
 
 
 def test_get_testcase_requirements_many_mixed():
@@ -148,3 +215,40 @@ def test_get_testcase_requirements_many_mixed():
     '''))
     assert get_testcase_requirements(doctree) == [
         "FOO-012", "FOO-032", "FOO-212", "FOO-232"]
+
+
+def test_get_testcase_requirements_single_url_link():
+    doctree = _publish(textwrap.dedent('''\
+    Test Foo
+    ********
+
+    :author: joe.foo@example.com
+    :component: foo
+    :requirement: https://example.com
+    '''))
+    results = get_testcase_requirements(doctree)
+    assert len(results) == 1
+    # check that we get actual rst node for a link (reference node)
+    assert results[0].tagname == "reference"
+    assert results[0].astext() == "https://example.com"
+
+
+def test_get_testcase_requirements_many_list_url_link():
+    doctree = _publish(textwrap.dedent('''\
+    Test Foo
+    ********
+
+    :author: joe.foo@example.com
+    :component: foo
+    :requirements:
+      - https://example.com/foo
+      - https://example.com/bar
+    '''))
+    results = get_testcase_requirements(doctree)
+    assert len(results) == 2
+    # check that we get actual rst node for a link (reference node)
+    assert results[0].tagname == "reference"
+    assert results[1].tagname == "reference"
+    # and expected content
+    assert results[0].astext() == "https://example.com/foo"
+    assert results[1].astext() == "https://example.com/bar"

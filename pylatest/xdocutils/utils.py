@@ -106,8 +106,23 @@ def get_testcase_requirements(doctree):
     for field in field_list.traverse(docutils.nodes.field):
         field_name = field[0].astext()
         if field_name == "requirement":
-            requirements.append(field[1][0].astext())
+            # process only non empty field body (when there is some value)
+            if len(field[1]) > 0:
+                # drop wrapper node <paragraph...>
+                item = field[1][0]
+                if item.tagname == "paragraph":
+                    item = item[0]
+                requirements.append(item)
         if field_name == "requirements":
             for item in field[1][0]:
-                requirements.append(item.astext())
+                # drop list item wrapper nodes <list_item: <paragraph...>>
+                if item.tagname == "list_item":
+                    if len(item) > 0:
+                        item = item[0]
+                    else:
+                        # the list item is empty, skip the item
+                        continue
+                if item.tagname == "paragraph":
+                    item = item[0]
+                requirements.append(item)
     return requirements
