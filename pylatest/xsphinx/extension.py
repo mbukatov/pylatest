@@ -65,9 +65,13 @@ def pylatest_resolve_requirements(app, doctree, docname):
 
     for node in doctree.traverse(nodes.requirementlist_node):
         content_node = docutils.nodes.bullet_list()
-        for req, cases in sorted(env.pylatest_requirements.items()):
+        for req_node, cases in sorted(
+                env.pylatest_requirements.values(),
+                key=lambda item: item[0].astext()):
             req_item_node = docutils.nodes.list_item()
-            req_item_node += docutils.nodes.paragraph(text=req)
+            req_item_para_node = docutils.nodes.paragraph()
+            req_item_para_node += req_node
+            req_item_node += req_item_para_node
             case_list_node = docutils.nodes.bullet_list()
             for case in sorted(cases):
                 case_item_node = docutils.nodes.list_item()

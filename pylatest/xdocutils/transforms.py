@@ -238,5 +238,15 @@ class RequiremenIndexingTransform(transforms.Transform):
             env.pylatest_requirements = {}
         # add requirements of current doc into reverse index
         requirements = get_testcase_requirements(self.document)
-        for req in requirements:
-            env.pylatest_requirements.setdefault(req, set()).add(env.docname)
+        for req_node in requirements:
+            # enforce req_node (rst node) identity based on sheer url for
+            # references or plain text representation for other rst nodes
+            if req_node.tagname == "reference":
+                req_key = req_node['refuri']
+            else:
+                req_key = req_node.astext()
+            # create new empty entry for current requirement (req_node) in
+            # env.pylatest_requirements dict if there is no such entry so far
+            env.pylatest_requirements.setdefault(req_key, (req_node, set()))
+            # add new docname into set of docnames of the requirement's entry
+            env.pylatest_requirements[req_key][1].add(env.docname)

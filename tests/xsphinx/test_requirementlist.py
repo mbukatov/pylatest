@@ -118,7 +118,6 @@ def test_requirementlist_caselinking_nested_html(app, status, warning):
     assert case_ref.get('href') == "../baz/test_one.html"
 
 
-@pytest.mark.xfail
 @pytest.mark.sphinx('html', testroot='requirementlist-url-flat')
 def test_requirementlist_url_flat_html(app, status, warning):
     """
