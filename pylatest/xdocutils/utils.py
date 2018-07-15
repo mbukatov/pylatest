@@ -98,23 +98,66 @@ def get_testcase_id(doctree):
 def get_testcase_requirements(doctree):
     """
     Get requirement(s) of test case from a field list in given doctree.
+
+    Requirement field in a field list is identified by either "requirement" or
+    "requirements" field name, and it's possible to have multiple requirement
+    items in a field list::
+
+        <field_list>
+            <field>
+                ...
+            <field>
+                <field_name>
+                    requirements
+                <field_body>
+                    ...
+            <field>
+                <field_name>
+                    requirement
+                <field_body>
+                    ...
+
+    Few examples of expected doctree structure of a requirement's field body::
+
+        <field_body>
+            <paragraph>
+                FOO-130
+
+    Or::
+
+        <field_body>
+            <paragraph>
+                <reference refuri="https://example.com">
+                    https://example.com
+
+    Or::
+
+        <field_body>
+            <bullet_list bullet="-">
+                <list_item>
+                    <paragraph>
+                        FOO-132
     """
+    requirement_field_names = ("requirement", "requirements")
     requirements = []
     field_list = get_field_list(doctree)
     if field_list is None:
         return requirements
     for field in field_list.traverse(docutils.nodes.field):
         field_name = field[0].astext()
-        if field_name == "requirement":
-            # process only non empty field body (when there is some value)
-            if len(field[1]) > 0:
-                # drop wrapper node <paragraph...>
-                item = field[1][0]
-                if item.tagname == "paragraph":
-                    item = item[0]
-                requirements.append(item)
-        if field_name == "requirements":
-            for item in field[1][0]:
+        # check few asumptions about the field as a whole
+        if field_name not in requirement_field_names:
+            continue
+        field_body = field[1]
+        if len(field_body) < 1:
+            continue
+        # processing of the field body (by rst node type in field body)
+        if field_body[0].tagname == "paragraph":
+            # drop the paragraph node
+            item = field_body[0][0]
+            requirements.append(item)
+        elif field_body[0].tagname == "bullet_list":
+            for item in field_body[0]:
                 # drop list item wrapper nodes <list_item: <paragraph...>>
                 if item.tagname == "list_item":
                     if len(item) > 0:

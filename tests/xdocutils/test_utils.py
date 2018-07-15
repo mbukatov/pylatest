@@ -89,32 +89,40 @@ def test_get_testcase_id():
     '''))
     assert get_testcase_id(doctree) == "FOO-122"
 
+#
+# requirements
+#
 
 def test_get_testcase_requirements_null(empty_doctree):
     assert get_testcase_requirements(empty_doctree) == []
 
 
-def test_get_testcase_requirements_single():
+REQUIREMENT_FIELD_NAMES = ["requirement", "requirements"]
+
+
+@pytest.mark.parametrize("field_name", REQUIREMENT_FIELD_NAMES)
+def test_get_testcase_requirements_single(field_name):
     doctree = _publish(textwrap.dedent('''\
     Test Foo
     ********
 
     :author: joe.foo@example.com
     :component: foo
-    :requirement: FOO-212
-    '''))
+    :{}: FOO-212
+    '''.format(field_name)))
     assert get_testcase_requirements(doctree) == ["FOO-212"]
 
 
-def test_get_testcase_requirements_single_emptyitem():
+@pytest.mark.parametrize("field_name", REQUIREMENT_FIELD_NAMES)
+def test_get_testcase_requirements_single_empty(field_name):
     doctree = _publish(textwrap.dedent('''\
     Test Foo
     ********
 
     :author: joe.foo@example.com
     :component: foo
-    :requirement:
-    '''))
+    :{}:
+    '''.format(field_name)))
     assert get_testcase_requirements(doctree) == []
 
 
@@ -131,76 +139,68 @@ def test_get_testcase_requirements_many():
     assert get_testcase_requirements(doctree) == ["FOO-212", "FOO-232"]
 
 
-def test_get_testcase_requirements_single_list():
+@pytest.mark.parametrize("field_name", REQUIREMENT_FIELD_NAMES)
+def test_get_testcase_requirements_list_single(field_name):
     doctree = _publish(textwrap.dedent('''\
     Test Foo
     ********
 
     :author: joe.foo@example.com
     :component: foo
-    :requirements:
+    :{}:
       - FOO-212
-    '''))
+    '''.format(field_name)))
     assert get_testcase_requirements(doctree) == ["FOO-212"]
 
 
-def test_get_testcase_requirements_many_list():
+@pytest.mark.parametrize("field_name", REQUIREMENT_FIELD_NAMES)
+def test_get_testcase_requirements_list_many(field_name):
     doctree = _publish(textwrap.dedent('''\
     Test Foo
     ********
 
     :author: joe.foo@example.com
     :component: foo
-    :requirements:
+    :{}:
       - FOO-212
       - FOO-232
-    '''))
+    '''.format(field_name)))
     assert get_testcase_requirements(doctree) == ["FOO-212", "FOO-232"]
 
 
-def test_get_testcase_requirements_emptyitems_mixed_list():
+@pytest.mark.parametrize("field_name", REQUIREMENT_FIELD_NAMES)
+def test_get_testcase_requirements_list_many_someemptyitems(field_name):
     doctree = _publish(textwrap.dedent('''\
     Test Foo
     ********
 
     :author: joe.foo@example.com
     :component: foo
-    :requirements:
+    :{}:
       -
       - FOO-132
       -
     :requirement: FOO-130
-    '''))
+    '''.format(field_name)))
     assert get_testcase_requirements(doctree) == ["FOO-132", "FOO-130"]
 
 
-def test_get_testcase_requirements_emptyitems_list():
+@pytest.mark.parametrize("field_name", REQUIREMENT_FIELD_NAMES)
+def test_get_testcase_requirements_list_many_onlyemptyitems(field_name):
     doctree = _publish(textwrap.dedent('''\
     Test Foo
     ********
 
     :author: joe.foo@example.com
     :component: foo
-    :requirements:
+    :{}:
       -
       -
-    '''))
+    '''.format(field_name)))
     assert get_testcase_requirements(doctree) == []
 
 
-def test_get_testcase_requirements_many_list_err_single():
-    doctree = _publish(textwrap.dedent('''\
-    Test Foo
-    ********
-
-    :author: joe.foo@example.com
-    :component: foo
-    :requirements: FOO-212
-    '''))
-    assert get_testcase_requirements(doctree) == ["FOO-212"]
-
-
-def test_get_testcase_requirements_many_mixed():
+def test_get_testcase_requirements_many_list_many():
     doctree = _publish(textwrap.dedent('''\
     Test Foo
     ********
@@ -217,7 +217,8 @@ def test_get_testcase_requirements_many_mixed():
         "FOO-012", "FOO-032", "FOO-212", "FOO-232"]
 
 
-def test_get_testcase_requirements_single_url_link():
+@pytest.mark.parametrize("field_name", REQUIREMENT_FIELD_NAMES)
+def test_get_testcase_requirements_single_url_link(field_name):
     doctree = _publish(textwrap.dedent('''\
     Test Foo
     ********
@@ -225,7 +226,7 @@ def test_get_testcase_requirements_single_url_link():
     :author: joe.foo@example.com
     :component: foo
     :requirement: https://example.com
-    '''))
+    '''.format(field_name)))
     results = get_testcase_requirements(doctree)
     assert len(results) == 1
     # check that we get actual rst node for a link (reference node)
