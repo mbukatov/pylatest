@@ -47,3 +47,9 @@ def visit_requirement_node(self, node):
 
 def depart_requirement_node(self, node):
     self.body.append('\n</div>\n')
+
+def visit_requirementlist_node(self, node):
+    pass
+
+def depart_requirementlist_node(self, node):
+    pass

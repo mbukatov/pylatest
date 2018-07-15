@@ -20,23 +20,11 @@ import textwrap
 import xml.etree.ElementTree as ET
 
 from docutils import nodes
-from docutils.core import publish_from_doctree, publish_doctree
+from docutils.core import publish_from_doctree
 import pytest
 
 import pylatest.xdocutils.core
 import pylatest.xdocutils.nodes
-
-
-@pytest.fixture
-def empty_doctree():
-    """
-    Produce empty rst document tree.
-    """
-    doctree = publish_doctree(
-        source="",
-        reader_name='standalone',
-        parser_name='restructuredtext',)
-    return doctree
 
 
 @pytest.fixture

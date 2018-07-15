@@ -21,6 +21,10 @@ from lxml import etree
 from pylatest.export import get_metadata
 
 
+# xml namespaces
+NS = {'h': 'http://www.w3.org/1999/xhtml'}
+
+
 def xmlparse_testcase(outdir, doc_name, builder):
     """
     Parse html testcase file via etree xml parser, so that
@@ -59,3 +63,14 @@ def get_metadata_from_build(tree, builder):
             content_value = field.get('content')
             metadata.append((id_value, content_value))
     return metadata
+
+
+def get_requirements_from_build(tree, builder="html"):
+    """
+    Extracts requirement list from given xml tree.
+    """
+    assert builder == "html"
+    requirements = tree.xpath(
+        '//h:div[@id="requirements"]/h:ul/h:li',
+        namespaces=NS)
+    return requirements

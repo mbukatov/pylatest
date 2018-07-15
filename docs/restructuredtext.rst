@@ -75,6 +75,14 @@ Directives
     ``foo`` directory tree, no matter if test cases there contain the metadata
     about component already or not.
 
+.. rst:directive:: requirementlist
+
+    This directive generates list of all requirements which are covered by
+    test cases in the Sphinx/Pylatest project, referencing test cases for each
+    requirement.
+
+    See :ref:`document_type_testcase` for details how to specify requirements
+    in a test case.
 
 Roles
 =====

@@ -4,6 +4,7 @@
 Pylatest ReStructuredText Readers module.
 """
 
+# Copyright (C) 2018 Martin Bukatovič <martin.bukatovic@gmail.com>
 # Copyright (C) 2017 mbukatov@redhat.com
 #
 # This program is free software: you can redistribute it and/or modify
@@ -21,6 +22,7 @@ Pylatest ReStructuredText Readers module.
 
 
 from docutils.readers import standalone
+from docutils.transforms import frontmatter
 
 from pylatest.xdocutils.transforms import TestActionsTableTransform
 from pylatest.xdocutils.transforms import RequirementSectionTransform
@@ -51,4 +53,18 @@ class PlainReader(standalone.Reader):
     def get_transforms(self):
         transforms = standalone.Reader.get_transforms(self)
         transforms.append(TestActionsPlainIdTransform)
+        return transforms
+
+
+class NoDocInfoReader(standalone.Reader):
+    """
+    NoDocInfoReader extends docutils standalone ReStructuredText reader
+    to drop DocInfo transformation, everything else remains the same.
+
+    This reader is used for unit testing only.
+    """
+
+    def get_transforms(self):
+        transforms = standalone.Reader.get_transforms(self)
+        transforms.remove(frontmatter.DocInfo)
         return transforms
