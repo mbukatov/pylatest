@@ -35,19 +35,6 @@ def visit_test_action_node(self, node):
 def depart_test_action_node(self, node):
     self.body.append('\n</div>\n')
 
-def visit_requirement_node(self, node):
-    attributes = {
-        'class': 'pylatest_requirement',
-        'req_id': node.attributes['req_id'],
-        }
-    # optional attributes
-    if 'priority' in node.attributes:
-        attributes['priority'] = node.attributes['priority']
-    self.body.append(self.starttag(node, 'div', **attributes))
-
-def depart_requirement_node(self, node):
-    self.body.append('\n</div>\n')
-
 def visit_requirementlist_node(self, node):
     pass
 

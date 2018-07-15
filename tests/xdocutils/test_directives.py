@@ -321,39 +321,3 @@ def test_testaction_single_valid_field_paragraph(register_all_plain, action_name
     result, num = re.subn('action_id="[0-9]+"', 'action_id="None"', result)
     assert num == 1
     assert result == exp_result
-
-
-@pytest.mark.parametrize("req_id", ["SOME_ID", 111])
-def test_requirement_full_nooptions(register_all_plain, req_id):
-    rst_input = textwrap.dedent('''\
-    .. requirement:: {}
-
-        Some content.
-    '''.format(req_id))
-    exp_result = textwrap.dedent('''\
-    <document source="_testparse() method">
-        <requirement_node req_id="{}">
-            <paragraph>
-                Some content.
-    '''.format(req_id))
-    assert _parse(rst_input) == exp_result
-
-
-def test_requirement_full_alloptions(register_all_plain):
-    rst_input = textwrap.dedent('''\
-    .. requirement:: FOO123
-        :priority: high
-
-        Natus illum repudiandae consequatur.
-
-        Expedita saepe architecto numquam accusamus.
-    ''')
-    exp_result = textwrap.dedent('''\
-    <document source="_testparse() method">
-        <requirement_node priority="high" req_id="FOO123">
-            <paragraph>
-                Natus illum repudiandae consequatur.
-            <paragraph>
-                Expedita saepe architecto numquam accusamus.
-    ''')
-    assert _parse(rst_input) == exp_result

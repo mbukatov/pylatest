@@ -135,30 +135,6 @@ class TestActionDirective(rst.Directive):
         return node_list
 
 
-class RequirementDirective(rst.Directive):
-    """
-    Implementation of ``requirement`` rst directive.
-    """
-
-    required_arguments = 1
-    optional_arguments = 0
-    final_argument_whitespace = True
-    has_content = True
-    option_spec = {
-        'priority': str,
-        }
-
-    def run(self):
-        self.assert_has_content()
-        req_id = self.arguments[0]
-        node = pylatest.xdocutils.nodes.requirement_node()
-        node.attributes['req_id'] = req_id
-        if 'priority' in self.options:
-            node.attributes['priority'] = self.options['priority']
-        self.state.nested_parse(self.content, self.content_offset, node)
-        return [node]
-
-
 class TestDefaultsDirective(rst.Directive):
     """
     Implementation of ``test_defaults`` rst directive.

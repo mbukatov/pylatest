@@ -25,7 +25,6 @@ from docutils.readers import standalone
 from docutils.transforms import frontmatter
 
 from pylatest.xdocutils.transforms import TestActionsTableTransform
-from pylatest.xdocutils.transforms import RequirementSectionTransform
 from pylatest.xdocutils.transforms import TestActionsPlainIdTransform
 
 
@@ -39,7 +38,6 @@ class NoPlainReader(standalone.Reader):
     def get_transforms(self):
         transforms = standalone.Reader.get_transforms(self)
         transforms.append(TestActionsTableTransform)
-        transforms.append(RequirementSectionTransform)
         return transforms
 
 

@@ -52,8 +52,6 @@ Directives
     This directive is now **deprecated** and could be removed in next release,
     use :rst:dir:`test_action` directive instead.
 
-.. .. rst:directive:: requirement
-
 .. rst:directive:: test_defaults
 
     This directive, which is usually placed in :ref:`document_type_index`

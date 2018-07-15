@@ -27,7 +27,6 @@ from docutils import nodes
 from docutils import transforms
 
 from pylatest.xdocutils.nodes import test_action_node
-from pylatest.xdocutils.nodes import requirement_node
 from pylatest.xdocutils.utils import get_testcase_requirements
 import pylatest.document
 
@@ -182,40 +181,6 @@ class TestActionsPlainIdTransform(transforms.Transform):
             new_action_id = actions.add(action_name, node, action_id)
             # update action id of the node
             node.attributes['action_id'] = new_action_id
-
-
-class RequirementSectionTransform(transforms.Transform):
-    """
-    Builds doctree section from pylatest requirement node.
-    """
-
-    # use priority in "very late (non-standard)" range so that all
-    # standard transformations will be executed before this one
-    default_priority = 999
-
-    def apply(self):
-        for node in self.document.traverse(requirement_node):
-            section_node = nodes.section()
-            # header of the section
-            title = "Requirement {0}".format(node.attributes['req_id'])
-            section_node += nodes.title(text=title)
-            # see docutils.nodes.Element docstring for description of both
-            # 'ids' and 'names' attributes (necessary for table of contents)
-            # attr ids: list of unique keys
-            section_node.attributes['ids'] = [nodes.make_id(title)]
-            # attr names: list of element names generated from title or content
-            section_node.attributes['names'] = [
-                nodes.fully_normalize_name(title)]
-            # priority paragraph (if priority is specified)
-            if 'priority' in node.attributes:
-                text = "Priority: {0}".format(node.attributes['priority'])
-                prio_node = nodes.paragraph(text=text)
-                section_node += prio_node
-            # and a paragraph with all content of the directive
-            for content_node in node:
-                section_node += content_node
-            # and finally: replace requirement node with just build section
-            node.replace_self(section_node)
 
 
 class RequiremenIndexingTransform(transforms.Transform):

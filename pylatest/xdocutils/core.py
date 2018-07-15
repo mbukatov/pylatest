@@ -41,7 +41,6 @@ from docutils import nodes
 from docutils.parsers import rst
 from docutils.writers.html4css1 import HTMLTranslator
 
-from pylatest.xdocutils.directives import RequirementDirective
 from pylatest.xdocutils.directives import OldTestActionDirective
 from pylatest.xdocutils.directives import TestActionDirective
 from pylatest.xdocutils.readers import NoPlainReader, PlainReader
@@ -91,7 +90,6 @@ def register_pylatest_directives():
     rst.directives.register_directive("test_step", OldTestActionDirective)
     rst.directives.register_directive("test_result", OldTestActionDirective)
     rst.directives.register_directive("test_action", TestActionDirective)
-    rst.directives.register_directive("requirement", RequirementDirective)
 
 
 def register_all(use_plain=False):

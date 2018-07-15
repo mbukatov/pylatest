@@ -88,8 +88,6 @@ def main():
         help="basename for new testcase without suffix")
     args = parser.parse_args()
 
-    # TODO: redesign this and add support for requirements.rst template
-
     # TODO: try to read config (eg. author and others in the future) from
     # config file in ~/.config/pylatest.conf as well
 

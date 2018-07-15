@@ -40,7 +40,6 @@ def pylatest_transform_handler(app, doctree, docname):
         # pylatest transforms for human readable html output,
         # translates pylatest nodes into nice sections or tables
         app.add_post_transform(transforms.TestActionsTableTransform)
-        app.add_post_transform(transforms.RequirementSectionTransform)
 
 
 def pylatest_requirements_transform_handler(app):
@@ -178,7 +177,6 @@ def setup(app):
     app.add_directive("test_step", directives.OldTestActionDirective)
     app.add_directive("test_result", directives.OldTestActionDirective)
     app.add_directive("test_action", directives.TestActionDirective)
-    app.add_directive("requirement", directives.RequirementDirective)
     app.add_directive("test_defaults", directives.TestDefaultsDirective)
     app.add_directive("requirementlist", directives.RequirementListDirective)
 
