@@ -81,11 +81,8 @@ Directives
     test cases in the Sphinx/Pylatest project, referencing test cases for each
     requirement.
 
-    * TODO: describe how to specify requirement for a test case somewhere
-    * TODO: option to limit test cases it covers, by metadata or docname path
-    * TODO: option to cover only single requirement
-    * TODO: option to fetch RHBZ title
-    * TODO: option to toggle listing of test cases covering the requirement
+    See :ref:`document_type_testcase` for details how to specify requirements
+    in a test case.
 
 Roles
 =====
