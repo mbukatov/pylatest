@@ -7,13 +7,6 @@
 Pylatest command line tools can be classified into several groups.
 
 
-Quickstart
-==========
-
-Command ``pylatest-quickstart`` is a simple wrapper of ``sphinx-quickstart``
-tool for starting new Sphinx/Pylatest project.
-
-
 Docutils Front End Tools
 ========================
 
