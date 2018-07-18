@@ -49,19 +49,13 @@ are going to use it:
 Create new Sphinx/Pylatest Project
 ==================================
 
-You can start a new Sphinx/Pylatest project using the quickstart script:
-
-.. code-block:: console
-
-    $ pylatest-quickstart
-
-This very simple wrapper of ``sphinx-quickstart`` will generate initial Sphinx
-project with pylatest extension enabled and few configuration values predefined
-(eg. ``Makefile`` will be always generated) having Pylatest use case in mind.
+First of all you need to create new Sphinx project using ``sphinx-quickstart``
+script (see `Sphinx Tutorial`_ for details) and then enable pylatest extension
+as shown in the next section.
 
 
-Adding Pylatest to Existing Project
-===================================
+Adding Pylatest to Existing Sphinx Project
+==========================================
 
 To use Pylatest with your existing Sphinx project, add ``pylatest``
 module into list of extensions in ``conf.py`` of the project:

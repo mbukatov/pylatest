@@ -64,7 +64,6 @@ setup(
             'pylatest-rst2htmlplain=pylatest.main:pylatest2htmlplain',
             'pylatest-rst2pseudoxml=pylatest.main:pylatest2pseudoxml',
             'pylatest-preview=pylatest.main:pylatest_preview',
-            'pylatest-quickstart=pylatest.xsphinx.quickstart:main',
         ],
     },
     )
