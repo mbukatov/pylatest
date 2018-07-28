@@ -80,7 +80,7 @@ def create_content(actions):
         [nodes.paragraph(text="Step")],
         [nodes.paragraph(text="Expected Result")],
         ]
-    table_node = build_table(row_nodes, [2, 44, 44], headrow_data)
+    table_node = build_table(row_nodes, [6, 47, 47], headrow_data)
     return table_node
 
 
