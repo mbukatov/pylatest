@@ -1,4 +1,4 @@
-table {
+table:not(.field-list) {
     width: 100%;
     table-layout: fixed;
 }
