@@ -210,5 +210,11 @@ def setup(app):
     app.add_config_value('pylatest_export_dry_run', False, 'html')
     app.add_config_value('pylatest_export_response_properties', None, 'html')
 
+    # pylatest css tweaks
+    app.add_stylesheet('pylatest.css')
+    # make sure the css file gets copied into _static dir during html build
+    here = os.path.abspath(os.path.dirname(__file__))
+    app.config.html_static_path.append(os.path.join(here, "pylatest.css"))
+
     # sphinx plugin metadata
     return {'version': '0.1.2'}

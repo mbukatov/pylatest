@@ -94,9 +94,9 @@ def test_actions_noplain_teststep_empty(rst_input_teststep_empty):
     <div class="document">
     <table border="1" class="docutils">
     <colgroup>
-    <col width="2%" />
-    <col width="49%" />
-    <col width="49%" />
+    <col width="6%" />
+    <col width="47%" />
+    <col width="47%" />
     </colgroup>
     <thead valign="bottom">
     <tr><th class="head">&nbsp;</th>
@@ -150,9 +150,9 @@ def test_actions_noplain_teststep_simple(rst_input_teststep_simple):
     <div class="document">
     <table border="1" class="docutils">
     <colgroup>
-    <col width="2%" />
-    <col width="49%" />
-    <col width="49%" />
+    <col width="6%" />
+    <col width="47%" />
+    <col width="47%" />
     </colgroup>
     <thead valign="bottom">
     <tr><th class="head">&nbsp;</th>
@@ -213,9 +213,9 @@ def test_actions_noplain_test_action_simple(rst_input_test_action_simple):
     <div class="document">
     <table border="1" class="docutils">
     <colgroup>
-    <col width="2%" />
-    <col width="49%" />
-    <col width="49%" />
+    <col width="6%" />
+    <col width="47%" />
+    <col width="47%" />
     </colgroup>
     <thead valign="bottom">
     <tr><th class="head">&nbsp;</th>
@@ -294,9 +294,9 @@ def test_actions_noplain_test_actions_two(rst_input_test_action_two):
     <div class="document">
     <table border="1" class="docutils">
     <colgroup>
-    <col width="2%" />
-    <col width="49%" />
-    <col width="49%" />
+    <col width="6%" />
+    <col width="47%" />
+    <col width="47%" />
     </colgroup>
     <thead valign="bottom">
     <tr><th class="head">&nbsp;</th>
@@ -387,9 +387,9 @@ def test_actions_noplain_autoid_test_action_simple_autoid():
     <div class="document">
     <table border="1" class="docutils">
     <colgroup>
-    <col width="2%" />
-    <col width="49%" />
-    <col width="49%" />
+    <col width="6%" />
+    <col width="47%" />
+    <col width="47%" />
     </colgroup>
     <thead valign="bottom">
     <tr><th class="head">&nbsp;</th>
@@ -430,9 +430,9 @@ def test_actions_noplain_autoid_test_actions_two_autoid():
     <div class="document">
     <table border="1" class="docutils">
     <colgroup>
-    <col width="2%" />
-    <col width="49%" />
-    <col width="49%" />
+    <col width="6%" />
+    <col width="47%" />
+    <col width="47%" />
     </colgroup>
     <thead valign="bottom">
     <tr><th class="head">&nbsp;</th>
@@ -529,9 +529,9 @@ def test_actions_noplain_full_example(rst_input_full_example):
     <div class="document">
     <table border="1" class="docutils">
     <colgroup>
-    <col width="2%" />
-    <col width="49%" />
-    <col width="49%" />
+    <col width="6%" />
+    <col width="47%" />
+    <col width="47%" />
     </colgroup>
     <thead valign="bottom">
     <tr><th class="head">&nbsp;</th>
