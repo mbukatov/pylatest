@@ -217,4 +217,4 @@ def setup(app):
     app.config.html_static_path.append(os.path.join(here, "pylatest.css"))
 
     # sphinx plugin metadata
-    return {'version': '0.1.2'}
+    return {'version': '0.1.3'}
