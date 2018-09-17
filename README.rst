@@ -20,6 +20,13 @@ Using Pylatest
 The main way to use Pylatest is via Sphinx_ project. See `Pylatest
 Documentation`_ for *Quickstart Tutorial* and additional details.
 
+Example
+-------
+
+To get better idea what pylatest project looks like, see minimal, but complete,
+`Pylatest Demo Project`_. The html builds are available at
+https://marbu.gitlab.io/pylatest-demo
+
 Development and testing
 -----------------------
 
@@ -40,3 +47,4 @@ pylatest is free and open source software.
 .. _Sphinx: http://www.sphinx-doc.org/en/stable/index.html
 .. _`reStructuredText syntax`: http://www.sphinx-doc.org/en/stable/rest.html
 .. _`Pylatest Documentation`: https://pylatest.readthedocs.io/en/stable/
+.. _`Pylatest Demo Project`: https://gitlab.com/marbu/pylatest-demo

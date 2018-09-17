@@ -4,6 +4,15 @@
  Frequently Asked Questions
 ============================
 
+Where do I find some complete example of Sphinx/Pylatest project?
+=================================================================
+
+There is minimal, but complete, `Pylatest Demo Project`_, which will help you
+to get better idea what pylatest project looks like.
+
+The html builds are available at https://marbu.gitlab.io/pylatest-demo
+
+
 How to configure Sphinx/Pylatest project for ci-ops-tools xml importer?
 =======================================================================
 
@@ -31,3 +40,6 @@ field/metadata names in ``pylatest_valid_export_metadata``. This list should
 contain only names which your ci-ops-tools xml importer accepts.
 
 For more details, see :ref:`xmlexport`.
+
+
+.. _`Pylatest Demo Project`: https://gitlab.com/marbu/pylatest-demo
