@@ -230,3 +230,30 @@ class XmlExportBuilder(Builder):
     def finish(self):
         # type: () -> None
         pass
+
+    @property
+    def math_renderer_name(self):
+        """
+        This method needs to be there since sphinx 1.8.0, but XmlExportBuilder
+        doesn't care about math rendering at all.
+
+        Moreover XmlExportBuilder actually can't implement any math rendering,
+        as it tries to embed pieces of html into xml file. No javascript
+        rendered formulas, images or anything like that is possible in such
+        environment.
+        """
+        # Because we can't just return None without crashing the build process,
+        # the only safe option which doesn't break the build is returned. Yes,
+        # I have actually no idea what I'm doing here.
+        return "mathjax"
+
+    def add_js_file(self, *args, **kwargs):
+        """
+        This method needs to be there since sphinx 1.8.0, but XmlExportBuilder
+        doesn't care about js files at all.
+
+        XmlExportBuilder tries to embed pieces of html into xml and there is no
+        place nor purpose for any javascript files in xml file we are producing
+        here.
+        """
+        pass

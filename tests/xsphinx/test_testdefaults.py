@@ -16,6 +16,9 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
+import io
+import os
+
 import lxml.html
 import pytest
 
@@ -40,7 +43,8 @@ def test_directive_html_content(app, status, warning):
     """
     app.builder.build_all()
     # get content of index.html file
-    html_str = (app.outdir / 'index.html').text()
+    with io.open(os.path.join(app.outdir, 'index.html'), encoding='utf-8') as html_file:
+        html_str = html_file.read()
     assert len(html_str) > 0
     # parse index.html and get div element with content
     html_tree = lxml.html.fromstring(html_str)
