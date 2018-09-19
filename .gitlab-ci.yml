@@ -29,4 +29,5 @@ docs:
     - pip install sphinx
     - cd docs
     - sphinx-build -M singlehtml . _build
-    - sphinx-build -M linkcheck  . _build
+    - sphinx-build -M linkcheck  . _build | tee linkcheck.log
+    - ! grep 'ok.*- unauthorized' linkcheck.log
