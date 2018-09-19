@@ -106,4 +106,4 @@ Roles
 
 .. _`Red Hat Bugzilla`: https://bugzilla.redhat.com/
 .. _`field list`: http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html#field-lists
-.. _`doc role`: http://www.sphinx-doc.org/en/stable/markup/inline.html#role-doc
+.. _`doc role`: http://www.sphinx-doc.org/en/stable/usage/restructuredtext/roles.html#role-doc

@@ -176,6 +176,6 @@ Would be represented in the following way in html output:
 .. _`Sphinx Tutorial`: http://www.sphinx-doc.org/en/stable/tutorial.html
 .. _`docutils field lists`: http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html#field-lists
 .. _`docutils directive`: http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html#directives
-.. _`latest stable Pylatest release from PyPI`: https://pypi.python.org/pypi/pylatest/
+.. _`latest stable Pylatest release from PyPI`: https://pypi.org/project/pylatest/
 .. _`marbu/pylatest copr`: https://copr.fedorainfracloud.org/coprs/marbu/pylatest/
 .. _Epel: https://fedoraproject.org/wiki/EPEL
