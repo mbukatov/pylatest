@@ -173,7 +173,7 @@ Would be represented in the following way in html output:
 
 
 .. _Sphinx: http://www.sphinx-doc.org/en/stable/index.html
-.. _`Sphinx Tutorial`: http://www.sphinx-doc.org/en/stable/tutorial.html
+.. _`Sphinx Tutorial`: http://www.sphinx-doc.org/en/stable/usage/quickstart.html
 .. _`docutils field lists`: http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html#field-lists
 .. _`docutils directive`: http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html#directives
 .. _`latest stable Pylatest release from PyPI`: https://pypi.org/project/pylatest/

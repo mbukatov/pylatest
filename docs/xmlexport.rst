@@ -255,6 +255,6 @@ One can further tweak xml export behaviour by setting following options in
     when the option is undefined.
 
 
-.. _`Sphinx builder`: http://www.sphinx-doc.org/en/stable/builders.html
-.. _`conf.py build configuration file`: http://www.sphinx-doc.org/en/stable/config.html
+.. _`Sphinx builder`: http://www.sphinx-doc.org/en/stable/usage/builders/index.html
+.. _`conf.py build configuration file`: http://www.sphinx-doc.org/en/stable/usage/configuration.html
 .. _`CDATA section`: https://en.wikipedia.org/wiki/CDATA
