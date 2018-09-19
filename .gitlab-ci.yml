@@ -30,4 +30,4 @@ docs:
     - cd docs
     - sphinx-build -M singlehtml . _build
     - sphinx-build -M linkcheck  . _build | tee linkcheck.log
-    - ! grep 'ok.*- unauthorized' linkcheck.log
+    - if grep 'ok.*- unauthorized' linkcheck.log; then false; fi
