@@ -45,6 +45,6 @@ pylatest is free and open source software.
 .. _`GNU GPL v3.0`: http://www.gnu.org/licenses/gpl-3.0.txt
 .. _Docutils: http://docutils.sourceforge.net/
 .. _Sphinx: http://www.sphinx-doc.org/en/stable/index.html
-.. _`reStructuredText syntax`: http://www.sphinx-doc.org/en/stable/rest.html
+.. _`reStructuredText syntax`: http://www.sphinx-doc.org/en/stable/usage/restructuredtext/basics.html
 .. _`Pylatest Documentation`: https://pylatest.readthedocs.io/en/stable/
 .. _`Pylatest Demo Project`: https://gitlab.com/marbu/pylatest-demo

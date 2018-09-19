@@ -63,7 +63,7 @@ Related Projects
 * `Pytest Polarion CFME`_
 
 
-.. _`reStructuredText syntax`: http://www.sphinx-doc.org/en/stable/rest.html
+.. _`reStructuredText syntax`: http://www.sphinx-doc.org/en/stable/usage/restructuredtext/basics.html
 .. _`GNU GPL v3.0`: http://www.gnu.org/licenses/gpl-3.0.txt
 .. _Docutils: http://docutils.sourceforge.net/
 .. _Sphinx: http://www.sphinx-doc.org/en/stable/index.html
