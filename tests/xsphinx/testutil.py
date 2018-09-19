@@ -16,6 +16,8 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
+import os
+
 from lxml import etree
 
 from pylatest.export import get_metadata
@@ -35,7 +37,9 @@ def xmlparse_testcase(outdir, doc_name, builder):
         "html": ".html",
         "xmlexport": ".xml",
         }
-    html_str = (outdir / (doc_name + builder2ext[builder])).text()
+    html_path = os.path.join(outdir, (doc_name + builder2ext[builder]))
+    with open(html_path) as html_file:
+        html_str = html_file.read()
     if builder == "html":
         # remove html specific entities so that we can use xml parser
         html_str = html_str.replace('&nbsp;', '')
