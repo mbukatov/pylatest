@@ -6,14 +6,14 @@ py27:
   stage: test
   script:
     - pip install tox
-    - tox -e py27-sphinx_{oldest,latest}
+    - tox -e 'py27-sphinx_{oldest,latest}'
 
 py36:
   image: python:3.6
   stage: test
   script:
     - pip install tox
-    - tox -e py36-sphinx_{oldest,fedora,latest}
+    - tox -e 'py36-sphinx_{oldest,fedora,latest}'
 
 flake8:
   image: python:3.6
