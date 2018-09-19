@@ -21,3 +21,12 @@ flake8:
   script:
     - pip install tox
     - tox -e flake8
+
+docs:
+  image: python:3.6
+  stage: test
+  script:
+    - pip install sphinx
+    - cd docs
+    - sphinx-build -M singlehtml . _build
+    - sphinx-build -M linkcheck  . _build
