@@ -6,13 +6,7 @@ you to:
 
 * Write a description of a test case using `reStructuredText syntax`_.
 * Maintain test case descriptions as Sphinx project.
-* Include this description into a python source code directly, where it can
-  be split into individual sections or actions to be performed, so that the
-  description and test automation code are stored next to each other.
-
-The reason behind this is to make synchronization between test case code
-and test case description documents simple while keeping the maintenance cost
-low in the long term.
+* Export test cases into other systems via XML files.
 
 Using Pylatest
 --------------
