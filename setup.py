@@ -58,6 +58,13 @@ setup(
             'pylatest-rst2htmlplain=pylatest.main:pylatest2htmlplain',
             'pylatest-rst2pseudoxml=pylatest.main:pylatest2pseudoxml',
             'pylatest-preview=pylatest.main:pylatest_preview',
-        ],
-    },
+            ],
+        },
+    # https://packaging.python.org/specifications/core-metadata/#project-url-multiple-use
+    project_urls={
+        'Documentation': 'https://pylatest.readthedocs.io',
+        'Bug Reports': 'https://gitlab.com/mbukatov/pylatest/issues',
+        'Source': 'https://gitlab.com/mbukatov/pylatest/',
+        'Example Project': 'https://gitlab.com/marbu/pylatest-demo',
+        },
     )
